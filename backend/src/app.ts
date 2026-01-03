@@ -7,6 +7,7 @@ import rateLimit from 'express-rate-limit';
 import { config } from './config';
 import { errorHandler } from './middleware/errorHandler';
 import { notFound } from './middleware/notFound';
+import authRoutes from './routes/auth.routes';
 
 export const createApp = (): Express => {
   const app = express();
@@ -76,11 +77,11 @@ export const createApp = (): Express => {
     });
   });
 
-  // Routes will be added here
-  // app.use(`/api/${config.apiVersion}/auth`, authRoutes);
+  // Routes
+  app.use(`/api/${config.apiVersion}/auth`, authRoutes);
+  // TODO: Add more routes as they are implemented
   // app.use(`/api/${config.apiVersion}/restaurants`, restaurantRoutes);
   // app.use(`/api/${config.apiVersion}/orders`, orderRoutes);
-  // ... more routes
 
   // 404 handler
   app.use(notFound);

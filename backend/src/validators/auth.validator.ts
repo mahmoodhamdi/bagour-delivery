@@ -117,10 +117,6 @@ export const driverRegisterSchema = Joi.object({
       'string.pattern.base': 'الرقم القومي يجب أن يكون 14 رقم',
       'any.required': 'الرقم القومي مطلوب',
     }),
-  dateOfBirth: Joi.date().required().messages({
-    'date.base': 'تاريخ الميلاد غير صالح',
-    'any.required': 'تاريخ الميلاد مطلوب',
-  }),
   vehicleType: Joi.string()
     .valid('motorcycle', 'bicycle', 'car')
     .required()

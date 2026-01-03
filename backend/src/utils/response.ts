@@ -17,6 +17,21 @@ export const sendSuccess = <T>(
   return res.status(statusCode).json(response);
 };
 
+export const successResponse = <T>(
+  res: Response,
+  statusCode: number,
+  message: string,
+  data?: T
+): Response => {
+  const response: IApiResponse<T> = {
+    success: true,
+    message,
+    data,
+  };
+
+  return res.status(statusCode).json(response);
+};
+
 export const sendCreated = <T>(res: Response, data?: T, message?: string): Response => {
   return sendSuccess(res, data, message, StatusCodes.CREATED);
 };
