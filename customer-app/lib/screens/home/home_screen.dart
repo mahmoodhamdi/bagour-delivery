@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../config/theme.dart';
 import '../../config/routes.dart';
 import '../../providers/restaurant_provider.dart';
+import '../favorites/favorites_screen.dart';
 import 'widgets/restaurant_card.dart';
 import 'widgets/category_chip.dart';
 import 'widgets/search_bar_widget.dart';
@@ -40,7 +41,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         children: const [
           HomeTabContent(),
           OrdersPlaceholder(),
-          FavoritesPlaceholder(),
+          FavoritesScreen(),
           ProfilePlaceholder(),
         ],
       ),
@@ -389,16 +390,6 @@ class OrdersPlaceholder extends StatelessWidget {
   }
 }
 
-class FavoritesPlaceholder extends StatelessWidget {
-  const FavoritesPlaceholder({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text('المفضلة'),
-    );
-  }
-}
 
 class ProfilePlaceholder extends StatelessWidget {
   const ProfilePlaceholder({super.key});

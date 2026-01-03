@@ -4,6 +4,7 @@ import '../screens/auth/auth_screens.dart';
 import '../screens/home/home_screen.dart';
 import '../screens/restaurant/restaurant_details_screen.dart';
 import '../screens/search/search_screen.dart';
+import '../screens/favorites/favorites_screen.dart';
 
 class AppRoutes {
   static const String splash = '/';
@@ -129,7 +130,7 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: AppRoutes.favorites,
-      builder: (context, state) => const PlaceholderScreen(title: 'Favorites'),
+      builder: (context, state) => const FavoritesScreen(),
     ),
     GoRoute(
       path: AppRoutes.notifications,
