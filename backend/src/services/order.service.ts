@@ -10,6 +10,8 @@ import { AppError } from '../utils/errors';
 import { StatusCodes } from 'http-status-codes';
 import { OrderStatus, PaymentMethod, IPaginatedResult } from '../types';
 import dayjs from 'dayjs';
+import { notificationService } from './notification.service';
+import { logger } from '../utils/logger';
 
 // Types
 interface CreateOrderItemInput {
@@ -155,6 +157,19 @@ class OrderService {
     await Customer.findByIdAndUpdate(input.customerId, {
       $inc: { totalOrders: 1 },
     });
+
+    // Send new order notification to restaurant
+    try {
+      if (restaurant.userId) {
+        await notificationService.sendNewOrderNotification(
+          restaurant.userId.toString(),
+          order._id.toString(),
+          order.orderNumber
+        );
+      }
+    } catch (notifError) {
+      logger.error(`Failed to send new order notification: ${notifError}`);
+    }
 
     return order;
   }
@@ -768,6 +783,22 @@ class OrderService {
     }
 
     await order.save();
+
+    // Send order status notification to customer
+    try {
+      const customer = await Customer.findById(order.customerId).select('userId');
+      if (customer?.userId) {
+        await notificationService.sendOrderStatusNotification(
+          customer.userId.toString(),
+          order._id.toString(),
+          order.orderNumber,
+          newStatus
+        );
+      }
+    } catch (notifError) {
+      logger.error(`Failed to send order status notification: ${notifError}`);
+    }
+
     return order;
   }
 
@@ -837,6 +868,24 @@ class OrderService {
     }
 
     await order.save();
+
+    // Send cancellation notification to customer
+    try {
+      if (cancelledBy !== 'customer') {
+        const customer = await Customer.findById(order.customerId).select('userId');
+        if (customer?.userId) {
+          await notificationService.sendOrderStatusNotification(
+            customer.userId.toString(),
+            order._id.toString(),
+            order.orderNumber,
+            'cancelled'
+          );
+        }
+      }
+    } catch (notifError) {
+      logger.error(`Failed to send cancellation notification: ${notifError}`);
+    }
+
     return order;
   }
 
@@ -860,11 +909,31 @@ class OrderService {
       );
     }
 
-    // TODO: Validate driver exists and is available
+    // Validate driver exists and is available
+    const { Driver } = await import('../models/Driver');
+    const driver = await Driver.findById(driverId);
+    if (!driver) {
+      throw new AppError('السائق غير موجود', StatusCodes.NOT_FOUND);
+    }
 
     order.driverId = new Types.ObjectId(driverId);
     order.driverAssignedAt = new Date();
     await order.save();
+
+    // Send order assigned notification to driver
+    try {
+      const restaurant = await Restaurant.findById(order.restaurantId).select('name nameAr');
+      if (driver.userId) {
+        await notificationService.sendOrderAssignedNotification(
+          driver.userId.toString(),
+          order._id.toString(),
+          order.orderNumber,
+          restaurant?.nameAr || restaurant?.name || 'المطعم'
+        );
+      }
+    } catch (notifError) {
+      logger.error(`Failed to send order assigned notification: ${notifError}`);
+    }
 
     return order;
   }

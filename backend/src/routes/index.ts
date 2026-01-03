@@ -8,6 +8,16 @@ import orderRoutes, {
   driverRouter as driverOrderRoutes,
   adminRouter as adminOrderRoutes,
 } from './order.routes';
+import customerRoutes from './customer.routes';
+import couponRoutes, { couponAdminRouter } from './coupon.routes';
+import paymentRoutes, { paymentAdminRouter } from './payment.routes';
+import {
+  transactionDriverRouter,
+  transactionRestaurantRouter,
+  transactionAdminRouter,
+} from './transaction.routes';
+import adminRoutes from './admin.routes';
+import notificationRoutes from './notification.routes';
 
 const router = Router();
 
@@ -29,14 +39,44 @@ router.use(`${API_VERSION}/upload`, uploadRoutes);
 // Order routes (customer)
 router.use(`${API_VERSION}/orders`, orderRoutes);
 
+// Customer routes
+router.use(`${API_VERSION}/customer`, customerRoutes);
+
 // Restaurant order routes
 router.use(`${API_VERSION}/restaurant`, restaurantOrderRoutes);
+
+// Restaurant transaction routes
+router.use(`${API_VERSION}/restaurant`, transactionRestaurantRouter);
 
 // Driver order routes
 router.use(`${API_VERSION}/driver`, driverOrderRoutes);
 
+// Driver transaction routes
+router.use(`${API_VERSION}/driver`, transactionDriverRouter);
+
 // Admin order routes
 router.use(`${API_VERSION}/admin`, adminOrderRoutes);
+
+// Coupon routes (customer)
+router.use(`${API_VERSION}/coupons`, couponRoutes);
+
+// Admin coupon routes
+router.use(`${API_VERSION}/admin`, couponAdminRouter);
+
+// Payment routes
+router.use(`${API_VERSION}/payment`, paymentRoutes);
+
+// Admin payment routes
+router.use(`${API_VERSION}/admin`, paymentAdminRouter);
+
+// Admin transaction routes
+router.use(`${API_VERSION}/admin`, transactionAdminRouter);
+
+// Admin routes (dashboard, users, restaurants, drivers, zones, settings, analytics)
+router.use(`${API_VERSION}/admin`, adminRoutes);
+
+// Notification routes
+router.use(`${API_VERSION}/notifications`, notificationRoutes);
 
 // Health check
 router.get('/health', (_req, res) => {

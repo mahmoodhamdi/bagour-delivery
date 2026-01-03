@@ -5,6 +5,15 @@ import '../screens/home/home_screen.dart';
 import '../screens/restaurant/restaurant_details_screen.dart';
 import '../screens/search/search_screen.dart';
 import '../screens/favorites/favorites_screen.dart';
+import '../screens/cart/cart_screen.dart';
+import '../screens/address/addresses_screen.dart';
+import '../screens/address/add_edit_address_screen.dart';
+import '../screens/checkout/checkout_screen.dart';
+import '../screens/order/order_tracking_screen.dart';
+import '../screens/order/order_history_screen.dart';
+import '../screens/payment/payment_webview_screen.dart';
+import '../screens/payment/payment_result_screen.dart';
+import '../screens/notifications/notifications_screen.dart';
 
 class AppRoutes {
   static const String splash = '/';
@@ -30,6 +39,9 @@ class AppRoutes {
   static const String favorites = '/favorites';
   static const String notifications = '/notifications';
   static const String settings = '/settings';
+  static const String payment = '/payment';
+  static const String paymentSuccess = '/payment/success';
+  static const String paymentFailed = '/payment/failed';
 }
 
 // Placeholder for actual screen implementations
@@ -103,22 +115,22 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: AppRoutes.cart,
-      builder: (context, state) => const PlaceholderScreen(title: 'Cart'),
+      builder: (context, state) => const CartScreen(),
     ),
     GoRoute(
       path: AppRoutes.checkout,
-      builder: (context, state) => const PlaceholderScreen(title: 'Checkout'),
+      builder: (context, state) => const CheckoutScreen(),
     ),
     GoRoute(
       path: AppRoutes.orderTracking,
       builder: (context, state) {
         final id = state.pathParameters['id']!;
-        return PlaceholderScreen(title: 'Order Tracking $id');
+        return OrderTrackingScreen(orderId: id);
       },
     ),
     GoRoute(
       path: AppRoutes.orderHistory,
-      builder: (context, state) => const PlaceholderScreen(title: 'Order History'),
+      builder: (context, state) => const OrderHistoryScreen(),
     ),
     GoRoute(
       path: AppRoutes.profile,
@@ -126,7 +138,18 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: AppRoutes.addresses,
-      builder: (context, state) => const PlaceholderScreen(title: 'Addresses'),
+      builder: (context, state) => const AddressesScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.addAddress,
+      builder: (context, state) => const AddEditAddressScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.editAddress,
+      builder: (context, state) {
+        final addressId = state.pathParameters['id']!;
+        return AddEditAddressScreen(addressId: addressId);
+      },
     ),
     GoRoute(
       path: AppRoutes.favorites,
@@ -134,11 +157,35 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: AppRoutes.notifications,
-      builder: (context, state) => const PlaceholderScreen(title: 'Notifications'),
+      builder: (context, state) => const NotificationsScreen(),
     ),
     GoRoute(
       path: AppRoutes.settings,
       builder: (context, state) => const PlaceholderScreen(title: 'Settings'),
+    ),
+    GoRoute(
+      path: AppRoutes.payment,
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>?;
+        return PaymentWebViewScreen(
+          paymentUrl: extra?['paymentUrl'] ?? '',
+          orderId: extra?['orderId'] ?? '',
+        );
+      },
+    ),
+    GoRoute(
+      path: AppRoutes.paymentSuccess,
+      builder: (context, state) {
+        final orderId = state.uri.queryParameters['order'] ?? '';
+        return PaymentResultScreen(success: true, orderId: orderId);
+      },
+    ),
+    GoRoute(
+      path: AppRoutes.paymentFailed,
+      builder: (context, state) {
+        final orderId = state.uri.queryParameters['order'] ?? '';
+        return PaymentResultScreen(success: false, orderId: orderId);
+      },
     ),
   ],
 );

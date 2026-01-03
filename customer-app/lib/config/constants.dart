@@ -108,12 +108,17 @@ class AppEndpoints {
   static const String favorites = '/customer/favorites';
 
   // Coupons
-  static const String validateCoupon = '/coupons/validate';
-  static const String applyCoupon = '/coupons/apply';
+  static const String couponValidate = '/coupons/validate';
+  static const String couponsAvailable = '/coupons/available';
 
   // Payments
-  static const String initiatePayment = '/payments/initiate';
+  static const String paymentInitiate = '/payment/initiate';
+  static const String paymentWallet = '/payment/wallet';
+  static const String paymentStatus = '/payment/status';
 
   // Settings
   static const String settings = '/settings/public';
+
+  // Notifications
+  static const String notifications = '/notifications';
 }
