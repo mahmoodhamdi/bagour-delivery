@@ -215,6 +215,123 @@ export const authApi = {
   },
 };
 
+// Restaurant API functions
+export interface UpdateProfileRequest {
+  name?: string;
+  nameAr?: string;
+  description?: string;
+  descriptionAr?: string;
+  phone?: string;
+  whatsapp?: string;
+  address?: string;
+  area?: string;
+  categories?: string[];
+  tags?: string[];
+  priceRange?: number;
+}
+
+export interface UpdateLocationRequest {
+  address: string;
+  area: string;
+  coordinates: {
+    lat: number;
+    lng: number;
+  };
+}
+
+export interface WorkingHoursDay {
+  day: number;
+  isOpen: boolean;
+  shifts: { open: string; close: string }[];
+}
+
+export interface UpdateDeliverySettingsRequest {
+  minimumOrder?: number;
+  deliveryFee?: number;
+  freeDeliveryAbove?: number | null;
+  estimatedDeliveryTime?: { min: number; max: number };
+  acceptsCash?: boolean;
+  acceptsOnlinePayment?: boolean;
+  autoAcceptOrders?: boolean;
+}
+
+export const restaurantApi = {
+  updateProfile: async (data: UpdateProfileRequest): Promise<ApiResponse<{ restaurant: Restaurant }>> => {
+    const response = await api.patch<ApiResponse<{ restaurant: Restaurant }>>(
+      API_ENDPOINTS.updateProfile,
+      data
+    );
+    return response.data;
+  },
+
+  updateLocation: async (data: UpdateLocationRequest): Promise<ApiResponse<{ restaurant: Restaurant }>> => {
+    const response = await api.put<ApiResponse<{ restaurant: Restaurant }>>(
+      '/restaurants/location',
+      data
+    );
+    return response.data;
+  },
+
+  updateWorkingHours: async (workingHours: WorkingHoursDay[]): Promise<ApiResponse<{ restaurant: Restaurant }>> => {
+    const response = await api.put<ApiResponse<{ restaurant: Restaurant }>>(
+      API_ENDPOINTS.updateWorkingHours,
+      { workingHours }
+    );
+    return response.data;
+  },
+
+  updateDeliverySettings: async (data: UpdateDeliverySettingsRequest): Promise<ApiResponse<{ restaurant: Restaurant }>> => {
+    const response = await api.put<ApiResponse<{ restaurant: Restaurant }>>(
+      '/restaurants/delivery-settings',
+      data
+    );
+    return response.data;
+  },
+
+  togglePause: async (isPaused: boolean, pauseReason?: string): Promise<ApiResponse<{ restaurant: Restaurant }>> => {
+    const response = await api.post<ApiResponse<{ restaurant: Restaurant }>>(
+      '/restaurants/toggle-pause',
+      { isPaused, pauseReason }
+    );
+    return response.data;
+  },
+
+  getDashboardStats: async (): Promise<ApiResponse<{
+    stats: {
+      totalOrders: number;
+      totalRevenue: number;
+      rating: number;
+      totalRatings: number;
+      isOpen: boolean;
+      isPaused: boolean;
+      isApproved: boolean;
+      menu: {
+        categories: number;
+        totalItems: number;
+        availableItems: number;
+      };
+    };
+  }>> => {
+    const response = await api.get<ApiResponse<{
+      stats: {
+        totalOrders: number;
+        totalRevenue: number;
+        rating: number;
+        totalRatings: number;
+        isOpen: boolean;
+        isPaused: boolean;
+        isApproved: boolean;
+        menu: {
+          categories: number;
+          totalItems: number;
+          availableItems: number;
+        };
+      };
+    }>>('/restaurants/stats');
+    return response.data;
+  },
+};
+
 // Menu types
 export interface MenuCategory {
   _id: string;
