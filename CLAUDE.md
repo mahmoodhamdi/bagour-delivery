@@ -42,11 +42,12 @@ npm run lint   # ESLint
 ```bash
 cd customer-app  # or delivery-app
 flutter pub get
-flutter run              # Run on device/emulator
-flutter test             # Run tests
-flutter test test/widget_test.dart  # Single test
-flutter build apk        # Android build
-flutter build ios        # iOS build
+flutter run                           # Run on device/emulator
+flutter test                          # Run all tests
+flutter test test/widget_test.dart    # Single test file
+flutter build apk                     # Android build
+flutter build ios                     # iOS build
+dart run build_runner build           # Generate Freezed/JSON code
 ```
 
 ## Architecture
@@ -55,25 +56,35 @@ flutter build ios        # iOS build
 - **backend/** - Express REST API with MongoDB (Mongoose)
 - **customer-app/** - Flutter mobile app for ordering
 - **delivery-app/** - Flutter mobile app for drivers (includes background location)
-- **restaurant-dashboard/** - Next.js web panel for restaurant owners
-- **admin-dashboard/** - Next.js web panel for platform admins
-- **shared/** - TypeScript types used across backend and dashboards
+- **restaurant-dashboard/** - Next.js 14 web panel with App Router
+- **admin-dashboard/** - Next.js 14 web panel for platform admins
+- **shared/** - TypeScript types shared across backend and dashboards
 
 ### Backend Architecture
-Uses path aliases (`@controllers/*`, `@services/*`, `@models/*`, etc.) configured in tsconfig.json.
+Uses path aliases configured in tsconfig.json:
+- `@controllers/*`, `@services/*`, `@models/*`, `@middleware/*`, `@validators/*`, `@utils/*`, `@config/*`
 
 Request flow: Routes → Validators (Joi) → Controllers → Services → Models
 
 Key directories:
-- `src/models/` - 13 Mongoose models (User, Restaurant, Order, Driver, etc.)
+- `src/models/` - Mongoose models (User, Restaurant, Order, Driver, MenuItem, etc.)
 - `src/controllers/` - Request handlers using service layer
-- `src/services/` - Business logic (auth.service.ts handles JWT, OTP, registration)
-- `src/middleware/` - Auth, validation, error handling
+- `src/services/` - Business logic (auth, restaurant, menu, order, upload)
+- `src/middleware/` - Auth, validation, error handling, file upload (multer)
 - `src/validators/` - Joi schemas for request validation
 
-### Frontend State Management
-- **Dashboards**: Zustand with localStorage persistence for auth state
-- **Flutter Apps**: Riverpod with StateNotifier pattern, Freezed for immutable models
+### Frontend Architecture
+**Dashboards (Next.js 14)**:
+- App Router with route groups: `(auth)/` for login/register, `(dashboard)/` for main app
+- Zustand stores in `src/stores/` for state management
+- shadcn/ui components in `src/components/ui/`
+- API service with axios in `src/services/api.ts` or `src/lib/api.ts`
+
+**Flutter Apps**:
+- Riverpod for state management with StateNotifier pattern
+- Freezed for immutable models (run `dart run build_runner build` after model changes)
+- GoRouter for navigation (routes in `lib/config/routes.dart`)
+- Services in `lib/services/`, Providers in `lib/providers/`
 
 ### Real-time Communication
 Socket.io configured for live order updates between all platforms.
@@ -81,43 +92,42 @@ Socket.io configured for live order updates between all platforms.
 ## Key Patterns
 
 ### Backend Error Handling
-Custom `AppError` class with HTTP status codes. Arabic error messages for user-facing errors.
-
+Use typed error classes from `@utils/errors`:
 ```typescript
-throw new AppError('رسالة الخطأ', StatusCodes.BAD_REQUEST);
+import { NotFoundError, BadRequestError, UnauthorizedError } from '@utils/errors';
+throw new NotFoundError('المطعم غير موجود');
+throw new BadRequestError('البيانات غير صحيحة');
 ```
 
 ### API Response Format
 Use response helpers from `@utils/response`:
 ```typescript
-sendSuccess(res, data, 'Success message');
-sendError(res, 'Error message', statusCode);
+import { sendSuccess, sendCreated, sendPaginated, sendError } from '@utils/response';
+sendSuccess(res, data, 'تم بنجاح');
+sendCreated(res, newItem, 'تم الإنشاء');
+sendPaginated(res, items, { total, page, limit, pages });
 ```
-
-### Flutter Navigation
-GoRouter with type-safe routes. Route definitions in `lib/core/routes/`.
 
 ### Form Validation
 - Backend: Joi schemas in `src/validators/`
 - Dashboards: React Hook Form + Zod
-- Flutter: Form Builder with custom validators
+- Flutter: Form Builder with custom validators in `lib/utils/validators.dart`
 
 ## Environment Configuration
 
 Backend requires `.env` with:
-- MongoDB URI
-- JWT secrets (access + refresh tokens)
+- MongoDB URI, JWT secrets (access + refresh)
 - Cloudinary credentials (image uploads)
 - Firebase config (auth + push notifications)
 - Paymob keys (payment processing)
 - Google Maps API key
 
-Frontend CORS configured for ports 3000 (customer), 3001 (restaurant), 3002 (admin).
+CORS configured for ports: 3000 (customer web), 3001 (restaurant), 3002 (admin).
 
 ## Bilingual Support
 
-All apps support Arabic (RTL) and English. Cairo font for Arabic text in Flutter apps.
+All apps support Arabic (RTL) and English. Arabic error messages for user-facing errors. Cairo font for Arabic text in Flutter apps.
 
 ## Current Development Status
 
-Phase 1 (Project Foundation) is complete. Phase 2 (Authentication) is in progress. See PROJECT_PROGRESS.md for detailed milestone tracking.
+See PROJECT_PROGRESS.md for detailed milestone tracking.
