@@ -36,6 +36,7 @@ export interface IDriver extends Document {
   approvedAt?: Date;
   approvedBy?: Types.ObjectId;
   rejectionReason?: string;
+  status: 'pending' | 'approved' | 'rejected' | 'suspended';
 
   // Status
   isActive: boolean;
@@ -71,7 +72,7 @@ const driverSchema = new Schema<IDriver>(
     },
     nationalIdImage: {
       type: String,
-      required: [true, 'National ID front image is required'],
+      default: '',
     },
     nationalIdBackImage: {
       type: String,
@@ -83,7 +84,7 @@ const driverSchema = new Schema<IDriver>(
     },
     licenseImage: {
       type: String,
-      required: [true, 'License image is required'],
+      default: '',
     },
     licenseExpiryDate: {
       type: Date,
@@ -164,6 +165,11 @@ const driverSchema = new Schema<IDriver>(
     },
     rejectionReason: {
       type: String,
+    },
+    status: {
+      type: String,
+      enum: ['pending', 'approved', 'rejected', 'suspended'],
+      default: 'pending',
     },
 
     // Status

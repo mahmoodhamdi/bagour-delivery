@@ -2,7 +2,7 @@ import { Request } from 'express';
 import { Document, Types } from 'mongoose';
 
 // User roles
-export type UserRole = 'customer' | 'restaurant' | 'delivery' | 'admin';
+export type UserRole = 'customer' | 'restaurant' | 'driver' | 'delivery' | 'admin';
 
 // Order status
 export type OrderStatus =
@@ -93,17 +93,22 @@ export interface IJwtPayload {
 
 // Authenticated user attached to request
 export interface IAuthUser {
-  _id: Types.ObjectId;
-  email: string;
-  phone: string;
-  name: string;
-  role: UserRole;
-  isActive: boolean;
+  id: string;
+  _id?: Types.ObjectId;
+  email?: string;
+  phone?: string;
+  name?: string;
+  role: string;
+  isActive?: boolean;
 }
 
 // Extended Request with user
 export interface IAuthRequest extends Request {
-  user?: IAuthUser;
+  user?: {
+    id: string;
+    role: string;
+    email?: string;
+  };
 }
 
 // API Response format
@@ -141,5 +146,3 @@ export interface INotificationData {
   url?: string;
 }
 
-// Export all types
-export * from './index';

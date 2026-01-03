@@ -9,14 +9,25 @@ export class AppError extends Error {
   constructor(
     message: string,
     statusCode: number = StatusCodes.INTERNAL_SERVER_ERROR,
-    code: string = 'ERROR',
+    isOperationalOrCode: boolean | string = true,
+    codeOrDetails?: string | unknown,
     details?: unknown
   ) {
     super(message);
     this.statusCode = statusCode;
-    this.code = code;
-    this.isOperational = true;
-    this.details = details;
+
+    // Handle both signatures:
+    // 1. (message, statusCode, code, details) - old pattern
+    // 2. (message, statusCode, isOperational, code, details) - new pattern
+    if (typeof isOperationalOrCode === 'boolean') {
+      this.isOperational = isOperationalOrCode;
+      this.code = (codeOrDetails as string) || 'ERROR';
+      this.details = details;
+    } else {
+      this.isOperational = true;
+      this.code = isOperationalOrCode || 'ERROR';
+      this.details = codeOrDetails;
+    }
 
     Error.captureStackTrace(this, this.constructor);
   }

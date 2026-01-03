@@ -13,7 +13,9 @@ export interface IUser extends Document {
   isEmailVerified: boolean;
   isPhoneVerified: boolean;
   isActive: boolean;
+  isBlocked: boolean;
   fcmTokens: string[];
+  lastLogin?: Date;
   lastLoginAt?: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -31,7 +33,7 @@ const userSchema = new Schema<IUser>(
   {
     role: {
       type: String,
-      enum: ['customer', 'restaurant', 'delivery', 'admin'],
+      enum: ['customer', 'restaurant', 'driver', 'delivery', 'admin'],
       required: [true, 'User role is required'],
       default: 'customer',
     },
@@ -79,9 +81,17 @@ const userSchema = new Schema<IUser>(
       type: Boolean,
       default: true,
     },
+    isBlocked: {
+      type: Boolean,
+      default: false,
+    },
     fcmTokens: {
       type: [String],
       default: [],
+    },
+    lastLogin: {
+      type: Date,
+      default: null,
     },
     lastLoginAt: {
       type: Date,
