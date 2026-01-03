@@ -215,6 +215,240 @@ export const authApi = {
   },
 };
 
+// Menu types
+export interface MenuCategory {
+  _id: string;
+  restaurantId: string;
+  name: string;
+  nameAr: string;
+  description?: string;
+  descriptionAr?: string;
+  image?: string;
+  sortOrder: number;
+  isActive: boolean;
+  itemCount?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface MenuAddon {
+  name: string;
+  nameAr: string;
+  price: number;
+  isAvailable: boolean;
+  maxQuantity: number;
+}
+
+export interface VariationOption {
+  name: string;
+  nameAr: string;
+  price: number;
+}
+
+export interface MenuVariation {
+  name: string;
+  nameAr: string;
+  isRequired: boolean;
+  options: VariationOption[];
+}
+
+export interface MenuItem {
+  _id: string;
+  restaurantId: string;
+  categoryId: string | { _id: string; name: string; nameAr: string };
+  name: string;
+  nameAr: string;
+  description?: string;
+  descriptionAr?: string;
+  image?: string;
+  price: number;
+  discountPrice?: number;
+  discountEndsAt?: string;
+  preparationTime?: number;
+  calories?: number;
+  servingSize?: string;
+  addons: MenuAddon[];
+  variations: MenuVariation[];
+  tags: string[];
+  isAvailable: boolean;
+  isPopular: boolean;
+  isNew: boolean;
+  sortOrder: number;
+  totalOrders: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateCategoryRequest {
+  name: string;
+  nameAr: string;
+  description?: string;
+  descriptionAr?: string;
+  sortOrder?: number;
+  isActive?: boolean;
+}
+
+export interface CreateItemRequest {
+  categoryId: string;
+  name: string;
+  nameAr: string;
+  description?: string;
+  descriptionAr?: string;
+  image?: string;
+  price: number;
+  discountPrice?: number;
+  discountEndsAt?: string;
+  preparationTime?: number;
+  calories?: number;
+  servingSize?: string;
+  addons?: MenuAddon[];
+  variations?: MenuVariation[];
+  tags?: string[];
+  isAvailable?: boolean;
+  isPopular?: boolean;
+  sortOrder?: number;
+}
+
+// Menu API functions
+export const menuApi = {
+  // Categories
+  getCategories: async (): Promise<ApiResponse<{ categories: MenuCategory[] }>> => {
+    const response = await api.get<ApiResponse<{ categories: MenuCategory[] }>>(
+      API_ENDPOINTS.categories
+    );
+    return response.data;
+  },
+
+  createCategory: async (data: CreateCategoryRequest): Promise<ApiResponse<{ category: MenuCategory }>> => {
+    const response = await api.post<ApiResponse<{ category: MenuCategory }>>(
+      API_ENDPOINTS.categories,
+      data
+    );
+    return response.data;
+  },
+
+  updateCategory: async (
+    id: string,
+    data: Partial<CreateCategoryRequest>
+  ): Promise<ApiResponse<{ category: MenuCategory }>> => {
+    const response = await api.patch<ApiResponse<{ category: MenuCategory }>>(
+      `${API_ENDPOINTS.categories}/${id}`,
+      data
+    );
+    return response.data;
+  },
+
+  deleteCategory: async (id: string): Promise<ApiResponse<void>> => {
+    const response = await api.delete<ApiResponse<void>>(`${API_ENDPOINTS.categories}/${id}`);
+    return response.data;
+  },
+
+  reorderCategories: async (
+    categories: { id: string; sortOrder: number }[]
+  ): Promise<ApiResponse<{ categories: MenuCategory[] }>> => {
+    const response = await api.put<ApiResponse<{ categories: MenuCategory[] }>>(
+      `${API_ENDPOINTS.categories}/reorder`,
+      { categories }
+    );
+    return response.data;
+  },
+
+  // Items
+  getItems: async (params?: {
+    categoryId?: string;
+    isAvailable?: boolean;
+    search?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<ApiResponse<{ items: MenuItem[]; pagination: { page: number; pages: number; total: number } }>> => {
+    const response = await api.get<ApiResponse<{ items: MenuItem[]; pagination: { page: number; pages: number; total: number } }>>(
+      API_ENDPOINTS.menuItems,
+      { params }
+    );
+    return response.data;
+  },
+
+  getItem: async (id: string): Promise<ApiResponse<{ item: MenuItem }>> => {
+    const response = await api.get<ApiResponse<{ item: MenuItem }>>(
+      `${API_ENDPOINTS.menuItems}/${id}`
+    );
+    return response.data;
+  },
+
+  createItem: async (data: CreateItemRequest): Promise<ApiResponse<{ item: MenuItem }>> => {
+    const response = await api.post<ApiResponse<{ item: MenuItem }>>(
+      API_ENDPOINTS.menuItems,
+      data
+    );
+    return response.data;
+  },
+
+  updateItem: async (
+    id: string,
+    data: Partial<CreateItemRequest>
+  ): Promise<ApiResponse<{ item: MenuItem }>> => {
+    const response = await api.patch<ApiResponse<{ item: MenuItem }>>(
+      `${API_ENDPOINTS.menuItems}/${id}`,
+      data
+    );
+    return response.data;
+  },
+
+  deleteItem: async (id: string): Promise<ApiResponse<void>> => {
+    const response = await api.delete<ApiResponse<void>>(`${API_ENDPOINTS.menuItems}/${id}`);
+    return response.data;
+  },
+
+  toggleItemAvailability: async (
+    id: string,
+    isAvailable: boolean
+  ): Promise<ApiResponse<{ item: MenuItem }>> => {
+    const response = await api.post<ApiResponse<{ item: MenuItem }>>(
+      `${API_ENDPOINTS.menuItems}/${id}/toggle`,
+      { isAvailable }
+    );
+    return response.data;
+  },
+
+  duplicateItem: async (id: string): Promise<ApiResponse<{ item: MenuItem }>> => {
+    const response = await api.post<ApiResponse<{ item: MenuItem }>>(
+      `${API_ENDPOINTS.menuItems}/${id}/duplicate`
+    );
+    return response.data;
+  },
+
+  bulkUpdateItems: async (
+    items: { id: string; isAvailable?: boolean; sortOrder?: number }[]
+  ): Promise<ApiResponse<void>> => {
+    const response = await api.put<ApiResponse<void>>(`${API_ENDPOINTS.menuItems}/bulk`, { items });
+    return response.data;
+  },
+};
+
+// Upload API functions
+export const uploadApi = {
+  uploadImage: async (file: File, type: 'menu-item' | 'category' | 'logo' | 'cover' = 'menu-item'): Promise<ApiResponse<{ url: string; publicId: string }>> => {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const endpoint = type === 'menu-item' ? '/upload/menu-item' :
+                     type === 'category' ? '/upload/category' :
+                     type === 'logo' ? '/upload/restaurant/logo' : '/upload/restaurant/cover';
+
+    const response = await api.post<ApiResponse<{ url: string; publicId: string }>>(
+      endpoint,
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } }
+    );
+    return response.data;
+  },
+
+  deleteImage: async (publicId: string): Promise<ApiResponse<void>> => {
+    const response = await api.delete<ApiResponse<void>>(`/upload/${publicId}`);
+    return response.data;
+  },
+};
+
 // Error handling helper
 export const getErrorMessage = (error: unknown): string => {
   if (axios.isAxiosError(error)) {
