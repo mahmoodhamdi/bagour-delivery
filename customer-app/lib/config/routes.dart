@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../screens/auth/auth_screens.dart';
 import '../screens/home/home_screen.dart';
+import '../screens/restaurant/restaurant_details_screen.dart';
 
 class AppRoutes {
   static const String splash = '/';
@@ -94,8 +95,8 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.restaurant,
       builder: (context, state) {
-        final id = state.pathParameters['id']!;
-        return PlaceholderScreen(title: 'Restaurant $id');
+        final slug = state.pathParameters['id']!;
+        return RestaurantDetailsScreen(slug: slug);
       },
     ),
     GoRoute(
