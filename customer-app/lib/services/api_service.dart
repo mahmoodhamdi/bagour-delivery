@@ -1,6 +1,9 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../config/constants.dart';
+
+final apiServiceProvider = Provider<ApiService>((ref) => ApiService());
 
 class ApiService {
   late final Dio _dio;
@@ -121,5 +124,41 @@ class ApiService {
     Options? options,
   }) async {
     return _dio.delete(path, data: data, queryParameters: queryParameters, options: options);
+  }
+
+  /// Handle Dio errors and return user-friendly messages
+  String handleError(DioException error) {
+    switch (error.type) {
+      case DioExceptionType.connectionTimeout:
+      case DioExceptionType.sendTimeout:
+      case DioExceptionType.receiveTimeout:
+        return 'انتهت مهلة الاتصال. يرجى المحاولة مرة أخرى';
+      case DioExceptionType.badResponse:
+        final statusCode = error.response?.statusCode;
+        final data = error.response?.data;
+        if (data is Map<String, dynamic> && data['message'] != null) {
+          return data['message'];
+        }
+        switch (statusCode) {
+          case 400:
+            return 'طلب غير صالح';
+          case 401:
+            return 'غير مصرح. يرجى تسجيل الدخول مرة أخرى';
+          case 403:
+            return 'غير مسموح بالوصول';
+          case 404:
+            return 'لم يتم العثور على المورد';
+          case 500:
+            return 'خطأ في الخادم. يرجى المحاولة لاحقاً';
+          default:
+            return 'حدث خطأ غير متوقع';
+        }
+      case DioExceptionType.cancel:
+        return 'تم إلغاء الطلب';
+      case DioExceptionType.connectionError:
+        return 'لا يوجد اتصال بالإنترنت';
+      default:
+        return 'حدث خطأ غير متوقع';
+    }
   }
 }
