@@ -1,0 +1,35 @@
+/** @type {import('jest').Config} */
+module.exports = {
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  roots: ['<rootDir>/src'],
+  testMatch: ['**/__tests__/**/*.test.ts', '**/*.test.ts'],
+  moduleNameMapper: {
+    '^@config/(.*)$': '<rootDir>/src/config/$1',
+    '^@controllers/(.*)$': '<rootDir>/src/controllers/$1',
+    '^@middleware/(.*)$': '<rootDir>/src/middleware/$1',
+    '^@models/(.*)$': '<rootDir>/src/models/$1',
+    '^@routes/(.*)$': '<rootDir>/src/routes/$1',
+    '^@services/(.*)$': '<rootDir>/src/services/$1',
+    '^@utils/(.*)$': '<rootDir>/src/utils/$1',
+    '^@validators/(.*)$': '<rootDir>/src/validators/$1',
+    '^@types$': '<rootDir>/src/types',
+    '^uuid$': require.resolve('uuid'),
+  },
+  transformIgnorePatterns: [
+    'node_modules/(?!(uuid)/)',
+  ],
+  setupFilesAfterEnv: ['<rootDir>/src/__tests__/setup.ts'],
+  collectCoverageFrom: [
+    'src/**/*.ts',
+    '!src/**/*.d.ts',
+    '!src/__tests__/**',
+    '!src/types/**',
+    '!src/index.ts',
+    '!src/app.ts',
+  ],
+  coverageDirectory: 'coverage',
+  coverageReporters: ['text', 'lcov', 'html'],
+  verbose: true,
+  testTimeout: 10000,
+};

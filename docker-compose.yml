@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7
+    container_name: bagour-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME:-bagour}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-bagour123}
+      MONGO_INITDB_DATABASE: bagour_delivery
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - bagour-network
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: bagour-backend
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      MONGODB_URI: mongodb://${MONGO_USERNAME:-bagour}:${MONGO_PASSWORD:-bagour123}@mongodb:27017/bagour_delivery?authSource=admin
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
+      FIREBASE_PROJECT_ID: ${FIREBASE_PROJECT_ID}
+      PAYMOB_API_KEY: ${PAYMOB_API_KEY}
+      PAYMOB_INTEGRATION_ID: ${PAYMOB_INTEGRATION_ID}
+      PAYMOB_HMAC_SECRET: ${PAYMOB_HMAC_SECRET}
+    depends_on:
+      - mongodb
+    networks:
+      - bagour-network
+
+  # Restaurant Dashboard
+  restaurant-dashboard:
+    build:
+      context: ./restaurant-dashboard
+      dockerfile: Dockerfile
+    container_name: bagour-restaurant-dashboard
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: ${API_URL:-http://localhost:5000}/api/v1
+      NEXT_PUBLIC_SOCKET_URL: ${SOCKET_URL:-http://localhost:5000}
+    depends_on:
+      - backend
+    networks:
+      - bagour-network
+
+  # Admin Dashboard
+  admin-dashboard:
+    build:
+      context: ./admin-dashboard
+      dockerfile: Dockerfile
+    container_name: bagour-admin-dashboard
+    restart: unless-stopped
+    ports:
+      - "3002:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: ${API_URL:-http://localhost:5000}/api/v1
+      NEXT_PUBLIC_SOCKET_URL: ${SOCKET_URL:-http://localhost:5000}
+    depends_on:
+      - backend
+    networks:
+      - bagour-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  bagour-network:
+    driver: bridge
