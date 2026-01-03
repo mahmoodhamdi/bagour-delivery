@@ -3,6 +3,11 @@ import authRoutes from './auth.routes';
 import restaurantRoutes from './restaurant.routes';
 import menuRoutes from './menu.routes';
 import uploadRoutes from './upload.routes';
+import orderRoutes, {
+  restaurantRouter as restaurantOrderRoutes,
+  driverRouter as driverOrderRoutes,
+  adminRouter as adminOrderRoutes,
+} from './order.routes';
 
 const router = Router();
 
@@ -20,6 +25,18 @@ router.use(`${API_VERSION}/menu`, menuRoutes);
 
 // Upload routes
 router.use(`${API_VERSION}/upload`, uploadRoutes);
+
+// Order routes (customer)
+router.use(`${API_VERSION}/orders`, orderRoutes);
+
+// Restaurant order routes
+router.use(`${API_VERSION}/restaurant`, restaurantOrderRoutes);
+
+// Driver order routes
+router.use(`${API_VERSION}/driver`, driverOrderRoutes);
+
+// Admin order routes
+router.use(`${API_VERSION}/admin`, adminOrderRoutes);
 
 // Health check
 router.get('/health', (_req, res) => {
