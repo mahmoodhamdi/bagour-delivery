@@ -48,6 +48,7 @@ flutter test test/widget_test.dart    # Single test file
 flutter build apk                     # Android build
 flutter build ios                     # iOS build
 dart run build_runner build           # Generate Freezed/JSON code
+dart run build_runner build --delete-conflicting-outputs  # Rebuild from scratch
 ```
 
 ## Architecture
@@ -62,14 +63,14 @@ dart run build_runner build           # Generate Freezed/JSON code
 
 ### Backend Architecture
 Uses path aliases configured in tsconfig.json:
-- `@controllers/*`, `@services/*`, `@models/*`, `@middleware/*`, `@validators/*`, `@utils/*`, `@config/*`
+- `@controllers/*`, `@services/*`, `@models/*`, `@middleware/*`, `@validators/*`, `@utils/*`, `@config/*`, `@types/*`
 
 Request flow: Routes → Validators (Joi) → Controllers → Services → Models
 
 Key directories:
 - `src/models/` - Mongoose models (User, Restaurant, Order, Driver, MenuItem, etc.)
 - `src/controllers/` - Request handlers using service layer
-- `src/services/` - Business logic (auth, restaurant, menu, order, upload)
+- `src/services/` - Business logic (auth, restaurant, menu, order, upload, socket)
 - `src/middleware/` - Auth, validation, error handling, file upload (multer)
 - `src/validators/` - Joi schemas for request validation
 
@@ -85,18 +86,33 @@ Key directories:
 - Freezed for immutable models (run `dart run build_runner build` after model changes)
 - GoRouter for navigation (routes in `lib/config/routes.dart`)
 - Services in `lib/services/`, Providers in `lib/providers/`
+- Models generate `*.freezed.dart` and `*.g.dart` files (never edit these manually)
 
 ### Real-time Communication
-Socket.io configured for live order updates between all platforms.
+Socket.io configured for live order updates. Room-based messaging pattern:
+- `user:{userId}` - Personal notifications
+- `restaurant:{restaurantId}` - Order notifications for restaurant
+- `driver:{driverId}` - Delivery notifications
+- `order:{orderId}` - Order status updates
+- `drivers:online` - Available drivers pool
+- `admin` - Admin monitoring
+
+Helper functions in `@config/socket`:
+```typescript
+import { emitToUser, emitToRestaurant, emitToDriver, emitToOrder } from '@config/socket';
+emitToUser(userId, 'order:status', { orderId, status });
+emitToRestaurant(restaurantId, 'order:new', orderData);
+```
 
 ## Key Patterns
 
 ### Backend Error Handling
 Use typed error classes from `@utils/errors`:
 ```typescript
-import { NotFoundError, BadRequestError, UnauthorizedError } from '@utils/errors';
+import { NotFoundError, BadRequestError, UnauthorizedError, ForbiddenError, ValidationError, ConflictError } from '@utils/errors';
 throw new NotFoundError('المطعم غير موجود');
 throw new BadRequestError('البيانات غير صحيحة');
+throw new ConflictError('البريد الإلكتروني مستخدم بالفعل');
 ```
 
 ### API Response Format
