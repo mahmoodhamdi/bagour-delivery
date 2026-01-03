@@ -105,6 +105,7 @@ export interface IOrder extends Document {
   paymentMethod: PaymentMethod;
   paymentStatus: PaymentStatus;
   paymentId?: string;
+  transactionId?: Types.ObjectId;
   paidAt?: Date;
 
   // Timing
@@ -350,6 +351,10 @@ const orderSchema = new Schema<IOrder>(
     },
     paymentId: {
       type: String,
+    },
+    transactionId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Transaction',
     },
     paidAt: {
       type: Date,

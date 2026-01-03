@@ -4,6 +4,8 @@ import { User, Customer, Restaurant, Driver } from '../models';
 import { AppError } from '../utils/errors';
 import { config } from '../config';
 import { IUser } from '../models/User';
+import { notificationService } from './notification.service';
+import { logger } from '../utils/logger';
 
 // Token types
 interface TokenPayload {
@@ -214,6 +216,16 @@ class AuthService {
 
     // Generate tokens
     const tokens = this.generateTokenPair(user._id.toString(), user.role);
+
+    // Send welcome notification
+    try {
+      await notificationService.sendWelcomeNotification(
+        user._id.toString(),
+        user.name
+      );
+    } catch (notifError) {
+      logger.error(`Failed to send welcome notification: ${notifError}`);
+    }
 
     return { user, tokens };
   }

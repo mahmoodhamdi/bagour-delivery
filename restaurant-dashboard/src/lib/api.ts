@@ -566,6 +566,215 @@ export const uploadApi = {
   },
 };
 
+// Order types
+export interface OrderItem {
+  menuItemId: string;
+  name: string;
+  nameAr?: string;
+  image?: string;
+  quantity: number;
+  price: number;
+  addons?: {
+    name: string;
+    nameAr?: string;
+    price: number;
+    quantity: number;
+  }[];
+  variations?: {
+    name: string;
+    nameAr?: string;
+    option: string;
+    optionAr?: string;
+    price: number;
+  }[];
+  specialInstructions?: string;
+}
+
+export interface OrderCustomer {
+  id: string;
+  name: string;
+  phone: string;
+}
+
+export interface OrderDriver {
+  id: string;
+  name: string;
+  phone?: string;
+  avatar?: string;
+}
+
+export interface Order {
+  _id: string;
+  orderNumber: string;
+  customer: OrderCustomer;
+  items: OrderItem[];
+  subtotal: number;
+  deliveryFee: number;
+  discount: number;
+  total: number;
+  status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'picked_up' | 'on_the_way' | 'delivered' | 'cancelled';
+  paymentMethod: 'cash' | 'card' | 'wallet';
+  paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded';
+  deliveryAddress: {
+    name: string;
+    address: string;
+    area: string;
+    city: string;
+    building?: string;
+    floor?: string;
+    apartment?: string;
+    landmark?: string;
+  };
+  driver?: OrderDriver;
+  notes?: string;
+  cancellationReason?: string;
+  estimatedDeliveryTime?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OrdersListResponse {
+  orders: Order[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    pages: number;
+  };
+}
+
+// Orders API functions
+export const ordersApi = {
+  getOrders: async (params?: {
+    status?: string;
+    page?: number;
+    limit?: number;
+    startDate?: string;
+    endDate?: string;
+  }): Promise<ApiResponse<OrdersListResponse>> => {
+    const response = await api.get<ApiResponse<OrdersListResponse>>(
+      API_ENDPOINTS.orders,
+      { params }
+    );
+    return response.data;
+  },
+
+  getOrder: async (id: string): Promise<ApiResponse<{ order: Order }>> => {
+    const response = await api.get<ApiResponse<{ order: Order }>>(
+      API_ENDPOINTS.orderDetails.replace(':id', id)
+    );
+    return response.data;
+  },
+
+  updateOrderStatus: async (
+    id: string,
+    status: Order['status'],
+    estimatedTime?: number
+  ): Promise<ApiResponse<{ order: Order }>> => {
+    const response = await api.patch<ApiResponse<{ order: Order }>>(
+      API_ENDPOINTS.updateOrderStatus.replace(':id', id),
+      { status, estimatedTime }
+    );
+    return response.data;
+  },
+
+  acceptOrder: async (
+    id: string,
+    estimatedTime?: number
+  ): Promise<ApiResponse<{ order: Order }>> => {
+    const response = await api.post<ApiResponse<{ order: Order }>>(
+      API_ENDPOINTS.acceptOrder.replace(':id', id),
+      { estimatedTime }
+    );
+    return response.data;
+  },
+
+  rejectOrder: async (
+    id: string,
+    reason: string
+  ): Promise<ApiResponse<{ order: Order }>> => {
+    const response = await api.post<ApiResponse<{ order: Order }>>(
+      API_ENDPOINTS.rejectOrder.replace(':id', id),
+      { reason }
+    );
+    return response.data;
+  },
+};
+
+// Earnings types
+export interface Transaction {
+  _id: string;
+  transactionNumber: string;
+  type: 'order_payment' | 'restaurant_payout' | 'refund';
+  orderId?: {
+    _id: string;
+    orderNumber: string;
+    total: number;
+  };
+  amount: number;
+  fee: number;
+  netAmount: number;
+  status: 'pending' | 'processing' | 'completed' | 'failed';
+  createdAt: string;
+  processedAt?: string;
+}
+
+export interface PayoutSummary {
+  pendingAmount: number;
+  processedAmount: number;
+  totalTransactions: number;
+  recentPayouts: Transaction[];
+}
+
+export interface EarningsStats {
+  todayEarnings: number;
+  weekEarnings: number;
+  monthEarnings: number;
+  totalEarnings: number;
+  todayOrders: number;
+  weekOrders: number;
+  monthOrders: number;
+  totalOrders: number;
+  pendingPayout: number;
+  averageOrderValue: number;
+}
+
+// Earnings API functions
+export const earningsApi = {
+  getPayoutSummary: async (): Promise<ApiResponse<PayoutSummary>> => {
+    const response = await api.get<ApiResponse<PayoutSummary>>(
+      '/restaurant/payouts/summary'
+    );
+    return response.data;
+  },
+
+  getTransactions: async (params?: {
+    type?: string;
+    status?: string;
+    startDate?: string;
+    endDate?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<ApiResponse<{ data: Transaction[]; pagination: { page: number; pages: number; total: number; limit: number } }>> => {
+    const response = await api.get<ApiResponse<{ data: Transaction[]; pagination: { page: number; pages: number; total: number; limit: number } }>>(
+      '/restaurant/transactions',
+      { params }
+    );
+    return response.data;
+  },
+
+  getEarningsStats: async (params?: {
+    startDate?: string;
+    endDate?: string;
+  }): Promise<ApiResponse<EarningsStats>> => {
+    const response = await api.get<ApiResponse<EarningsStats>>(
+      '/restaurant/orders/stats',
+      { params }
+    );
+    return response.data;
+  },
+};
+
 // Error handling helper
 export const getErrorMessage = (error: unknown): string => {
   if (axios.isAxiosError(error)) {

@@ -38,47 +38,52 @@ import {
 const menuItems = [
   {
     title: 'لوحة التحكم',
-    url: '/dashboard',
+    url: '/',
     icon: LayoutDashboard,
   },
   {
     title: 'المستخدمين',
-    url: '/dashboard/users',
+    url: '/users',
     icon: Users,
   },
   {
     title: 'المطاعم',
-    url: '/dashboard/restaurants',
+    url: '/restaurants',
     icon: Store,
   },
   {
     title: 'السائقين',
-    url: '/dashboard/drivers',
+    url: '/drivers',
     icon: Truck,
   },
   {
     title: 'الطلبات',
-    url: '/dashboard/orders',
+    url: '/orders',
     icon: ShoppingBag,
   },
   {
     title: 'الكوبونات',
-    url: '/dashboard/coupons',
+    url: '/coupons',
     icon: Ticket,
   },
   {
     title: 'مناطق التوصيل',
-    url: '/dashboard/zones',
+    url: '/zones',
     icon: MapPin,
   },
   {
+    title: 'الإشعارات',
+    url: '/notifications',
+    icon: Bell,
+  },
+  {
     title: 'التحليلات',
-    url: '/dashboard/analytics',
+    url: '/analytics',
     icon: BarChart3,
   },
   {
     title: 'الإعدادات',
-    url: '/dashboard/settings',
+    url: '/settings',
     icon: Settings,
   },
 ];

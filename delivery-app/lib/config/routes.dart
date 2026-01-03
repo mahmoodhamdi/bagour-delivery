@@ -5,6 +5,7 @@ import '../screens/orders/available_orders_screen.dart';
 import '../screens/orders/active_delivery_screen.dart';
 import '../screens/earnings/earnings_screen.dart';
 import '../screens/earnings/request_withdrawal_screen.dart';
+import '../screens/notifications/notifications_screen.dart';
 
 class AppRoutes {
   static const String splash = '/';
@@ -144,7 +145,7 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: AppRoutes.notifications,
-      builder: (context, state) => const PlaceholderScreen(title: 'Notifications'),
+      builder: (context, state) => const NotificationsScreen(),
     ),
     GoRoute(
       path: AppRoutes.settings,
