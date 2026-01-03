@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../screens/home/home_screen.dart';
+import '../screens/orders/available_orders_screen.dart';
+import '../screens/orders/active_delivery_screen.dart';
+import '../screens/earnings/earnings_screen.dart';
+import '../screens/earnings/request_withdrawal_screen.dart';
 
 class AppRoutes {
   static const String splash = '/';
@@ -35,7 +40,7 @@ class AppRoutes {
   static const String support = '/support';
 }
 
-// Placeholder for actual screen implementations
+// Placeholder for screens not yet implemented
 class PlaceholderScreen extends StatelessWidget {
   final String title;
   const PlaceholderScreen({super.key, required this.title});
@@ -78,46 +83,49 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: AppRoutes.home,
-      builder: (context, state) => const PlaceholderScreen(title: 'Home'),
+      builder: (context, state) => const HomeScreen(),
     ),
+    // Orders
     GoRoute(
       path: AppRoutes.orders,
-      builder: (context, state) => const PlaceholderScreen(title: 'Orders'),
+      builder: (context, state) => const AvailableOrdersScreen(),
     ),
     GoRoute(
       path: AppRoutes.activeOrder,
-      builder: (context, state) => const PlaceholderScreen(title: 'Active Order'),
+      builder: (context, state) => const ActiveDeliveryScreen(),
     ),
     GoRoute(
       path: AppRoutes.orderDetails,
       builder: (context, state) {
         final id = state.pathParameters['id']!;
-        return PlaceholderScreen(title: 'Order $id');
+        return ActiveDeliveryScreen(orderId: id);
       },
     ),
     GoRoute(
       path: AppRoutes.orderNavigation,
       builder: (context, state) {
         final id = state.pathParameters['id']!;
-        return PlaceholderScreen(title: 'Navigate to Order $id');
+        return ActiveDeliveryScreen(orderId: id);
       },
     ),
+    // Earnings
     GoRoute(
       path: AppRoutes.earnings,
-      builder: (context, state) => const PlaceholderScreen(title: 'Earnings'),
+      builder: (context, state) => const EarningsScreen(),
     ),
     GoRoute(
       path: AppRoutes.earningsDetails,
-      builder: (context, state) => const PlaceholderScreen(title: 'Earnings Details'),
+      builder: (context, state) => const EarningsScreen(),
     ),
     GoRoute(
       path: AppRoutes.withdrawals,
-      builder: (context, state) => const PlaceholderScreen(title: 'Withdrawals'),
+      builder: (context, state) => const EarningsScreen(),
     ),
     GoRoute(
       path: AppRoutes.requestWithdrawal,
-      builder: (context, state) => const PlaceholderScreen(title: 'Request Withdrawal'),
+      builder: (context, state) => const RequestWithdrawalScreen(),
     ),
+    // Profile
     GoRoute(
       path: AppRoutes.profile,
       builder: (context, state) => const PlaceholderScreen(title: 'Profile'),

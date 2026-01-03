@@ -99,17 +99,24 @@ Socket.io configured for live order updates. Room-based messaging pattern:
 
 Helper functions in `@config/socket`:
 ```typescript
-import { emitToUser, emitToRestaurant, emitToDriver, emitToOrder } from '@config/socket';
+import { emitToUser, emitToRestaurant, emitToDriver, emitToOrder, getIO } from '@config/socket';
 emitToUser(userId, 'order:status', { orderId, status });
 emitToRestaurant(restaurantId, 'order:new', orderData);
+getIO()?.to('drivers:online').emit('order:available', orderData);  // Broadcast to available drivers
 ```
+
+Socket events emitted by server:
+- `order:new` - New order for restaurant
+- `order:status` - Order status update
+- `order:driver_location` - Driver location during delivery
+- `driver:status` - Driver online/offline status
 
 ## Key Patterns
 
 ### Backend Error Handling
 Use typed error classes from `@utils/errors`:
 ```typescript
-import { NotFoundError, BadRequestError, UnauthorizedError, ForbiddenError, ValidationError, ConflictError } from '@utils/errors';
+import { NotFoundError, BadRequestError, UnauthorizedError, ForbiddenError, ValidationError, ConflictError, TooManyRequestsError, ServiceUnavailableError } from '@utils/errors';
 throw new NotFoundError('المطعم غير موجود');
 throw new BadRequestError('البيانات غير صحيحة');
 throw new ConflictError('البريد الإلكتروني مستخدم بالفعل');
