@@ -43,8 +43,10 @@ export const authenticate = async (
     }
 
     // Attach user to request
+    const userId = user._id.toString();
     req.user = {
-      id: user._id.toString(),
+      id: userId,
+      userId: userId,
       role: user.role,
       email: user.email,
     };
@@ -100,8 +102,10 @@ export const optionalAuth = async (
       const user = await User.findById(decoded.userId);
 
       if (user && user.isActive && !user.isBlocked) {
+        const userId = user._id.toString();
         req.user = {
-          id: user._id.toString(),
+          id: userId,
+          userId: userId,
           role: user.role,
           email: user.email,
         };

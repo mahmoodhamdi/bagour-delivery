@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import authRoutes from './auth.routes';
+import restaurantRoutes from './restaurant.routes';
 
 const router = Router();
 
@@ -8,6 +9,9 @@ const API_VERSION = '/api/v1';
 
 // Auth routes
 router.use(`${API_VERSION}/auth`, authRoutes);
+
+// Restaurant routes
+router.use(`${API_VERSION}/restaurants`, restaurantRoutes);
 
 // Health check
 router.get('/health', (_req, res) => {
