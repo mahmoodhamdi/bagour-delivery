@@ -70,16 +70,26 @@ class AppAssets {
 }
 
 class AppEndpoints {
-  // Auth
-  static const String register = '/auth/register';
-  static const String login = '/auth/login';
-  static const String logout = '/auth/logout';
-  static const String refreshToken = '/auth/refresh-token';
+  // Auth - Customer
+  static const String customerRegister = '/auth/customer/register';
+  static const String customerLogin = '/auth/customer/login';
+
+  // Auth - OTP
+  static const String verifyOtp = '/auth/verify-otp';
+  static const String resendOtp = '/auth/resend-otp';
+
+  // Auth - Password
   static const String forgotPassword = '/auth/forgot-password';
   static const String resetPassword = '/auth/reset-password';
-  static const String me = '/auth/me';
-  static const String updateProfile = '/auth/profile';
   static const String changePassword = '/auth/change-password';
+
+  // Auth - Token
+  static const String refreshToken = '/auth/refresh-token';
+  static const String fcmToken = '/auth/fcm-token';
+
+  // Auth - Profile
+  static const String me = '/auth/me';
+  static const String logout = '/auth/logout';
 
   // Restaurants
   static const String restaurants = '/restaurants';
