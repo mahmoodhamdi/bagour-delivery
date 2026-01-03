@@ -1,6 +1,6 @@
 # Bagour Delivery - Project Progress
 
-## Overall Progress: 33/60 Milestones (55%)
+## Overall Progress: 34/60 Milestones (57%)
 
 ---
 
@@ -30,7 +30,7 @@
 - [x] 2.10 Admin Dashboard - Auth
 - [x] 2.11 Auth Integration Testing
 
-## Phase 3: Restaurant Management (12/15)
+## Phase 3: Restaurant Management (13/15)
 - [x] 3.1 Backend - Restaurant Service
 - [x] 3.2 Backend - Restaurant Controller
 - [x] 3.3 Backend - Menu Management
@@ -43,7 +43,7 @@
 - [x] 3.10 Dashboard - Settings
 - [x] 3.11 Customer App - Home
 - [x] 3.12 Customer App - Restaurant Details
-- [ ] 3.13 Customer App - Search
+- [x] 3.13 Customer App - Search
 - [ ] 3.14 Customer App - Favorites
 - [ ] 3.15 Phase 3 Testing
 
@@ -203,8 +203,8 @@
 ## Quick Stats
 
 - Total Milestones: 60
-- Completed: 33
-- Remaining: 27
+- Completed: 34
+- Remaining: 26
 - Phase 1 Complete: ✅
 - Phase 2 Complete: ✅
-- Phase 3 Progress: 12/15
+- Phase 3 Progress: 13/15

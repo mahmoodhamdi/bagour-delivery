@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../screens/auth/auth_screens.dart';
 import '../screens/home/home_screen.dart';
 import '../screens/restaurant/restaurant_details_screen.dart';
+import '../screens/search/search_screen.dart';
 
 class AppRoutes {
   static const String splash = '/';
@@ -90,7 +91,7 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: AppRoutes.search,
-      builder: (context, state) => const PlaceholderScreen(title: 'Search'),
+      builder: (context, state) => const SearchScreen(),
     ),
     GoRoute(
       path: AppRoutes.restaurant,
