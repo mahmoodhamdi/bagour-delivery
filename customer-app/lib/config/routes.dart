@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../screens/auth/auth_screens.dart';
 
 class AppRoutes {
   static const String splash = '/';
@@ -54,15 +55,32 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: AppRoutes.login,
-      builder: (context, state) => const PlaceholderScreen(title: 'Login'),
+      builder: (context, state) => const LoginScreen(),
     ),
     GoRoute(
       path: AppRoutes.register,
-      builder: (context, state) => const PlaceholderScreen(title: 'Register'),
+      builder: (context, state) => const RegisterScreen(),
     ),
     GoRoute(
       path: AppRoutes.forgotPassword,
-      builder: (context, state) => const PlaceholderScreen(title: 'Forgot Password'),
+      builder: (context, state) => const ForgotPasswordScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.otp,
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>?;
+        return OtpScreen(
+          identifier: extra?['phone'] ?? extra?['email'] ?? '',
+          type: extra?['type'] ?? 'phone_verification',
+        );
+      },
+    ),
+    GoRoute(
+      path: AppRoutes.resetPassword,
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>?;
+        return ResetPasswordScreen(email: extra?['email'] ?? '');
+      },
     ),
     GoRoute(
       path: AppRoutes.home,
