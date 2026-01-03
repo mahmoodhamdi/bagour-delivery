@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../screens/auth/auth_screens.dart';
+import '../screens/home/home_screen.dart';
 
 class AppRoutes {
   static const String splash = '/';
@@ -84,7 +85,7 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: AppRoutes.home,
-      builder: (context, state) => const PlaceholderScreen(title: 'Home'),
+      builder: (context, state) => const HomeScreen(),
     ),
     GoRoute(
       path: AppRoutes.search,
