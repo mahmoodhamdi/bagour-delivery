@@ -106,10 +106,14 @@ export interface IAuthUser {
 export interface IAuthRequest extends Request {
   user?: {
     id: string;
+    userId: string;
     role: string;
     email?: string;
   };
 }
+
+// Alias for backward compatibility
+export type AuthRequest = IAuthRequest;
 
 // API Response format
 export interface IApiResponse<T = unknown> {

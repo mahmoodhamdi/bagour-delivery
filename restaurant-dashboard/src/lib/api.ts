@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'axios';
+import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
 import Cookies from 'js-cookie';
 import { API_CONFIG, STORAGE_KEYS, API_ENDPOINTS } from '@/config/constants';
 
@@ -10,13 +10,39 @@ export interface ApiResponse<T = unknown> {
   errors?: Record<string, string[]>;
 }
 
-export interface Admin {
+export interface Restaurant {
   id: string;
   name: string;
+  nameEn?: string;
   email: string;
-  role: 'admin' | 'super_admin';
-  avatar?: string;
-  permissions: string[];
+  phone: string;
+  logo?: string;
+  coverImage?: string;
+  status: 'pending' | 'approved' | 'rejected' | 'suspended';
+  isOpen: boolean;
+  address: {
+    street: string;
+    area: string;
+    city: string;
+    coordinates?: {
+      lat: number;
+      lng: number;
+    };
+  };
+  cuisineTypes: string[];
+  rating: number;
+  totalOrders: number;
+  deliveryFee?: number;
+  minimumOrder?: number;
+  averageDeliveryTime?: number;
+  workingHours?: WorkingHours[];
+}
+
+export interface WorkingHours {
+  day: string;
+  isOpen: boolean;
+  openTime: string;
+  closeTime: string;
 }
 
 export interface User {
@@ -30,7 +56,7 @@ export interface User {
 
 export interface AuthResponse {
   user: User;
-  admin: Admin;
+  restaurant: Restaurant;
   accessToken: string;
   refreshToken: string;
 }
@@ -38,6 +64,39 @@ export interface AuthResponse {
 export interface LoginRequest {
   email: string;
   password: string;
+}
+
+export interface RegisterRequest {
+  name: string;
+  nameEn?: string;
+  email: string;
+  phone: string;
+  password: string;
+  address: {
+    street: string;
+    area: string;
+    city: string;
+  };
+  cuisineTypes: string[];
+  deliveryFee?: number;
+  minimumOrder?: number;
+}
+
+export interface VerifyOtpRequest {
+  email?: string;
+  phone?: string;
+  otp: string;
+  type: 'registration' | 'password_reset';
+}
+
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  email: string;
+  otp: string;
+  newPassword: string;
 }
 
 // Create axios instance
@@ -50,7 +109,7 @@ const api: AxiosInstance = axios.create({
   },
 });
 
-// Request interceptor to add auth token
+// Request interceptor - add auth token
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const token = Cookies.get(STORAGE_KEYS.accessToken);
@@ -59,20 +118,15 @@ api.interceptors.request.use(
     }
     return config;
   },
-  (error: AxiosError) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Response interceptor to handle token refresh
+// Response interceptor - handle token refresh
 api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
-    const originalRequest = error.config as InternalAxiosRequestConfig & {
-      _retry?: boolean;
-    };
+    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
-    // If the error is 401 and we haven't already retried
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
@@ -103,21 +157,17 @@ api.interceptors.response.use(
         // Clear tokens and redirect to login
         Cookies.remove(STORAGE_KEYS.accessToken);
         Cookies.remove(STORAGE_KEYS.refreshToken);
-        localStorage.removeItem(STORAGE_KEYS.adminData);
+        localStorage.removeItem(STORAGE_KEYS.restaurantData);
 
         if (typeof window !== 'undefined') {
           window.location.href = '/login';
         }
-
-        return Promise.reject(refreshError);
       }
     }
 
     return Promise.reject(error);
   }
 );
-
-export default api;
 
 // Auth API functions
 export const authApi = {
@@ -126,16 +176,41 @@ export const authApi = {
     return response.data;
   },
 
-  logout: async (): Promise<void> => {
+  register: async (data: RegisterRequest): Promise<ApiResponse<AuthResponse>> => {
+    const response = await api.post<ApiResponse<AuthResponse>>(API_ENDPOINTS.register, data);
+    return response.data;
+  },
+
+  verifyOtp: async (data: VerifyOtpRequest): Promise<ApiResponse<void>> => {
+    const response = await api.post<ApiResponse<void>>(API_ENDPOINTS.verifyOtp, data);
+    return response.data;
+  },
+
+  resendOtp: async (data: { email?: string; phone?: string; type: string }): Promise<ApiResponse<void>> => {
+    const response = await api.post<ApiResponse<void>>(API_ENDPOINTS.resendOtp, data);
+    return response.data;
+  },
+
+  forgotPassword: async (data: ForgotPasswordRequest): Promise<ApiResponse<void>> => {
+    const response = await api.post<ApiResponse<void>>(API_ENDPOINTS.forgotPassword, data);
+    return response.data;
+  },
+
+  resetPassword: async (data: ResetPasswordRequest): Promise<ApiResponse<void>> => {
+    const response = await api.post<ApiResponse<void>>(API_ENDPOINTS.resetPassword, data);
+    return response.data;
+  },
+
+  logout: async (fcmToken?: string): Promise<void> => {
     try {
-      await api.post(API_ENDPOINTS.logout);
+      await api.post(API_ENDPOINTS.logout, fcmToken ? { fcmToken } : undefined);
     } catch {
       // Ignore logout errors
     }
   },
 
-  getProfile: async (): Promise<ApiResponse<{ user: User; admin: Admin }>> => {
-    const response = await api.get<ApiResponse<{ user: User; admin: Admin }>>('/admin/profile');
+  getProfile: async (): Promise<ApiResponse<{ user: User; restaurant: Restaurant }>> => {
+    const response = await api.get<ApiResponse<{ user: User; restaurant: Restaurant }>>(API_ENDPOINTS.profile);
     return response.data;
   },
 };
@@ -168,16 +243,4 @@ export const getErrorMessage = (error: unknown): string => {
   return 'حدث خطأ غير متوقع';
 };
 
-// Helper functions
-export const apiHelpers = {
-  get: <T>(url: string, params?: Record<string, unknown>) =>
-    api.get<T>(url, { params }),
-
-  post: <T>(url: string, data?: unknown) => api.post<T>(url, data),
-
-  put: <T>(url: string, data?: unknown) => api.put<T>(url, data),
-
-  patch: <T>(url: string, data?: unknown) => api.patch<T>(url, data),
-
-  delete: <T>(url: string) => api.delete<T>(url),
-};
+export default api;

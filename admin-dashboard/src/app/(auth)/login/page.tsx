@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import Cookies from 'js-cookie';
 import { useAuthStore } from '@/stores/auth';
 import { ROUTES, STORAGE_KEYS } from '@/config/constants';
+import { authApi, getErrorMessage } from '@/services/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -26,7 +27,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Loader2, ShieldCheck } from 'lucide-react';
+import { Loader2, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 
 const loginSchema = z.object({
   email: z
@@ -43,8 +44,9 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const router = useRouter();
-  const { setAdmin } = useAuthStore();
+  const { setAuth } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -58,33 +60,25 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      // TODO: Replace with actual API call
-      // const response = await api.post('/auth/admin/login', data);
+      const response = await authApi.login(data);
 
-      // Simulate login for now
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      if (response.success && response.data) {
+        const { accessToken, refreshToken, user, admin } = response.data;
 
-      // Mock response
-      const mockAdmin = {
-        id: '1',
-        name: 'مسؤول النظام',
-        email: data.email,
-        role: 'super_admin' as const,
-        permissions: ['all'],
-      };
+        // Save tokens
+        Cookies.set(STORAGE_KEYS.accessToken, accessToken, { expires: 7 });
+        Cookies.set(STORAGE_KEYS.refreshToken, refreshToken, { expires: 30 });
 
-      // Save tokens
-      Cookies.set(STORAGE_KEYS.accessToken, 'mock-access-token', { expires: 7 });
-      Cookies.set(STORAGE_KEYS.refreshToken, 'mock-refresh-token', {
-        expires: 30,
-      });
+        // Update store
+        setAuth(user, admin);
 
-      setAdmin(mockAdmin);
-      toast.success('تم تسجيل الدخول بنجاح');
-      router.push(ROUTES.dashboard);
+        toast.success('تم تسجيل الدخول بنجاح');
+        router.push(ROUTES.dashboard);
+      } else {
+        toast.error(response.message || 'فشل تسجيل الدخول');
+      }
     } catch (error) {
-      console.error('Login error:', error);
-      toast.error('فشل تسجيل الدخول. يرجى التحقق من البيانات المدخلة.');
+      toast.error(getErrorMessage(error));
     } finally {
       setIsLoading(false);
     }
@@ -116,6 +110,7 @@ export default function LoginPage() {
                     <Input
                       type="email"
                       placeholder="admin@bagour.com"
+                      disabled={isLoading}
                       {...field}
                     />
                   </FormControl>
@@ -130,11 +125,25 @@ export default function LoginPage() {
                 <FormItem>
                   <FormLabel>كلمة المرور</FormLabel>
                   <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="••••••••"
-                      {...field}
-                    />
+                    <div className="relative">
+                      <Input
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder="••••••••"
+                        disabled={isLoading}
+                        {...field}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

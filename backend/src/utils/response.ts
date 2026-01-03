@@ -57,6 +57,28 @@ export const sendPaginated = <T>(
   return res.status(StatusCodes.OK).json(response);
 };
 
+export const paginatedResponse = <T>(
+  res: Response,
+  statusCode: number,
+  message: string,
+  data: T[],
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    pages: number;
+  }
+): Response => {
+  const response: IApiResponse<T[]> = {
+    success: true,
+    message,
+    data,
+    pagination,
+  };
+
+  return res.status(statusCode).json(response);
+};
+
 export const sendError = (
   res: Response,
   message: string,
