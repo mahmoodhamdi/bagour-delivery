@@ -1,0 +1,86 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing
+coverage/
+.nyc_output/
+
+# TypeScript
+*.tsbuildinfo
+
+# Flutter
+customer-app/.dart_tool/
+customer-app/.packages
+customer-app/.pub-cache/
+customer-app/.pub/
+customer-app/build/
+customer-app/.flutter-plugins
+customer-app/.flutter-plugins-dependencies
+customer-app/.metadata
+customer-app/android/.gradle/
+customer-app/android/local.properties
+customer-app/ios/Pods/
+customer-app/ios/.symlinks/
+customer-app/ios/Flutter/Flutter.framework
+customer-app/ios/Flutter/Flutter.podspec
+customer-app/*.iml
+customer-app/pubspec.lock
+
+delivery-app/.dart_tool/
+delivery-app/.packages
+delivery-app/.pub-cache/
+delivery-app/.pub/
+delivery-app/build/
+delivery-app/.flutter-plugins
+delivery-app/.flutter-plugins-dependencies
+delivery-app/.metadata
+delivery-app/android/.gradle/
+delivery-app/android/local.properties
+delivery-app/ios/Pods/
+delivery-app/ios/.symlinks/
+delivery-app/ios/Flutter/Flutter.framework
+delivery-app/ios/Flutter/Flutter.podspec
+delivery-app/*.iml
+delivery-app/pubspec.lock
+
+# Next.js
+.next/
+.vercel
+
+# Misc
+*.pem
+.cache/
