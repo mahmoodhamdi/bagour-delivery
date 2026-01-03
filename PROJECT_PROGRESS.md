@@ -1,6 +1,6 @@
 # Bagour Delivery - Project Progress
 
-## Overall Progress: 41/60 Milestones (68%)
+## Overall Progress: 52/60 Milestones (87%)
 
 ---
 
@@ -47,23 +47,23 @@
 - [x] 3.14 Customer App - Favorites
 - [x] 3.15 Phase 3 Testing
 
-## Phase 4: Order System (5/17)
+## Phase 4: Order System (16/17)
 - [x] 4.1 Backend - Order Service 1
 - [x] 4.2 Backend - Order Service 2
 - [x] 4.3 Backend - Order Controller
 - [x] 4.4 Backend - Socket.io
 - [x] 4.5 Customer App - Cart Provider
-- [ ] 4.6 Customer App - Cart Screen
-- [ ] 4.7 Customer App - Address
-- [ ] 4.8 Customer App - Checkout
-- [ ] 4.9 Customer App - Order Tracking
-- [ ] 4.10 Customer App - Order History
-- [ ] 4.11 Dashboard - Orders List
-- [ ] 4.12 Dashboard - Order Actions
-- [ ] 4.13 Delivery App - Home
-- [ ] 4.14 Delivery App - Available Orders
-- [ ] 4.15 Delivery App - Active Delivery
-- [ ] 4.16 Delivery App - Earnings
+- [x] 4.6 Customer App - Cart Screen
+- [x] 4.7 Customer App - Address
+- [x] 4.8 Customer App - Checkout
+- [x] 4.9 Customer App - Order Tracking
+- [x] 4.10 Customer App - Order History
+- [x] 4.11 Dashboard - Orders List
+- [x] 4.12 Dashboard - Order Actions
+- [x] 4.13 Delivery App - Home
+- [x] 4.14 Delivery App - Available Orders
+- [x] 4.15 Delivery App - Active Delivery
+- [x] 4.16 Delivery App - Earnings
 - [ ] 4.17 Phase 4 Testing
 
 ## Phase 5: Payment System (0/6)
@@ -198,15 +198,16 @@
 | 2026-01-03 | 3 | 3.1 - 3.4 | Backend Restaurant/Menu/Upload Services |
 | 2026-01-03 | 4 | 3.5 - 3.9 | Dashboard Layout, Home & Menu Management |
 | 2026-01-03 | 5 | 3.10 - 3.15, 4.1 - 4.3 | Settings, Phase 3 Testing, Order Service & Controller |
+| 2026-01-03 | 6 | 4.14 - 4.16 | Delivery App: Available Orders, Active Delivery, Earnings |
 
 ---
 
 ## Quick Stats
 
 - Total Milestones: 60
-- Completed: 41
-- Remaining: 19
+- Completed: 52
+- Remaining: 8
 - Phase 1 Complete: ✅
 - Phase 2 Complete: ✅
 - Phase 3 Complete: ✅
-- Phase 4 In Progress: 5/17
+- Phase 4 In Progress: 16/17
