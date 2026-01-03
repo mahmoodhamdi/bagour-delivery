@@ -1,6 +1,6 @@
 # Bagour Delivery - Project Progress
 
-## Overall Progress: 39/60 Milestones (65%)
+## Overall Progress: 40/60 Milestones (67%)
 
 ---
 
@@ -47,11 +47,11 @@
 - [x] 3.14 Customer App - Favorites
 - [x] 3.15 Phase 3 Testing
 
-## Phase 4: Order System (3/17)
+## Phase 4: Order System (4/17)
 - [x] 4.1 Backend - Order Service 1
 - [x] 4.2 Backend - Order Service 2
 - [x] 4.3 Backend - Order Controller
-- [ ] 4.4 Backend - Socket.io
+- [x] 4.4 Backend - Socket.io
 - [ ] 4.5 Customer App - Cart Provider
 - [ ] 4.6 Customer App - Cart Screen
 - [ ] 4.7 Customer App - Address
@@ -204,9 +204,9 @@
 ## Quick Stats
 
 - Total Milestones: 60
-- Completed: 39
-- Remaining: 21
+- Completed: 40
+- Remaining: 20
 - Phase 1 Complete: ✅
 - Phase 2 Complete: ✅
 - Phase 3 Complete: ✅
-- Phase 4 In Progress: 3/17
+- Phase 4 In Progress: 4/17
