@@ -1,0 +1,647 @@
+# Admin API Documentation
+
+paths:
+  # Dashboard
+  /admin/dashboard/stats:
+    get:
+      tags:
+        - Admin
+      summary: Get dashboard statistics
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Dashboard stats
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalOrders:
+                    type: integer
+                  totalRevenue:
+                    type: number
+                  totalCustomers:
+                    type: integer
+                  totalRestaurants:
+                    type: integer
+                  totalDrivers:
+                    type: integer
+                  pendingApprovals:
+                    type: object
+                    properties:
+                      restaurants:
+                        type: integer
+                      drivers:
+                        type: integer
+                  todayOrders:
+                    type: integer
+                  todayRevenue:
+                    type: number
+
+  /admin/dashboard/revenue-chart:
+    get:
+      tags:
+        - Admin
+      summary: Get revenue chart data
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [week, month, year]
+            default: month
+      responses:
+        '200':
+          description: Revenue chart data
+
+  /admin/analytics/orders:
+    get:
+      tags:
+        - Admin
+      summary: Get order analytics
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Order analytics
+
+  /admin/analytics/popular-items:
+    get:
+      tags:
+        - Admin
+      summary: Get popular menu items
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Popular items list
+
+  # User Management
+  /admin/users:
+    get:
+      tags:
+        - Admin
+      summary: Get all users
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: role
+          in: query
+          schema:
+            type: string
+            enum: [customer, restaurant, driver, admin]
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, blocked]
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Users list
+
+  /admin/users/{id}/block:
+    put:
+      tags:
+        - Admin
+      summary: Block user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+      responses:
+        '200':
+          description: User blocked
+
+  /admin/users/{id}/unblock:
+    put:
+      tags:
+        - Admin
+      summary: Unblock user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User unblocked
+
+  # Restaurant Management
+  /admin/restaurants:
+    get:
+      tags:
+        - Admin
+      summary: Get all restaurants
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, approved, rejected, suspended]
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Restaurants list
+
+  /admin/restaurants/{id}/approve:
+    put:
+      tags:
+        - Admin
+      summary: Approve restaurant
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Restaurant approved
+
+  /admin/restaurants/{id}/reject:
+    put:
+      tags:
+        - Admin
+      summary: Reject restaurant
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - reason
+              properties:
+                reason:
+                  type: string
+      responses:
+        '200':
+          description: Restaurant rejected
+
+  /admin/restaurants/{id}/suspend:
+    put:
+      tags:
+        - Admin
+      summary: Suspend restaurant
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - reason
+              properties:
+                reason:
+                  type: string
+      responses:
+        '200':
+          description: Restaurant suspended
+
+  # Driver Management
+  /admin/drivers:
+    get:
+      tags:
+        - Admin
+      summary: Get all drivers
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, approved, rejected, suspended]
+        - name: isOnline
+          in: query
+          schema:
+            type: boolean
+        - name: page
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Drivers list
+
+  /admin/drivers/{id}/approve:
+    put:
+      tags:
+        - Admin
+      summary: Approve driver
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Driver approved
+
+  /admin/drivers/{id}/reject:
+    put:
+      tags:
+        - Admin
+      summary: Reject driver
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - reason
+              properties:
+                reason:
+                  type: string
+      responses:
+        '200':
+          description: Driver rejected
+
+  # Zone Management
+  /admin/zones:
+    get:
+      tags:
+        - Admin
+      summary: Get all zones
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Zones list
+
+    post:
+      tags:
+        - Admin
+      summary: Create zone
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - nameAr
+                - coordinates
+              properties:
+                name:
+                  type: string
+                nameAr:
+                  type: string
+                coordinates:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      enum: [Polygon]
+                    coordinates:
+                      type: array
+                deliveryFee:
+                  type: number
+                minimumOrder:
+                  type: number
+                isActive:
+                  type: boolean
+      responses:
+        '201':
+          description: Zone created
+
+  /admin/zones/{id}:
+    put:
+      tags:
+        - Admin
+      summary: Update zone
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                nameAr:
+                  type: string
+                deliveryFee:
+                  type: number
+                isActive:
+                  type: boolean
+      responses:
+        '200':
+          description: Zone updated
+
+    delete:
+      tags:
+        - Admin
+      summary: Delete zone
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Zone deleted
+
+  # Coupon Management
+  /admin/coupons:
+    get:
+      tags:
+        - Admin
+      summary: Get all coupons
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: isActive
+          in: query
+          schema:
+            type: boolean
+        - name: page
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Coupons list
+
+    post:
+      tags:
+        - Admin
+      summary: Create coupon
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Coupon'
+      responses:
+        '201':
+          description: Coupon created
+
+  /admin/coupons/{id}/toggle:
+    put:
+      tags:
+        - Admin
+      summary: Toggle coupon active/inactive
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Coupon toggled
+
+  # Reviews Management
+  /admin/reviews:
+    get:
+      tags:
+        - Admin
+      summary: Get all reviews
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: isReported
+          in: query
+          schema:
+            type: boolean
+        - name: isVisible
+          in: query
+          schema:
+            type: boolean
+        - name: page
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Reviews list
+
+  /admin/reviews/{id}/visibility:
+    put:
+      tags:
+        - Admin
+      summary: Toggle review visibility
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - isVisible
+              properties:
+                isVisible:
+                  type: boolean
+      responses:
+        '200':
+          description: Visibility updated
+
+  /admin/reviews/{id}/resolve:
+    put:
+      tags:
+        - Admin
+      summary: Resolve reported review
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - action
+              properties:
+                action:
+                  type: string
+                  enum: [dismiss, hide, delete]
+      responses:
+        '200':
+          description: Report resolved
+
+  # Settings
+  /admin/settings:
+    get:
+      tags:
+        - Admin
+      summary: Get platform settings
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Platform settings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Settings'
+
+    put:
+      tags:
+        - Admin
+      summary: Update platform settings
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Settings'
+      responses:
+        '200':
+          description: Settings updated
+
+  # Notifications
+  /admin/notifications/broadcast:
+    post:
+      tags:
+        - Admin
+      summary: Broadcast notification
+      description: Send notification to all users or specific groups
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - body
+                - target
+              properties:
+                title:
+                  type: string
+                titleAr:
+                  type: string
+                body:
+                  type: string
+                bodyAr:
+                  type: string
+                target:
+                  type: string
+                  enum: [all, customers, restaurants, drivers]
+                data:
+                  type: object
+      responses:
+        '200':
+          description: Notification sent

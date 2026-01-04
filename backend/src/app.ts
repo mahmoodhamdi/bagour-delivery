@@ -8,6 +8,7 @@ import { config } from './config';
 import { errorHandler } from './middleware/errorHandler';
 import { notFound } from './middleware/notFound';
 import routes from './routes';
+import { setupSwagger } from './config/swagger';
 
 export const createApp = (): Express => {
   const app = express();
@@ -73,9 +74,13 @@ export const createApp = (): Express => {
         version: config.apiVersion,
         name: 'Bagour Delivery API',
         description: 'Food delivery platform for Bagour city',
+        docs: '/api-docs',
       },
     });
   });
+
+  // Setup Swagger documentation
+  setupSwagger(app);
 
   // All API routes
   app.use(routes);

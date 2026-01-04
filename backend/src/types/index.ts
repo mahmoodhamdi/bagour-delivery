@@ -110,6 +110,9 @@ export interface IAuthRequest extends Request {
     role: string;
     email?: string;
   };
+  customerId?: string;
+  restaurantId?: string;
+  driverId?: string;
 }
 
 // Alias for backward compatibility

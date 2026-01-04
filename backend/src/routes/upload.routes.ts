@@ -207,7 +207,7 @@ router.post(
  * DELETE /api/v1/upload/:publicId
  */
 router.delete(
-  '/:publicId(*)',
+  '/:publicId',
   authenticate,
   async (req: Request, res: Response, next: NextFunction) => {
     try {

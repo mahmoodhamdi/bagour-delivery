@@ -1,0 +1,396 @@
+# Menu API Documentation
+
+paths:
+  # Menu Categories
+  /menu/categories:
+    get:
+      tags:
+        - Menu
+      summary: Get menu categories
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of categories
+
+    post:
+      tags:
+        - Menu
+      summary: Create menu category
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - nameAr
+              properties:
+                name:
+                  type: string
+                  example: Grills
+                nameAr:
+                  type: string
+                  example: المشويات
+                description:
+                  type: string
+                image:
+                  type: string
+                  format: uri
+                sortOrder:
+                  type: integer
+      responses:
+        '201':
+          description: Category created
+
+  /menu/categories/{id}:
+    patch:
+      tags:
+        - Menu
+      summary: Update menu category
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                nameAr:
+                  type: string
+                description:
+                  type: string
+                image:
+                  type: string
+                isActive:
+                  type: boolean
+      responses:
+        '200':
+          description: Category updated
+
+    delete:
+      tags:
+        - Menu
+      summary: Delete menu category
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Category deleted
+
+  /menu/categories/reorder:
+    put:
+      tags:
+        - Menu
+      summary: Reorder categories
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - order
+              properties:
+                order:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      sortOrder:
+                        type: integer
+      responses:
+        '200':
+          description: Categories reordered
+
+  # Menu Items
+  /menu/items:
+    get:
+      tags:
+        - Menu
+      summary: Get menu items
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: categoryId
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: isAvailable
+          in: query
+          schema:
+            type: boolean
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of menu items
+
+    post:
+      tags:
+        - Menu
+      summary: Create menu item
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - categoryId
+                - name
+                - nameAr
+                - price
+              properties:
+                categoryId:
+                  type: string
+                name:
+                  type: string
+                  example: Beef Shawarma
+                nameAr:
+                  type: string
+                  example: شاورما لحم
+                description:
+                  type: string
+                descriptionAr:
+                  type: string
+                price:
+                  type: number
+                  minimum: 0
+                discountPrice:
+                  type: number
+                image:
+                  type: string
+                  format: uri
+                images:
+                  type: array
+                  items:
+                    type: string
+                    format: uri
+                preparationTime:
+                  type: integer
+                  description: Minutes
+                calories:
+                  type: integer
+                isAvailable:
+                  type: boolean
+                  default: true
+                isPopular:
+                  type: boolean
+                addons:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - name
+                      - nameAr
+                      - price
+                    properties:
+                      name:
+                        type: string
+                      nameAr:
+                        type: string
+                      price:
+                        type: number
+                      isAvailable:
+                        type: boolean
+                variations:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - name
+                      - nameAr
+                      - options
+                    properties:
+                      name:
+                        type: string
+                      nameAr:
+                        type: string
+                      required:
+                        type: boolean
+                      options:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            nameAr:
+                              type: string
+                            price:
+                              type: number
+      responses:
+        '201':
+          description: Menu item created
+
+  /menu/items/{id}:
+    get:
+      tags:
+        - Menu
+      summary: Get menu item details
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Menu item details
+
+    patch:
+      tags:
+        - Menu
+      summary: Update menu item
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                nameAr:
+                  type: string
+                description:
+                  type: string
+                price:
+                  type: number
+                discountPrice:
+                  type: number
+                isAvailable:
+                  type: boolean
+                addons:
+                  type: array
+                variations:
+                  type: array
+      responses:
+        '200':
+          description: Menu item updated
+
+    delete:
+      tags:
+        - Menu
+      summary: Delete menu item
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Menu item deleted
+
+  /menu/items/{id}/toggle:
+    post:
+      tags:
+        - Menu
+      summary: Toggle item availability
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Availability toggled
+
+  /menu/items/bulk:
+    put:
+      tags:
+        - Menu
+      summary: Bulk update items
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - items
+              properties:
+                items:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - id
+                    properties:
+                      id:
+                        type: string
+                      isAvailable:
+                        type: boolean
+                      sortOrder:
+                        type: integer
+      responses:
+        '200':
+          description: Items updated
+
+  /menu/items/{id}/duplicate:
+    post:
+      tags:
+        - Menu
+      summary: Duplicate menu item
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Item duplicated
