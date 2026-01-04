@@ -212,6 +212,56 @@ class OrderNotifier extends StateNotifier<OrderState> {
   void clearError() {
     state = state.copyWith(error: null);
   }
+
+  /// Create a new order
+  Future<String?> createOrder({
+    required String restaurantId,
+    required List<Map<String, dynamic>> items,
+    required String addressId,
+    required String paymentMethod,
+    String? notes,
+    String? couponCode,
+  }) async {
+    state = state.copyWith(isLoading: true, error: null);
+
+    try {
+      final response = await _apiService.post(
+        AppEndpoints.orders,
+        data: {
+          'restaurantId': restaurantId,
+          'items': items,
+          'addressId': addressId,
+          'paymentMethod': paymentMethod,
+          if (notes != null && notes.isNotEmpty) 'notes': notes,
+          if (couponCode != null && couponCode.isNotEmpty) 'couponCode': couponCode,
+        },
+      );
+
+      if (response.statusCode == 201 && response.data['success'] == true) {
+        final order = Order.fromJson(response.data['data']);
+        state = state.copyWith(order: order, isLoading: false);
+        return order.id;
+      } else {
+        state = state.copyWith(
+          isLoading: false,
+          error: response.data['message'] ?? 'فشل إنشاء الطلب',
+        );
+        return null;
+      }
+    } on DioException catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: _apiService.handleError(e),
+      );
+      return null;
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: 'حدث خطأ غير متوقع',
+      );
+      return null;
+    }
+  }
 }
 
 /// Order list notifier
@@ -331,4 +381,11 @@ final completedOrdersProvider = Provider<List<Order>>((ref) {
 /// Has active orders provider
 final hasActiveOrdersProvider = Provider<bool>((ref) {
   return ref.watch(activeOrdersProvider).isNotEmpty;
+});
+
+/// Order creation provider (for checkout)
+final orderCreationProvider =
+    StateNotifierProvider<OrderNotifier, OrderState>((ref) {
+  final apiService = ref.watch(apiServiceProvider);
+  return OrderNotifier(apiService);
 });

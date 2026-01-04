@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../config/theme.dart';
+import '../../utils/url_launcher_helper.dart';
 
 class SupportScreen extends StatelessWidget {
   const SupportScreen({super.key});
@@ -27,11 +28,9 @@ class SupportScreen extends StatelessWidget {
                     child: const Icon(Icons.phone, color: AppColors.success),
                   ),
                   title: const Text('اتصل بنا'),
-                  subtitle: const Text('01XXXXXXXXX'),
+                  subtitle: Text(UrlLauncherHelper.supportPhone),
                   trailing: const Icon(Icons.chevron_right),
-                  onTap: () {
-                    // TODO: Launch phone dialer
-                  },
+                  onTap: () => UrlLauncherHelper.launchSupportPhone(),
                 ),
                 const Divider(height: 1),
                 ListTile(
@@ -46,9 +45,7 @@ class SupportScreen extends StatelessWidget {
                   title: const Text('واتساب'),
                   subtitle: const Text('تواصل معنا عبر واتساب'),
                   trailing: const Icon(Icons.chevron_right),
-                  onTap: () {
-                    // TODO: Launch WhatsApp
-                  },
+                  onTap: () => UrlLauncherHelper.launchSupportWhatsApp(),
                 ),
                 const Divider(height: 1),
                 ListTile(
@@ -61,11 +58,9 @@ class SupportScreen extends StatelessWidget {
                     child: const Icon(Icons.email, color: AppColors.primary),
                   ),
                   title: const Text('البريد الإلكتروني'),
-                  subtitle: const Text('support@bagour-delivery.com'),
+                  subtitle: Text(UrlLauncherHelper.supportEmail),
                   trailing: const Icon(Icons.chevron_right),
-                  onTap: () {
-                    // TODO: Launch email
-                  },
+                  onTap: () => UrlLauncherHelper.launchSupportEmail(),
                 ),
               ],
             ),
