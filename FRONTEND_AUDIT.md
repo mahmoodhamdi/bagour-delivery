@@ -100,13 +100,15 @@ Both dashboards are production-ready with full UI, API integration, and RTL supp
 - **Icons:** Lucide React
 
 ### Restaurant Dashboard Specific
-- Order real-time updates (polling)
+- Socket.io real-time order updates
+- Revenue charts with Recharts
 - Image upload for menu items
 - Working hours management
 
 ### Admin Dashboard Specific
 - Charts with Recharts
-- Zone map visualization (placeholder)
+- Interactive zone map with Leaflet
+- Export reports (CSV/PDF)
 - Bulk notification sending
 
 ---
@@ -174,12 +176,13 @@ Both dashboards are production-ready with full UI, API integration, and RTL supp
 ## Remaining Minor Items
 
 ### Restaurant Dashboard
-1. Socket.io integration for real-time order updates (currently using polling)
-2. Revenue charts on dashboard (placeholder exists)
+All major features complete.
 
 ### Admin Dashboard
-1. Interactive zone map with drawing (using placeholder map)
-2. Export reports to PDF/Excel
+All major features complete.
+
+### Flutter Apps
+1. FCM push notifications (backend ready, Flutter needs Firebase setup)
 
 ---
 

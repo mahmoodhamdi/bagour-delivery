@@ -17,8 +17,18 @@ import {
   Users,
   DollarSign,
   ShoppingBag,
+  Download,
+  FileSpreadsheet,
+  FileText,
 } from 'lucide-react';
 import { analyticsApi, getErrorMessage } from '@/services/api';
+import { exportAnalyticsReport } from '@/lib/export';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface CustomerStats {
   totalCustomers: number;
@@ -114,9 +124,41 @@ export default function AnalyticsPage() {
           <h1 className="text-2xl font-bold">التحليلات</h1>
           <p className="text-muted-foreground">إحصائيات وتقارير المنصة</p>
         </div>
-        <Button onClick={fetchAnalytics} variant="outline" size="icon">
-          <RefreshCw className="h-4 w-4" />
-        </Button>
+        <div className="flex gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                <Download className="h-4 w-4 ml-2" />
+                تصدير التقرير
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onClick={() => exportAnalyticsReport({
+                  customerStats: customerStats || undefined,
+                  financialData: financialData || undefined,
+                  popularItems: popularItems,
+                }, 'csv')}
+              >
+                <FileSpreadsheet className="h-4 w-4 ml-2" />
+                تصدير Excel (CSV)
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => exportAnalyticsReport({
+                  customerStats: customerStats || undefined,
+                  financialData: financialData || undefined,
+                  popularItems: popularItems,
+                }, 'pdf')}
+              >
+                <FileText className="h-4 w-4 ml-2" />
+                تصدير PDF
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button onClick={fetchAnalytics} variant="outline" size="icon">
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       {error && (

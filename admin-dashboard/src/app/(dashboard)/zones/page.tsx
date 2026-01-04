@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Switch } from '@/components/ui/switch';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Table,
   TableBody,
@@ -21,8 +22,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { RefreshCw, Plus, Edit, Trash2, MapPin } from 'lucide-react';
+import { RefreshCw, Plus, Edit, Trash2, MapPin, Map, List } from 'lucide-react';
 import { zonesApi, Zone, getErrorMessage } from '@/services/api';
+import ZoneMap from '@/components/ZoneMap';
 
 export default function ZonesPage() {
   const [zones, setZones] = useState<Zone[]>([]);
@@ -34,6 +36,8 @@ export default function ZonesPage() {
     isNew: boolean;
   }>({ open: false, zone: null, isNew: false });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedZone, setSelectedZone] = useState<Zone | null>(null);
+  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
 
   const fetchZones = async () => {
     setIsLoading(true);
@@ -118,6 +122,24 @@ export default function ZonesPage() {
           <p className="text-muted-foreground">إدارة مناطق ورسوم التوصيل</p>
         </div>
         <div className="flex gap-2">
+          <div className="flex border rounded-lg">
+            <Button
+              variant={viewMode === 'list' ? 'default' : 'ghost'}
+              size="icon"
+              onClick={() => setViewMode('list')}
+              className="rounded-l-none"
+            >
+              <List className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={viewMode === 'map' ? 'default' : 'ghost'}
+              size="icon"
+              onClick={() => setViewMode('map')}
+              className="rounded-r-none"
+            >
+              <Map className="h-4 w-4" />
+            </Button>
+          </div>
           <Button onClick={fetchZones} variant="outline" size="icon">
             <RefreshCw className="h-4 w-4" />
           </Button>
@@ -138,72 +160,140 @@ export default function ZonesPage() {
         </div>
       )}
 
-      <Card>
-        <CardContent className="pt-6">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>المنطقة</TableHead>
-                <TableHead>الاسم بالعربية</TableHead>
-                <TableHead>رسوم التوصيل</TableHead>
-                <TableHead>الحد الأدنى للطلب</TableHead>
-                <TableHead>الحالة</TableHead>
-                <TableHead></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {zones.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                    لا توجد مناطق
-                  </TableCell>
-                </TableRow>
+      {viewMode === 'map' ? (
+        <div className="grid gap-6 lg:grid-cols-3">
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle>خريطة المناطق</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ZoneMap
+                zones={zones}
+                selectedZone={selectedZone}
+                onZoneSelect={(zone) => setSelectedZone(zone)}
+              />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                {selectedZone ? selectedZone.nameAr : 'تفاصيل المنطقة'}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {selectedZone ? (
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm text-muted-foreground">الاسم بالإنجليزية</label>
+                    <p className="font-medium">{selectedZone.name}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm text-muted-foreground">رسوم التوصيل</label>
+                    <p className="font-medium">{formatCurrency(selectedZone.deliveryFee)}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm text-muted-foreground">الحد الأدنى للطلب</label>
+                    <p className="font-medium">{formatCurrency(selectedZone.minOrderAmount)}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm text-muted-foreground">الحالة</label>
+                    <p className={`font-medium ${selectedZone.isActive ? 'text-green-600' : 'text-gray-500'}`}>
+                      {selectedZone.isActive ? 'نشط' : 'غير نشط'}
+                    </p>
+                  </div>
+                  <div className="flex gap-2 pt-4">
+                    <Button
+                      className="flex-1"
+                      onClick={() => setEditDialog({ open: true, zone: selectedZone, isNew: false })}
+                    >
+                      <Edit className="h-4 w-4 ml-2" />
+                      تعديل
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      onClick={() => handleDelete(selectedZone._id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
               ) : (
-                zones.map((zone) => (
-                  <TableRow key={zone._id}>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <MapPin className="h-4 w-4 text-muted-foreground" />
-                        <span className="font-medium">{zone.name}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>{zone.nameAr}</TableCell>
-                    <TableCell>{formatCurrency(zone.deliveryFee)}</TableCell>
-                    <TableCell>{formatCurrency(zone.minOrderAmount)}</TableCell>
-                    <TableCell>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        zone.isActive
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {zone.isActive ? 'نشط' : 'غير نشط'}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => setEditDialog({ open: true, zone, isNew: false })}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDelete(zone._id)}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </div>
+                <p className="text-center text-muted-foreground py-8">
+                  اختر منطقة من الخريطة لعرض التفاصيل
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      ) : (
+        <Card>
+          <CardContent className="pt-6">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>المنطقة</TableHead>
+                  <TableHead>الاسم بالعربية</TableHead>
+                  <TableHead>رسوم التوصيل</TableHead>
+                  <TableHead>الحد الأدنى للطلب</TableHead>
+                  <TableHead>الحالة</TableHead>
+                  <TableHead></TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {zones.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                      لا توجد مناطق
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+                ) : (
+                  zones.map((zone) => (
+                    <TableRow key={zone._id} className={selectedZone?._id === zone._id ? 'bg-muted/50' : ''}>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <MapPin className="h-4 w-4 text-muted-foreground" />
+                          <span className="font-medium">{zone.name}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>{zone.nameAr}</TableCell>
+                      <TableCell>{formatCurrency(zone.deliveryFee)}</TableCell>
+                      <TableCell>{formatCurrency(zone.minOrderAmount)}</TableCell>
+                      <TableCell>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          zone.isActive
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {zone.isActive ? 'نشط' : 'غير نشط'}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setEditDialog({ open: true, zone, isNew: false })}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDelete(zone._id)}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Edit Dialog */}
       <Dialog open={editDialog.open} onOpenChange={(open) => !open && setEditDialog({ open: false, zone: null, isNew: false })}>

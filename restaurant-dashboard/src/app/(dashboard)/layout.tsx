@@ -4,7 +4,9 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/stores/auth';
+import { useOrdersStore } from '@/stores/orders';
 import { ROUTES } from '@/config/constants';
+import { useSocket } from '@/hooks/useSocket';
 import {
   SidebarProvider,
   Sidebar,
@@ -68,6 +70,10 @@ export default function DashboardLayout({
   const router = useRouter();
   const { restaurant, isAuthenticated, isLoading, logout, updateRestaurant } =
     useAuthStore();
+  const { pendingOrdersCount } = useOrdersStore();
+
+  // Initialize socket connection for real-time updates
+  useSocket();
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -176,12 +182,14 @@ export default function DashboardLayout({
           <header className="sticky top-0 z-10 flex h-14 items-center justify-between border-b bg-background px-4">
             <SidebarTrigger />
             <div className="flex items-center gap-4">
-              <button className="relative rounded-full p-2 hover:bg-muted">
+              <Link href="/orders" className="relative rounded-full p-2 hover:bg-muted">
                 <Bell className="h-5 w-5" />
-                <span className="absolute -top-1 -left-1 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] text-white">
-                  3
-                </span>
-              </button>
+                {pendingOrdersCount > 0 && (
+                  <span className="absolute -top-1 -left-1 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] text-white">
+                    {pendingOrdersCount > 9 ? '9+' : pendingOrdersCount}
+                  </span>
+                )}
+              </Link>
             </div>
           </header>
 

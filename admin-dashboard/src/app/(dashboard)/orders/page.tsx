@@ -19,11 +19,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { RefreshCw, Eye, ShoppingBag } from 'lucide-react';
+import { RefreshCw, Eye, ShoppingBag, Download, FileSpreadsheet, FileText } from 'lucide-react';
 import { ordersApi, Order, getErrorMessage } from '@/services/api';
 import { ORDER_STATUSES } from '@/config/constants';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
+import { exportOrdersReport } from '@/lib/export';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -130,9 +137,59 @@ export default function OrdersPage() {
           <h1 className="text-2xl font-bold">إدارة الطلبات</h1>
           <p className="text-muted-foreground">عرض جميع الطلبات</p>
         </div>
-        <Button onClick={fetchOrders} variant="outline" size="icon">
-          <RefreshCw className="h-4 w-4" />
-        </Button>
+        <div className="flex gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                <Download className="h-4 w-4 ml-2" />
+                تصدير
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onClick={() => exportOrdersReport({
+                  orders: orders.map(order => ({
+                    orderNumber: order.orderNumber,
+                    customerName: order.customerId?.name || '-',
+                    restaurantName: order.restaurantId?.name || '-',
+                    total: order.totalAmount,
+                    status: ORDER_STATUSES[order.status as keyof typeof ORDER_STATUSES]?.label || order.status,
+                    createdAt: format(new Date(order.createdAt), 'dd/MM/yyyy HH:mm'),
+                  })),
+                  summary: {
+                    totalOrders: orders.length,
+                    totalRevenue: orders.reduce((sum, o) => sum + o.totalAmount, 0),
+                  },
+                }, 'csv')}
+              >
+                <FileSpreadsheet className="h-4 w-4 ml-2" />
+                تصدير Excel (CSV)
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => exportOrdersReport({
+                  orders: orders.map(order => ({
+                    orderNumber: order.orderNumber,
+                    customerName: order.customerId?.name || '-',
+                    restaurantName: order.restaurantId?.name || '-',
+                    total: order.totalAmount,
+                    status: ORDER_STATUSES[order.status as keyof typeof ORDER_STATUSES]?.label || order.status,
+                    createdAt: format(new Date(order.createdAt), 'dd/MM/yyyy HH:mm'),
+                  })),
+                  summary: {
+                    totalOrders: orders.length,
+                    totalRevenue: orders.reduce((sum, o) => sum + o.totalAmount, 0),
+                  },
+                }, 'pdf')}
+              >
+                <FileText className="h-4 w-4 ml-2" />
+                تصدير PDF
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button onClick={fetchOrders} variant="outline" size="icon">
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       {error && (
