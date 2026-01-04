@@ -1,0 +1,467 @@
+# Transactions API Documentation
+
+paths:
+  # Driver Transaction Endpoints
+  /driver/transactions:
+    get:
+      tags:
+        - Driver
+        - Transactions
+      summary: Get driver transactions
+      description: Retrieve transaction history for the driver
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [earning, withdrawal, payout, adjustment]
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, completed, failed, cancelled]
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Transactions retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Transaction'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+  /driver/transactions/{id}:
+    get:
+      tags:
+        - Driver
+        - Transactions
+      summary: Get transaction details
+      description: Get detailed information about a specific transaction
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Transaction retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Transaction'
+
+  # Restaurant Transaction Endpoints
+  /restaurant/transactions:
+    get:
+      tags:
+        - Restaurant Dashboard
+        - Transactions
+      summary: Get restaurant transactions
+      description: Retrieve transaction history for the restaurant
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [earning, commission, payout, refund, adjustment]
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Transactions retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Transaction'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+  /restaurant/transactions/{id}:
+    get:
+      tags:
+        - Restaurant Dashboard
+        - Transactions
+      summary: Get restaurant transaction details
+      description: Get detailed information about a specific transaction
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Transaction retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Transaction'
+
+  /restaurant/earnings/summary:
+    get:
+      tags:
+        - Restaurant Dashboard
+        - Transactions
+      summary: Get earnings summary
+      description: Get summary of restaurant earnings and balance
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [today, week, month, year]
+            default: month
+      responses:
+        '200':
+          description: Summary retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      currentBalance:
+                        type: number
+                        example: 5250.00
+                      totalEarnings:
+                        type: number
+                        example: 15750.00
+                      totalCommission:
+                        type: number
+                        example: 1575.00
+                      totalPayouts:
+                        type: number
+                        example: 10500.00
+                      pendingBalance:
+                        type: number
+                        example: 3675.00
+                      earningsByPeriod:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            date:
+                              type: string
+                            earnings:
+                              type: number
+
+  # Admin Transaction Endpoints
+  /admin/transactions:
+    get:
+      tags:
+        - Admin
+        - Transactions
+      summary: Get all transactions (Admin)
+      description: View all platform transactions
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: userType
+          in: query
+          schema:
+            type: string
+            enum: [driver, restaurant]
+        - name: type
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: userId
+          in: query
+          schema:
+            type: string
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Transactions retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Transaction'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+  /admin/transactions/{id}:
+    get:
+      tags:
+        - Admin
+        - Transactions
+      summary: Get transaction details (Admin)
+      description: Get detailed transaction information
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Transaction retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Transaction'
+
+  /admin/payouts:
+    get:
+      tags:
+        - Admin
+        - Transactions
+      summary: Get pending payouts (Admin)
+      description: Get list of pending withdrawal/payout requests
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: userType
+          in: query
+          schema:
+            type: string
+            enum: [driver, restaurant]
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, processing, completed, rejected]
+      responses:
+        '200':
+          description: Payouts retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Transaction'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+  /admin/payouts/{id}/process:
+    post:
+      tags:
+        - Admin
+        - Transactions
+      summary: Process payout (Admin)
+      description: Approve or reject a payout request
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - action
+              properties:
+                action:
+                  type: string
+                  enum: [approve, reject]
+                notes:
+                  type: string
+                transactionId:
+                  type: string
+                  description: Bank transaction ID or reference
+      responses:
+        '200':
+          description: Payout processed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Transaction'
+
+  /admin/finance/overview:
+    get:
+      tags:
+        - Admin
+        - Transactions
+      summary: Get financial overview (Admin)
+      description: Get platform financial overview and metrics
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [today, week, month, year]
+            default: month
+      responses:
+        '200':
+          description: Overview retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      totalRevenue:
+                        type: number
+                      platformCommission:
+                        type: number
+                      driverEarnings:
+                        type: number
+                      restaurantEarnings:
+                        type: number
+                      pendingPayouts:
+                        type: number
+                      completedPayouts:
+                        type: number
+                      refunds:
+                        type: number
+                      revenueByDate:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            date:
+                              type: string
+                            revenue:
+                              type: number
+                            commission:
+                              type: number

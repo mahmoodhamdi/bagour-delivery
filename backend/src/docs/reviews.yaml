@@ -1,0 +1,546 @@
+# Reviews API Documentation
+
+paths:
+  # Public Review Endpoints
+  /restaurants/{restaurantId}/reviews:
+    get:
+      tags:
+        - Reviews
+      summary: Get restaurant reviews
+      description: Get public reviews for a restaurant
+      parameters:
+        - name: restaurantId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: rating
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 5
+          description: Filter by rating
+        - name: sortBy
+          in: query
+          schema:
+            type: string
+            enum: [recent, highest, lowest, helpful]
+            default: recent
+      responses:
+        '200':
+          description: Reviews retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Review'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+  /restaurants/{restaurantId}/reviews/stats:
+    get:
+      tags:
+        - Reviews
+      summary: Get restaurant review statistics
+      description: Get aggregated review statistics for a restaurant
+      parameters:
+        - name: restaurantId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Review stats retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      averageRating:
+                        type: number
+                        example: 4.5
+                      totalReviews:
+                        type: number
+                        example: 150
+                      ratingDistribution:
+                        type: object
+                        properties:
+                          5:
+                            type: number
+                            example: 80
+                          4:
+                            type: number
+                            example: 40
+                          3:
+                            type: number
+                            example: 20
+                          2:
+                            type: number
+                            example: 5
+                          1:
+                            type: number
+                            example: 5
+
+  /reviews/{id}:
+    get:
+      tags:
+        - Reviews
+      summary: Get review by ID
+      description: Get a specific review details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Review retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Review'
+
+  /reviews/{id}/report:
+    post:
+      tags:
+        - Reviews
+      summary: Report a review
+      description: Report inappropriate review content
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - reason
+              properties:
+                reason:
+                  type: string
+                  enum: [spam, inappropriate, fake, offensive]
+                details:
+                  type: string
+      responses:
+        '200':
+          description: Review reported successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: تم الإبلاغ عن التقييم
+
+  # Customer Review Endpoints
+  /customer/reviews:
+    get:
+      tags:
+        - Customer
+        - Reviews
+      summary: Get my reviews
+      description: Get all reviews submitted by the customer
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Reviews retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Review'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+  # Restaurant Owner Review Endpoints
+  /restaurant/reviews:
+    get:
+      tags:
+        - Restaurant Dashboard
+        - Reviews
+      summary: Get my restaurant reviews
+      description: Get all reviews for the restaurant owner's restaurant
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: rating
+          in: query
+          schema:
+            type: integer
+        - name: replied
+          in: query
+          schema:
+            type: boolean
+          description: Filter by whether owner replied
+      responses:
+        '200':
+          description: Reviews retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Review'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+  /restaurant/reviews/stats:
+    get:
+      tags:
+        - Restaurant Dashboard
+        - Reviews
+      summary: Get my restaurant review stats
+      description: Get review statistics for the restaurant owner's restaurant
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Stats retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      averageRating:
+                        type: number
+                      totalReviews:
+                        type: number
+                      ratingDistribution:
+                        type: object
+                      recentReviews:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Review'
+                      needsReply:
+                        type: number
+                        description: Number of reviews without reply
+
+  /restaurant/reviews/{id}/reply:
+    post:
+      tags:
+        - Restaurant Dashboard
+        - Reviews
+      summary: Reply to review
+      description: Restaurant owner can reply to a customer review
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - reply
+              properties:
+                reply:
+                  type: string
+                  example: شكراً لك على تقييمك، نسعد بخدمتك دائماً
+                  minLength: 10
+                  maxLength: 500
+      responses:
+        '200':
+          description: Reply added successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: تم إضافة الرد بنجاح
+                  data:
+                    $ref: '#/components/schemas/Review'
+
+    put:
+      tags:
+        - Restaurant Dashboard
+        - Reviews
+      summary: Update reply
+      description: Update existing reply to a review
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - reply
+              properties:
+                reply:
+                  type: string
+      responses:
+        '200':
+          description: Reply updated successfully
+
+    delete:
+      tags:
+        - Restaurant Dashboard
+        - Reviews
+      summary: Delete reply
+      description: Remove reply from a review
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Reply deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: تم حذف الرد
+
+  # Admin Review Endpoints
+  /admin/reviews:
+    get:
+      tags:
+        - Admin
+        - Reviews
+      summary: Get all reviews (Admin)
+      description: Admin can view all reviews across all restaurants
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: restaurantId
+          in: query
+          schema:
+            type: string
+        - name: rating
+          in: query
+          schema:
+            type: integer
+        - name: reported
+          in: query
+          schema:
+            type: boolean
+        - name: visible
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Reviews retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Review'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+  /admin/reviews/{id}/visibility:
+    put:
+      tags:
+        - Admin
+        - Reviews
+      summary: Toggle review visibility (Admin)
+      description: Hide or show a review publicly
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - isVisible
+              properties:
+                isVisible:
+                  type: boolean
+                reason:
+                  type: string
+      responses:
+        '200':
+          description: Visibility updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+
+  /admin/reviews/{id}/resolve:
+    put:
+      tags:
+        - Admin
+        - Reviews
+      summary: Resolve reported review (Admin)
+      description: Mark a reported review as resolved
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - action
+              properties:
+                action:
+                  type: string
+                  enum: [approved, hidden, deleted]
+                notes:
+                  type: string
+      responses:
+        '200':
+          description: Report resolved
+
+  /admin/reviews/{id}:
+    delete:
+      tags:
+        - Admin
+        - Reviews
+      summary: Delete review (Admin)
+      description: Permanently delete a review
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Review deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: تم حذف التقييم

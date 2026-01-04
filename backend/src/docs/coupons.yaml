@@ -1,0 +1,610 @@
+# Coupons API Documentation
+
+paths:
+  # Customer Coupon Endpoints
+  /coupons/validate:
+    post:
+      tags:
+        - Coupons
+      summary: Validate coupon code
+      description: Validate a coupon code and calculate discount for an order
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - code
+                - restaurantId
+                - subtotal
+              properties:
+                code:
+                  type: string
+                  example: WELCOME20
+                restaurantId:
+                  type: string
+                subtotal:
+                  type: number
+                  example: 150
+      responses:
+        '200':
+          description: Coupon validation result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      valid:
+                        type: boolean
+                        example: true
+                      coupon:
+                        $ref: '#/components/schemas/Coupon'
+                      discount:
+                        type: number
+                        example: 30
+                      finalAmount:
+                        type: number
+                        example: 120
+                      message:
+                        type: string
+                        example: تم تطبيق كود الخصم بنجاح
+        '400':
+          description: Invalid or expired coupon
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  data:
+                    type: object
+                    properties:
+                      valid:
+                        type: boolean
+                        example: false
+                      message:
+                        type: string
+                        example: كود الخصم منتهي الصلاحية
+
+  /coupons/available:
+    get:
+      tags:
+        - Coupons
+      summary: Get available coupons
+      description: Get list of active coupons available for the customer
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: restaurantId
+          in: query
+          schema:
+            type: string
+          description: Filter by restaurant
+      responses:
+        '200':
+          description: Available coupons retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Coupon'
+
+  /coupons/code/{code}:
+    get:
+      tags:
+        - Coupons
+      summary: Get coupon by code
+      description: Get coupon details by code (public info only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Coupon found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Coupon'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  # Admin Coupon Endpoints
+  /admin/coupons:
+    get:
+      tags:
+        - Admin
+        - Coupons
+      summary: Get all coupons (Admin)
+      description: Retrieve all coupons with filtering and pagination
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, inactive, expired]
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [percentage, fixed, free_delivery]
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Search by code or description
+      responses:
+        '200':
+          description: Coupons retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Coupon'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+    post:
+      tags:
+        - Admin
+        - Coupons
+      summary: Create coupon (Admin)
+      description: Create a new discount coupon
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - code
+                - type
+                - value
+                - startDate
+                - endDate
+              properties:
+                code:
+                  type: string
+                  example: SUMMER25
+                  description: Unique coupon code (auto-generated if not provided)
+                description:
+                  type: string
+                  example: Summer discount - 25% off
+                descriptionAr:
+                  type: string
+                  example: خصم الصيف - خصم 25%
+                type:
+                  type: string
+                  enum: [percentage, fixed, free_delivery]
+                  example: percentage
+                value:
+                  type: number
+                  example: 25
+                  description: Percentage value or fixed amount
+                minOrderAmount:
+                  type: number
+                  example: 100
+                  description: Minimum order amount to apply coupon
+                maxDiscount:
+                  type: number
+                  example: 50
+                  description: Maximum discount amount (for percentage coupons)
+                maxUses:
+                  type: number
+                  example: 1000
+                  description: Total number of times coupon can be used
+                maxUsesPerUser:
+                  type: number
+                  example: 1
+                  description: Max uses per customer
+                startDate:
+                  type: string
+                  format: date-time
+                endDate:
+                  type: string
+                  format: date-time
+                restaurantId:
+                  type: string
+                  description: Restrict to specific restaurant
+                firstOrderOnly:
+                  type: boolean
+                  example: false
+                userSegment:
+                  type: string
+                  enum: [all, new, vip, inactive]
+                  default: all
+                isActive:
+                  type: boolean
+                  default: true
+      responses:
+        '201':
+          description: Coupon created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: تم إنشاء كود الخصم بنجاح
+                  data:
+                    $ref: '#/components/schemas/Coupon'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '409':
+          description: Coupon code already exists
+
+  /admin/coupons/generate-code:
+    get:
+      tags:
+        - Admin
+        - Coupons
+      summary: Generate coupon code (Admin)
+      description: Generate a unique random coupon code
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: prefix
+          in: query
+          schema:
+            type: string
+            example: BAGOUR
+        - name: length
+          in: query
+          schema:
+            type: integer
+            default: 8
+      responses:
+        '200':
+          description: Code generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        example: BAGOUR-XY7K9M
+
+  /admin/coupons/bulk:
+    post:
+      tags:
+        - Admin
+        - Coupons
+      summary: Create bulk coupons (Admin)
+      description: Generate multiple unique coupon codes with same settings
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - count
+                - type
+                - value
+                - startDate
+                - endDate
+              properties:
+                count:
+                  type: integer
+                  minimum: 1
+                  maximum: 1000
+                  example: 100
+                prefix:
+                  type: string
+                  example: REFER
+                type:
+                  type: string
+                  enum: [percentage, fixed, free_delivery]
+                value:
+                  type: number
+                description:
+                  type: string
+                descriptionAr:
+                  type: string
+                minOrderAmount:
+                  type: number
+                maxDiscount:
+                  type: number
+                maxUses:
+                  type: number
+                  default: 1
+                maxUsesPerUser:
+                  type: number
+                  default: 1
+                startDate:
+                  type: string
+                  format: date-time
+                endDate:
+                  type: string
+                  format: date-time
+      responses:
+        '201':
+          description: Bulk coupons created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: تم إنشاء 100 كود خصم بنجاح
+                  data:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                        example: 100
+                      codes:
+                        type: array
+                        items:
+                          type: string
+
+  /admin/coupons/{id}:
+    get:
+      tags:
+        - Admin
+        - Coupons
+      summary: Get coupon by ID (Admin)
+      description: Get detailed coupon information including usage stats
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Coupon retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Coupon'
+
+    put:
+      tags:
+        - Admin
+        - Coupons
+      summary: Update coupon (Admin)
+      description: Update coupon details (cannot change code or type)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  type: string
+                descriptionAr:
+                  type: string
+                value:
+                  type: number
+                minOrderAmount:
+                  type: number
+                maxDiscount:
+                  type: number
+                maxUses:
+                  type: number
+                maxUsesPerUser:
+                  type: number
+                startDate:
+                  type: string
+                  format: date-time
+                endDate:
+                  type: string
+                  format: date-time
+                isActive:
+                  type: boolean
+      responses:
+        '200':
+          description: Coupon updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: تم تحديث كود الخصم بنجاح
+                  data:
+                    $ref: '#/components/schemas/Coupon'
+
+    delete:
+      tags:
+        - Admin
+        - Coupons
+      summary: Delete coupon (Admin)
+      description: Delete a coupon (soft delete - marks as inactive)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Coupon deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: تم حذف كود الخصم
+
+  /admin/coupons/{id}/toggle:
+    put:
+      tags:
+        - Admin
+        - Coupons
+      summary: Toggle coupon status (Admin)
+      description: Activate or deactivate a coupon
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Coupon status toggled
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      isActive:
+                        type: boolean
+
+  /admin/coupons/{id}/stats:
+    get:
+      tags:
+        - Admin
+        - Coupons
+      summary: Get coupon statistics (Admin)
+      description: Get usage statistics for a specific coupon
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Statistics retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      coupon:
+                        $ref: '#/components/schemas/Coupon'
+                      totalUses:
+                        type: number
+                        example: 45
+                      uniqueUsers:
+                        type: number
+                        example: 42
+                      totalDiscount:
+                        type: number
+                        example: 1250.50
+                      averageOrderValue:
+                        type: number
+                        example: 175
+                      usageByDate:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            date:
+                              type: string
+                              format: date
+                            uses:
+                              type: number
+                      topUsers:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            userId:
+                              type: string
+                            userName:
+                              type: string
+                            uses:
+                              type: number

@@ -69,7 +69,7 @@ const seedDatabase = async () => {
     const adminUser = await User.create({
       role: 'admin',
       email: 'admin@bagour-delivery.com',
-      phone: '+201000000000',
+      phone: '01000000000',
       password: hashedPassword,
       name: 'مدير النظام',
       isEmailVerified: true,
@@ -136,16 +136,16 @@ const seedDatabase = async () => {
     // ==================== CUSTOMERS ====================
     logger.info('Seeding customers...');
     const customerData = [
-      { name: 'أحمد محمد', email: 'ahmed@test.com', phone: '+201111111111' },
-      { name: 'محمد علي', email: 'mohamed@test.com', phone: '+201111111112' },
-      { name: 'فاطمة حسن', email: 'fatma@test.com', phone: '+201111111113' },
-      { name: 'سارة أحمد', email: 'sara@test.com', phone: '+201111111114' },
-      { name: 'علي إبراهيم', email: 'ali@test.com', phone: '+201111111115' },
-      { name: 'نور الدين', email: 'nour@test.com', phone: '+201111111116' },
-      { name: 'ياسمين محمود', email: 'yasmin@test.com', phone: '+201111111117' },
-      { name: 'كريم سعيد', email: 'karim@test.com', phone: '+201111111118' },
-      { name: 'هدى عبدالله', email: 'hoda@test.com', phone: '+201111111119' },
-      { name: 'عمر خالد', email: 'omar@test.com', phone: '+201111111120' },
+      { name: 'أحمد محمد', email: 'ahmed@test.com', phone: '01111111111' },
+      { name: 'محمد علي', email: 'mohamed@test.com', phone: '01111111112' },
+      { name: 'فاطمة حسن', email: 'fatma@test.com', phone: '01111111113' },
+      { name: 'سارة أحمد', email: 'sara@test.com', phone: '01111111114' },
+      { name: 'علي إبراهيم', email: 'ali@test.com', phone: '01111111115' },
+      { name: 'نور الدين', email: 'nour@test.com', phone: '01111111116' },
+      { name: 'ياسمين محمود', email: 'yasmin@test.com', phone: '01111111117' },
+      { name: 'كريم سعيد', email: 'karim@test.com', phone: '01111111118' },
+      { name: 'هدى عبدالله', email: 'hoda@test.com', phone: '01111111119' },
+      { name: 'عمر خالد', email: 'omar@test.com', phone: '01111111120' },
     ];
 
     const customers: { user: mongoose.Document; customer: mongoose.Document }[] = [];
@@ -249,7 +249,7 @@ const seedDatabase = async () => {
       const user = await User.create({
         role: 'restaurant',
         email: `restaurant${i + 1}@test.com`,
-        phone: `+20122222222${i}`,
+        phone: `0122222222${i}`,
         password: testPassword,
         name: `صاحب ${data.nameAr}`,
         isEmailVerified: true,
@@ -432,7 +432,7 @@ const seedDatabase = async () => {
       const user = await User.create({
         role: 'delivery',
         email: `driver${i + 1}@test.com`,
-        phone: `+20133333333${i}`,
+        phone: `012222222${10 + i}`,
         password: testPassword,
         name: data.name,
         isEmailVerified: true,
@@ -479,62 +479,77 @@ const seedDatabase = async () => {
     await Coupon.insertMany([
       {
         code: 'WELCOME20',
-        description: '20% off your first order',
-        descriptionAr: 'خصم 20% على طلبك الأول',
-        discountType: 'percentage',
-        discountValue: 20,
+        type: 'percentage',
+        value: 20,
         minimumOrder: 50,
         maximumDiscount: 50,
-        usageLimit: 1000,
+        totalUsageLimit: 1000,
         usedCount: 156,
         perUserLimit: 1,
         validFrom: new Date(),
         validUntil: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90 days
+        restaurantIds: [],
+        categoryIds: [],
+        customerIds: [],
+        firstOrderOnly: true,
         isActive: true,
+        usedBy: [],
+        createdBy: adminUser._id,
       },
       {
         code: 'SAVE10',
-        description: '10 EGP off orders above 100 EGP',
-        descriptionAr: 'خصم 10 جنيه على الطلبات فوق 100 جنيه',
-        discountType: 'fixed',
-        discountValue: 10,
+        type: 'fixed',
+        value: 10,
         minimumOrder: 100,
-        maximumDiscount: 10,
-        usageLimit: 500,
+        totalUsageLimit: 500,
         usedCount: 89,
         perUserLimit: 3,
         validFrom: new Date(),
         validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+        restaurantIds: [],
+        categoryIds: [],
+        customerIds: [],
+        firstOrderOnly: false,
         isActive: true,
+        usedBy: [],
+        createdBy: adminUser._id,
       },
       {
         code: 'FREEDEL',
-        description: 'Free delivery on any order',
-        descriptionAr: 'توصيل مجاني على أي طلب',
-        discountType: 'fixed',
-        discountValue: 15,
+        type: 'fixed',
+        value: 15,
         minimumOrder: 0,
-        maximumDiscount: 15,
-        usageLimit: 200,
+        totalUsageLimit: 200,
         usedCount: 45,
         perUserLimit: 2,
         validFrom: new Date(),
         validUntil: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days
+        restaurantIds: [],
+        categoryIds: [],
+        customerIds: [],
+        firstOrderOnly: false,
         isActive: true,
+        usedBy: [],
+        createdBy: adminUser._id,
       },
       {
         code: 'EXPIRED50',
-        description: 'Expired coupon for testing',
-        descriptionAr: 'كوبون منتهي للاختبار',
-        discountType: 'percentage',
-        discountValue: 50,
+        type: 'percentage',
+        value: 50,
         minimumOrder: 0,
         maximumDiscount: 100,
-        usageLimit: 100,
+        totalUsageLimit: 100,
         usedCount: 0,
+        perUserLimit: 1,
         validFrom: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000),
         validUntil: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // Expired 30 days ago
+        restaurantIds: [],
+        categoryIds: [],
+        customerIds: [],
+        firstOrderOnly: false,
         isActive: false,
+        usedBy: [],
+        createdBy: adminUser._id,
       },
     ]);
 
@@ -555,18 +570,22 @@ const seedDatabase = async () => {
       // Get menu items for this restaurant
       const restMenuItems = await MenuItem.find({ restaurantId: rest.restaurant._id }).limit(3);
 
-      const items = restMenuItems.map((item) => ({
-        menuItemId: item._id,
-        name: (item as unknown as { name: string }).name,
-        nameAr: (item as unknown as { nameAr: string }).nameAr,
-        quantity: 1 + Math.floor(Math.random() * 2),
-        unitPrice: (item as unknown as { price: number }).price,
-        totalPrice: (item as unknown as { price: number }).price * (1 + Math.floor(Math.random() * 2)),
-        selectedAddons: [],
-        selectedVariations: [],
-      }));
+      const items = restMenuItems.map((item) => {
+        const quantity = 1 + Math.floor(Math.random() * 2);
+        const basePrice = (item as unknown as { price: number }).price;
+        return {
+          menuItemId: item._id,
+          name: (item as unknown as { name: string }).name,
+          nameAr: (item as unknown as { nameAr: string }).nameAr,
+          basePrice,
+          quantity,
+          selectedAddons: [],
+          selectedVariations: [],
+          itemTotal: basePrice * quantity,
+        };
+      });
 
-      const subtotal = items.reduce((sum, item) => sum + item.totalPrice, 0);
+      const subtotal = items.reduce((sum, item) => sum + item.itemTotal, 0);
       const deliveryFee = 10 + Math.floor(Math.random() * 10);
       const serviceFee = Math.round(subtotal * 0.05);
       const total = subtotal + deliveryFee + serviceFee;
@@ -641,7 +660,7 @@ const seedDatabase = async () => {
           orderId: order._id,
           notes: `أرباح توصيل طلب ${(order as unknown as { orderNumber: string }).orderNumber}`,
           status: 'completed',
-          createdAt: orderDate,
+          // Let transactionNumber auto-generate to avoid duplicates
         });
 
         const restaurantAmount = Math.round(subtotal * 0.85);
@@ -654,7 +673,7 @@ const seedDatabase = async () => {
           orderId: order._id,
           notes: `أرباح طلب ${(order as unknown as { orderNumber: string }).orderNumber}`,
           status: 'completed',
-          createdAt: orderDate,
+          // Let transactionNumber auto-generate to avoid duplicates
         });
       }
     }
@@ -664,7 +683,7 @@ const seedDatabase = async () => {
     const notificationTemplates = [
       { type: 'order', title: 'تم تأكيد طلبك', body: 'طلبك قيد التحضير الآن' },
       { type: 'order', title: 'طلبك جاهز', body: 'السائق في طريقه لاستلام طلبك' },
-      { type: 'promotional', title: 'عرض خاص!', body: 'احصل على خصم 20% على طلبك القادم' },
+      { type: 'promotion', title: 'عرض خاص!', body: 'احصل على خصم 20% على طلبك القادم' },
       { type: 'system', title: 'تحديث التطبيق', body: 'تم إضافة ميزات جديدة للتطبيق' },
     ];
 

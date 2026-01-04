@@ -1,0 +1,278 @@
+# Payments API Documentation
+
+paths:
+  /payment/initiate:
+    post:
+      tags:
+        - Payments
+      summary: Initiate payment
+      description: Initiate payment for an order using Paymob gateway
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - orderId
+                - amount
+              properties:
+                orderId:
+                  type: string
+                amount:
+                  type: number
+                  example: 150.50
+                paymentMethod:
+                  type: string
+                  enum: [card, wallet, cash]
+                  default: card
+      responses:
+        '200':
+          description: Payment initiated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      paymentUrl:
+                        type: string
+                        format: uri
+                        description: Redirect URL for payment
+                      paymentToken:
+                        type: string
+                      transactionId:
+                        type: string
+        '400':
+          $ref: '#/components/responses/ValidationError'
+
+  /payment/callback:
+    post:
+      tags:
+        - Payments
+      summary: Payment callback
+      description: Paymob callback endpoint (webhook)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Paymob callback payload
+      responses:
+        '200':
+          description: Callback processed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+
+  /payment/verify/{transactionId}:
+    get:
+      tags:
+        - Payments
+      summary: Verify payment
+      description: Verify payment status with Paymob
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: transactionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Payment status retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      transactionId:
+                        type: string
+                      status:
+                        type: string
+                        enum: [pending, success, failed, refunded]
+                      amount:
+                        type: number
+                      paidAt:
+                        type: string
+                        format: date-time
+
+  /payment/refund:
+    post:
+      tags:
+        - Payments
+      summary: Request refund
+      description: Request refund for a cancelled or problematic order
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - orderId
+                - amount
+                - reason
+              properties:
+                orderId:
+                  type: string
+                amount:
+                  type: number
+                reason:
+                  type: string
+                  example: Order cancelled by customer
+      responses:
+        '200':
+          description: Refund initiated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: تم طلب الاسترجاع بنجاح
+                  data:
+                    type: object
+                    properties:
+                      refundId:
+                        type: string
+                      status:
+                        type: string
+
+  # Admin Payment Endpoints
+  /admin/payments:
+    get:
+      tags:
+        - Admin
+        - Payments
+      summary: Get all payments (Admin)
+      description: View all payment transactions
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, success, failed, refunded]
+        - name: method
+          in: query
+          schema:
+            type: string
+            enum: [card, wallet, cash]
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Payments retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                        transactionId:
+                          type: string
+                        orderId:
+                          type: string
+                        amount:
+                          type: number
+                        method:
+                          type: string
+                        status:
+                          type: string
+                        createdAt:
+                          type: string
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+  /admin/payments/{id}/refund:
+    post:
+      tags:
+        - Admin
+        - Payments
+      summary: Process refund (Admin)
+      description: Admin can manually process refund
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - amount
+                - reason
+              properties:
+                amount:
+                  type: number
+                reason:
+                  type: string
+                notes:
+                  type: string
+      responses:
+        '200':
+          description: Refund processed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: تم استرجاع المبلغ بنجاح
