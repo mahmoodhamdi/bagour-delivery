@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../screens/auth/auth_screens.dart';
+import '../screens/splash/splash_screen.dart';
+import '../screens/onboarding/onboarding_screen.dart';
 import '../screens/home/home_screen.dart';
 import '../screens/restaurant/restaurant_details_screen.dart';
 import '../screens/search/search_screen.dart';
@@ -14,6 +15,9 @@ import '../screens/order/order_history_screen.dart';
 import '../screens/payment/payment_webview_screen.dart';
 import '../screens/payment/payment_result_screen.dart';
 import '../screens/notifications/notifications_screen.dart';
+import '../screens/profile/profile_screen.dart';
+import '../screens/profile/edit_profile_screen.dart';
+import '../screens/settings/settings_screen.dart';
 
 class AppRoutes {
   static const String splash = '/';
@@ -44,30 +48,16 @@ class AppRoutes {
   static const String paymentFailed = '/payment/failed';
 }
 
-// Placeholder for actual screen implementations
-class PlaceholderScreen extends StatelessWidget {
-  final String title;
-  const PlaceholderScreen({super.key, required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(title)),
-      body: Center(child: Text('$title Screen')),
-    );
-  }
-}
-
 final GoRouter appRouter = GoRouter(
   initialLocation: AppRoutes.splash,
   routes: [
     GoRoute(
       path: AppRoutes.splash,
-      builder: (context, state) => const PlaceholderScreen(title: 'Splash'),
+      builder: (context, state) => const SplashScreen(),
     ),
     GoRoute(
       path: AppRoutes.onboarding,
-      builder: (context, state) => const PlaceholderScreen(title: 'Onboarding'),
+      builder: (context, state) => const OnboardingScreen(),
     ),
     GoRoute(
       path: AppRoutes.login,
@@ -134,7 +124,11 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: AppRoutes.profile,
-      builder: (context, state) => const PlaceholderScreen(title: 'Profile'),
+      builder: (context, state) => const ProfileScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.editProfile,
+      builder: (context, state) => const EditProfileScreen(),
     ),
     GoRoute(
       path: AppRoutes.addresses,
@@ -161,7 +155,7 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: AppRoutes.settings,
-      builder: (context, state) => const PlaceholderScreen(title: 'Settings'),
+      builder: (context, state) => const SettingsScreen(),
     ),
     GoRoute(
       path: AppRoutes.payment,

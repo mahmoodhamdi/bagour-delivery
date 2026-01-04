@@ -249,7 +249,7 @@ class AvailableOrderCard extends StatelessWidget {
           const SizedBox(width: 4),
           Text(
             minutes > 0
-                ? '${minutes}:${seconds.toString().padLeft(2, '0')}'
+                ? '$minutes:${seconds.toString().padLeft(2, '0')}'
                 : '${seconds}s',
             style: TextStyle(
               fontSize: 12,

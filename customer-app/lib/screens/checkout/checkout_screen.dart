@@ -208,7 +208,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: canPlaceOrder && !isPlacing
-                    ? () => _placeOrder(context, selectedAddress!)
+                    ? () => _placeOrder(context, selectedAddress)
                     : null,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 4),

@@ -99,22 +99,27 @@ class RestaurantService {
       final queryParams = <String, dynamic>{};
 
       if (params.search?.isNotEmpty ?? false) queryParams['q'] = params.search;
-      if (params.category?.isNotEmpty ?? false)
+      if (params.category?.isNotEmpty ?? false) {
         queryParams['category'] = params.category;
+      }
       if (params.area?.isNotEmpty ?? false) queryParams['area'] = params.area;
-      if (params.priceRange != null)
+      if (params.priceRange != null) {
         queryParams['priceRange'] = params.priceRange;
+      }
       if (params.isOpen != null) queryParams['isOpen'] = params.isOpen;
-      if (params.sortBy?.isNotEmpty ?? false)
+      if (params.sortBy?.isNotEmpty ?? false) {
         queryParams['sortBy'] = params.sortBy;
-      if (params.sortOrder?.isNotEmpty ?? false)
+      }
+      if (params.sortOrder?.isNotEmpty ?? false) {
         queryParams['sortOrder'] = params.sortOrder;
+      }
       queryParams['page'] = params.page;
       queryParams['limit'] = params.limit;
       if (params.lat != null) queryParams['lat'] = params.lat;
       if (params.lng != null) queryParams['lng'] = params.lng;
-      if (params.lat != null && params.lng != null)
+      if (params.lat != null && params.lng != null) {
         queryParams['maxDistance'] = params.maxDistance;
+      }
 
       final response = await _api.get(
         AppEndpoints.restaurants,
