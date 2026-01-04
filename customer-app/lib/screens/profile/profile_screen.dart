@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../config/theme.dart';
 import '../../config/routes.dart';
 import '../../providers/providers.dart';
+import '../../utils/url_launcher_helper.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -299,7 +300,7 @@ class ProfileScreen extends ConsumerWidget {
               subtitle: const Text('+20 100 000 0000'),
               onTap: () {
                 Navigator.pop(context);
-                // TODO: Launch phone
+                UrlLauncherHelper.launchSupportPhone();
               },
             ),
             ListTile(
@@ -315,7 +316,7 @@ class ProfileScreen extends ConsumerWidget {
               subtitle: const Text('تواصل عبر واتساب'),
               onTap: () {
                 Navigator.pop(context);
-                // TODO: Launch WhatsApp
+                UrlLauncherHelper.launchSupportWhatsApp();
               },
             ),
             ListTile(
@@ -331,7 +332,7 @@ class ProfileScreen extends ConsumerWidget {
               subtitle: const Text('support@bagour.com'),
               onTap: () {
                 Navigator.pop(context);
-                // TODO: Launch email
+                UrlLauncherHelper.launchSupportEmail();
               },
             ),
             const SizedBox(height: 16),

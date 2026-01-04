@@ -6,6 +6,7 @@ import '../../config/routes.dart';
 import '../../models/address.dart';
 import '../../providers/cart_provider.dart';
 import '../../providers/address_provider.dart';
+import '../../providers/order_provider.dart';
 import 'widgets/checkout_address_section.dart';
 import 'widgets/checkout_payment_section.dart';
 import 'widgets/checkout_items_section.dart';
@@ -267,24 +268,58 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       final notes = ref.read(checkoutNotesProvider);
       final paymentMethod = ref.read(selectedPaymentMethodProvider);
 
-      // TODO: Implement order placement API call
-      // For now, simulate order placement
-      await Future.delayed(const Duration(seconds: 2));
+      // Prepare order items
+      final orderItems = cart.items.map((item) => {
+        'menuItemId': item.menuItemId,
+        'quantity': item.quantity,
+        'specialInstructions': item.specialInstructions,
+        'addons': item.addons.map((addon) => {
+          'name': addon.name,
+          'price': addon.price,
+          'quantity': addon.quantity,
+        }).toList(),
+        'variations': item.variations.map((variation) => {
+          'variationName': variation.variationName,
+          'optionName': variation.optionName,
+          'price': variation.price,
+        }).toList(),
+      }).toList();
 
-      // Clear cart after successful order
-      await ref.read(cartProvider.notifier).clearCart();
+      // Create order via API
+      final orderId = await ref.read(orderCreationProvider.notifier).createOrder(
+        restaurantId: cart.restaurantId!,
+        items: orderItems,
+        addressId: address.id!,
+        paymentMethod: paymentMethod.name,
+        notes: notes,
+      );
 
-      if (mounted) {
-        // Show success and navigate to order tracking
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('تم تأكيد طلبك بنجاح!'),
-            backgroundColor: AppColors.success,
-          ),
-        );
+      if (orderId != null) {
+        // Clear cart after successful order
+        await ref.read(cartProvider.notifier).clearCart();
 
-        // Navigate to order tracking (using placeholder ID)
-        context.go('/order/placeholder_id');
+        if (mounted) {
+          // Show success and navigate to order tracking
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('تم تأكيد طلبك بنجاح!'),
+              backgroundColor: AppColors.success,
+            ),
+          );
+
+          // Navigate to order tracking
+          context.go('/order/$orderId');
+        }
+      } else {
+        final error = ref.read(orderCreationProvider).error;
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(error ?? 'فشل تأكيد الطلب'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
       }
     } catch (e) {
       if (mounted) {
