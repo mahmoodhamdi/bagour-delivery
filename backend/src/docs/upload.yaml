@@ -1,0 +1,212 @@
+# File Upload API Documentation
+
+paths:
+  /upload/image:
+    post:
+      tags:
+        - Upload
+      summary: Upload single image
+      description: Upload a single image file to Cloudinary
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - image
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: Image file (max 5MB, formats jpg, jpeg, png, webp)
+                folder:
+                  type: string
+                  enum: [avatars, restaurants, menu-items, reviews, documents, banners]
+                  default: avatars
+      responses:
+        '200':
+          description: Image uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: تم رفع الصورة بنجاح
+                  data:
+                    type: object
+                    properties:
+                      url:
+                        type: string
+                        format: uri
+                        example: https://res.cloudinary.com/bagour/image/upload/v123/avatars/user1.jpg
+                      publicId:
+                        type: string
+                        example: avatars/user1
+                      width:
+                        type: number
+                      height:
+                        type: number
+                      format:
+                        type: string
+                      size:
+                        type: number
+        '400':
+          description: Invalid file or file too large
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: حجم الصورة يجب أن يكون أقل من 5 ميجابايت
+
+  /upload/images:
+    post:
+      tags:
+        - Upload
+      summary: Upload multiple images
+      description: Upload multiple image files (max 5 files)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - images
+              properties:
+                images:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  maxItems: 5
+                folder:
+                  type: string
+                  default: menu-items
+      responses:
+        '200':
+          description: Images uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: تم رفع الصور بنجاح
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        url:
+                          type: string
+                          format: uri
+                        publicId:
+                          type: string
+        '400':
+          description: Too many files or invalid files
+
+  /upload/document:
+    post:
+      tags:
+        - Upload
+      summary: Upload document
+      description: Upload PDF or image document (driver license, ID, etc.)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - document
+                - type
+              properties:
+                document:
+                  type: string
+                  format: binary
+                  description: Document file (max 10MB, formats pdf, jpg, jpeg, png)
+                type:
+                  type: string
+                  enum: [national_id, license, vehicle_registration, insurance, other]
+      responses:
+        '200':
+          description: Document uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: تم رفع المستند بنجاح
+                  data:
+                    type: object
+                    properties:
+                      url:
+                        type: string
+                        format: uri
+                      publicId:
+                        type: string
+                      type:
+                        type: string
+        '400':
+          description: Invalid document
+
+  /upload/delete:
+    delete:
+      tags:
+        - Upload
+      summary: Delete uploaded file
+      description: Delete a file from Cloudinary using its public ID
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - publicId
+              properties:
+                publicId:
+                  type: string
+                  example: avatars/user1
+                  description: Cloudinary public ID of the file
+      responses:
+        '200':
+          description: File deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: تم حذف الملف بنجاح
+        '404':
+          $ref: '#/components/responses/NotFoundError'

@@ -1,0 +1,643 @@
+# Driver API Documentation
+
+paths:
+  /driver/profile:
+    get:
+      tags:
+        - Driver
+      summary: Get driver profile
+      description: Retrieve the authenticated driver's profile information
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Driver'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+    patch:
+      tags:
+        - Driver
+      summary: Update driver profile
+      description: Update driver profile information
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: محمد السائق
+                email:
+                  type: string
+                  format: email
+                phone:
+                  type: string
+                  example: "+201234567890"
+                avatar:
+                  type: string
+                  format: uri
+                vehicleType:
+                  type: string
+                  enum: [motorcycle, car, bicycle]
+                vehiclePlate:
+                  type: string
+                  example: ABC 1234
+                vehicleColor:
+                  type: string
+                  example: أسود
+                vehicleModel:
+                  type: string
+                  example: Honda 2020
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: تم تحديث الملف الشخصي
+                  data:
+                    $ref: '#/components/schemas/Driver'
+
+  /driver/status:
+    put:
+      tags:
+        - Driver
+      summary: Toggle online/offline status
+      description: Change driver's online/offline status for accepting deliveries
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - isOnline
+              properties:
+                isOnline:
+                  type: boolean
+                  example: true
+                location:
+                  type: object
+                  properties:
+                    latitude:
+                      type: number
+                      example: 30.4167
+                    longitude:
+                      type: number
+                      example: 30.9667
+      responses:
+        '200':
+          description: Status updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: تم تحديث الحالة
+        '400':
+          description: Cannot go offline during active delivery
+
+  /driver/location:
+    put:
+      tags:
+        - Driver
+      summary: Update driver location
+      description: Update current GPS location of the driver
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - latitude
+                - longitude
+              properties:
+                latitude:
+                  type: number
+                  example: 30.4167
+                longitude:
+                  type: number
+                  example: 30.9667
+                accuracy:
+                  type: number
+                  example: 10
+                  description: Location accuracy in meters
+                heading:
+                  type: number
+                  example: 180
+                  description: Direction in degrees (0-360)
+                speed:
+                  type: number
+                  example: 25
+                  description: Speed in km/h
+      responses:
+        '200':
+          description: Location updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: تم تحديث الموقع
+
+  /driver/availability:
+    put:
+      tags:
+        - Driver
+      summary: Toggle availability
+      description: Toggle driver availability to accept new deliveries
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - isAvailable
+              properties:
+                isAvailable:
+                  type: boolean
+      responses:
+        '200':
+          description: Availability updated
+
+  /driver/stats:
+    get:
+      tags:
+        - Driver
+      summary: Get driver statistics
+      description: Retrieve driver's performance statistics and earnings
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [today, week, month, all]
+            default: month
+      responses:
+        '200':
+          description: Statistics retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      totalDeliveries:
+                        type: number
+                        example: 125
+                      completedDeliveries:
+                        type: number
+                        example: 120
+                      cancelledDeliveries:
+                        type: number
+                        example: 5
+                      totalEarnings:
+                        type: number
+                        example: 3750.50
+                      currentBalance:
+                        type: number
+                        example: 1250.00
+                      averageRating:
+                        type: number
+                        example: 4.8
+                      totalRatings:
+                        type: number
+                        example: 98
+                      completionRate:
+                        type: number
+                        example: 96
+                      averageDeliveryTime:
+                        type: number
+                        example: 25
+                        description: Average delivery time in minutes
+                      onTimeDeliveryRate:
+                        type: number
+                        example: 94
+
+  /driver/orders/available:
+    get:
+      tags:
+        - Driver
+      summary: Get available orders
+      description: Retrieve list of orders ready for pickup (driver can accept)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: latitude
+          in: query
+          required: true
+          schema:
+            type: number
+        - name: longitude
+          in: query
+          required: true
+          schema:
+            type: number
+        - name: radius
+          in: query
+          schema:
+            type: number
+            default: 5
+            description: Search radius in kilometers
+      responses:
+        '200':
+          description: Available orders retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: '#/components/schemas/Order'
+                        - type: object
+                          properties:
+                            distance:
+                              type: number
+                              example: 2.5
+                              description: Distance from driver in km
+                            estimatedEarning:
+                              type: number
+                              example: 25
+
+  /driver/orders/active:
+    get:
+      tags:
+        - Driver
+      summary: Get active delivery
+      description: Get current active delivery order
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Active order retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Order'
+        '404':
+          description: No active delivery
+
+  /driver/orders/{id}/accept:
+    put:
+      tags:
+        - Driver
+      summary: Accept delivery
+      description: Accept a delivery order for pickup
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Order accepted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: تم قبول الطلب
+                  data:
+                    $ref: '#/components/schemas/Order'
+        '400':
+          description: Order already accepted or driver has active delivery
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /driver/orders/{id}/pickup:
+    put:
+      tags:
+        - Driver
+      summary: Mark as picked up
+      description: Mark order as picked up from restaurant
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                note:
+                  type: string
+                  example: تم استلام الطلب
+                pickupCode:
+                  type: string
+                  example: "1234"
+                  description: Verification code from restaurant
+      responses:
+        '200':
+          description: Order marked as picked up
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: تم استلام الطلب من المطعم
+
+  /driver/orders/{id}/deliver:
+    put:
+      tags:
+        - Driver
+      summary: Mark as delivered
+      description: Complete delivery and mark order as delivered
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                note:
+                  type: string
+                  example: تم التسليم بنجاح
+                deliveryCode:
+                  type: string
+                  example: "5678"
+                  description: Verification code from customer
+                signature:
+                  type: string
+                  format: uri
+                  description: Customer signature image (base64 or URL)
+                photo:
+                  type: string
+                  format: uri
+                  description: Delivery proof photo
+      responses:
+        '200':
+          description: Order delivered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: تم التسليم بنجاح
+                  data:
+                    type: object
+                    properties:
+                      order:
+                        $ref: '#/components/schemas/Order'
+                      earnings:
+                        type: number
+                        example: 25
+
+  /driver/earnings:
+    get:
+      tags:
+        - Driver
+      summary: Get earnings
+      description: Retrieve driver's earnings history and balance
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Earnings retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      currentBalance:
+                        type: number
+                        example: 1250.00
+                      totalEarnings:
+                        type: number
+                        example: 3750.50
+                      totalWithdrawn:
+                        type: number
+                        example: 2500.50
+                      transactions:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Transaction'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+  /driver/earnings/withdraw:
+    post:
+      tags:
+        - Driver
+      summary: Request withdrawal
+      description: Request to withdraw earnings to bank account or wallet
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - amount
+                - method
+              properties:
+                amount:
+                  type: number
+                  minimum: 100
+                  example: 500
+                method:
+                  type: string
+                  enum: [bank_transfer, wallet, cash]
+                  example: bank_transfer
+                bankAccountNumber:
+                  type: string
+                  description: Required if method is bank_transfer
+                walletNumber:
+                  type: string
+                  description: Required if method is wallet
+                notes:
+                  type: string
+      responses:
+        '200':
+          description: Withdrawal request created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: تم إرسال طلب السحب بنجاح
+                  data:
+                    $ref: '#/components/schemas/Transaction'
+        '400':
+          description: Insufficient balance or amount below minimum
+
+  /driver/documents:
+    put:
+      tags:
+        - Driver
+      summary: Update documents
+      description: Update driver's verification documents
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nationalId:
+                  type: string
+                nationalIdImage:
+                  type: string
+                  format: uri
+                licenseNumber:
+                  type: string
+                licenseImage:
+                  type: string
+                  format: uri
+                licenseExpiryDate:
+                  type: string
+                  format: date
+                vehicleRegistration:
+                  type: string
+                  format: uri
+                vehicleInsurance:
+                  type: string
+                  format: uri
+      responses:
+        '200':
+          description: Documents updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: تم تحديث المستندات، في انتظار المراجعة
+
+  /driver/zones:
+    get:
+      tags:
+        - Driver
+      summary: Get available zones
+      description: Get list of delivery zones driver can operate in
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Zones retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Zone'

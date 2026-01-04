@@ -1,0 +1,485 @@
+# Customer API Documentation
+
+paths:
+  /customer/profile:
+    get:
+      tags:
+        - Customer
+      summary: Get customer profile
+      description: Retrieve the authenticated customer's profile information including addresses and loyalty points
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Customer'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /customer/loyalty-points:
+    get:
+      tags:
+        - Customer
+      summary: Get loyalty points
+      description: Get customer's current loyalty points balance and history
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Loyalty points retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      balance:
+                        type: number
+                        example: 250
+                      pointsToNextReward:
+                        type: number
+                        example: 50
+                      history:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            points:
+                              type: number
+                            reason:
+                              type: string
+                            createdAt:
+                              type: string
+                              format: date-time
+
+  /customer/addresses:
+    get:
+      tags:
+        - Customer
+      summary: Get all addresses
+      description: Retrieve all saved addresses for the customer
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Addresses retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Address'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+    post:
+      tags:
+        - Customer
+      summary: Add new address
+      description: Add a new delivery address to customer's account
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - address
+                - area
+                - city
+                - latitude
+                - longitude
+              properties:
+                label:
+                  type: string
+                  enum: [home, work, other]
+                  example: home
+                name:
+                  type: string
+                  example: المنزل
+                address:
+                  type: string
+                  example: شارع الجمهورية، مبنى 15
+                building:
+                  type: string
+                  example: "15"
+                floor:
+                  type: string
+                  example: "3"
+                apartment:
+                  type: string
+                  example: "12"
+                area:
+                  type: string
+                  example: وسط البلد
+                city:
+                  type: string
+                  example: الباجور
+                landmark:
+                  type: string
+                  example: بجوار مسجد النور
+                phone:
+                  type: string
+                  example: "+201234567890"
+                latitude:
+                  type: number
+                  example: 30.4167
+                longitude:
+                  type: number
+                  example: 30.9667
+                isDefault:
+                  type: boolean
+                  example: false
+      responses:
+        '201':
+          description: Address added successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: تم إضافة العنوان بنجاح
+                  data:
+                    $ref: '#/components/schemas/Address'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+
+  /customer/addresses/{id}:
+    put:
+      tags:
+        - Customer
+      summary: Update address
+      description: Update an existing delivery address
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                label:
+                  type: string
+                name:
+                  type: string
+                address:
+                  type: string
+                building:
+                  type: string
+                floor:
+                  type: string
+                apartment:
+                  type: string
+                area:
+                  type: string
+                city:
+                  type: string
+                landmark:
+                  type: string
+                phone:
+                  type: string
+                latitude:
+                  type: number
+                longitude:
+                  type: number
+      responses:
+        '200':
+          description: Address updated successfully
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+    delete:
+      tags:
+        - Customer
+      summary: Delete address
+      description: Remove an address from customer's account
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Address deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: تم حذف العنوان بنجاح
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /customer/addresses/{id}/default:
+    patch:
+      tags:
+        - Customer
+      summary: Set default address
+      description: Set an address as the default delivery address
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Default address set successfully
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /customer/addresses/default:
+    get:
+      tags:
+        - Customer
+      summary: Get default address
+      description: Retrieve the customer's default delivery address
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Default address retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Address'
+        '404':
+          description: No default address set
+
+  /customer/favorites:
+    get:
+      tags:
+        - Customer
+      summary: Get favorite restaurants
+      description: Retrieve all restaurants favorited by the customer
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Favorites retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Restaurant'
+
+  /customer/favorites/{restaurantId}:
+    post:
+      tags:
+        - Customer
+      summary: Add restaurant to favorites
+      description: Add a restaurant to customer's favorites list
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: restaurantId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Restaurant added to favorites
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: تم إضافة المطعم للمفضلة
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+    delete:
+      tags:
+        - Customer
+      summary: Remove restaurant from favorites
+      description: Remove a restaurant from customer's favorites list
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: restaurantId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Restaurant removed from favorites
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: تم إزالة المطعم من المفضلة
+
+  /customer/favorites/{restaurantId}/check:
+    get:
+      tags:
+        - Customer
+      summary: Check if restaurant is favorited
+      description: Check if a restaurant is in customer's favorites
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: restaurantId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Favorite status retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      isFavorite:
+                        type: boolean
+                        example: true
+
+  /customer/notifications:
+    get:
+      tags:
+        - Customer
+      summary: Get customer notifications
+      description: Retrieve all notifications for the customer
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: unreadOnly
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Notifications retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Notification'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+  /customer/orders:
+    get:
+      tags:
+        - Customer
+      summary: Get customer orders
+      description: Retrieve order history for the customer
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, confirmed, preparing, ready, picked_up, on_the_way, delivered, cancelled]
+      responses:
+        '200':
+          description: Orders retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Order'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
