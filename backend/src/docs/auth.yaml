@@ -1,0 +1,464 @@
+# Authentication API Documentation
+
+paths:
+  /auth/customer/register:
+    post:
+      tags:
+        - Auth
+      summary: Register new customer
+      description: Create a new customer account. OTP will be sent to phone for verification.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterCustomer'
+      responses:
+        '201':
+          description: Registration successful, OTP sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: تم إنشاء الحساب بنجاح، يرجى التحقق من هاتفك
+                  data:
+                    type: object
+                    properties:
+                      userId:
+                        type: string
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '409':
+          description: Email or phone already exists
+
+  /auth/customer/login:
+    post:
+      tags:
+        - Auth
+      summary: Customer login
+      description: Authenticate customer and receive JWT tokens
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Invalid credentials
+
+  /auth/restaurant/register:
+    post:
+      tags:
+        - Auth
+      summary: Register new restaurant
+      description: |
+        Create a new restaurant account. The restaurant will be pending admin approval.
+        Required documents: commercial license, tax registration.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - nameAr
+                - email
+                - phone
+                - password
+                - address
+              properties:
+                name:
+                  type: string
+                  example: Bagouri Restaurant
+                nameAr:
+                  type: string
+                  example: مطعم الباجوري
+                email:
+                  type: string
+                  format: email
+                phone:
+                  type: string
+                  example: "+201234567890"
+                password:
+                  type: string
+                  format: password
+                  minLength: 6
+                description:
+                  type: string
+                descriptionAr:
+                  type: string
+                cuisineType:
+                  type: array
+                  items:
+                    type: string
+                address:
+                  type: object
+                  properties:
+                    street:
+                      type: string
+                    area:
+                      type: string
+                    city:
+                      type: string
+                location:
+                  type: object
+                  properties:
+                    latitude:
+                      type: number
+                    longitude:
+                      type: number
+      responses:
+        '201':
+          description: Registration successful, pending approval
+        '400':
+          $ref: '#/components/responses/ValidationError'
+
+  /auth/restaurant/login:
+    post:
+      tags:
+        - Auth
+      summary: Restaurant owner login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+        '401':
+          description: Invalid credentials
+        '403':
+          description: Restaurant not approved yet
+
+  /auth/driver/register:
+    post:
+      tags:
+        - Auth
+      summary: Register new driver
+      description: |
+        Create a new driver account. Requires valid documents.
+        Driver will be pending admin approval and document verification.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+                - phone
+                - password
+                - nationalId
+                - licenseNumber
+                - licenseExpiryDate
+                - vehicleType
+                - vehiclePlate
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                phone:
+                  type: string
+                password:
+                  type: string
+                  format: password
+                nationalId:
+                  type: string
+                  description: 14-digit Egyptian national ID
+                nationalIdImage:
+                  type: string
+                  format: uri
+                nationalIdBackImage:
+                  type: string
+                  format: uri
+                licenseNumber:
+                  type: string
+                licenseImage:
+                  type: string
+                  format: uri
+                licenseExpiryDate:
+                  type: string
+                  format: date
+                vehicleType:
+                  type: string
+                  enum: [motorcycle, car, bicycle]
+                vehiclePlate:
+                  type: string
+                vehicleColor:
+                  type: string
+                vehicleModel:
+                  type: string
+      responses:
+        '201':
+          description: Registration successful, pending approval
+
+  /auth/driver/login:
+    post:
+      tags:
+        - Auth
+      summary: Driver login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+        '403':
+          description: Driver not approved yet
+
+  /auth/admin/login:
+    post:
+      tags:
+        - Auth
+      summary: Admin login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+        '401':
+          description: Invalid credentials
+
+  /auth/verify-otp:
+    post:
+      tags:
+        - Auth
+      summary: Verify OTP
+      description: Verify phone number with OTP code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - phone
+                - otp
+              properties:
+                phone:
+                  type: string
+                  example: "+201234567890"
+                otp:
+                  type: string
+                  example: "123456"
+      responses:
+        '200':
+          description: OTP verified successfully
+        '400':
+          description: Invalid or expired OTP
+
+  /auth/resend-otp:
+    post:
+      tags:
+        - Auth
+      summary: Resend OTP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - phone
+              properties:
+                phone:
+                  type: string
+      responses:
+        '200':
+          description: OTP resent successfully
+        '429':
+          description: Too many requests
+
+  /auth/forgot-password:
+    post:
+      tags:
+        - Auth
+      summary: Request password reset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        '200':
+          description: Reset link sent to email
+
+  /auth/reset-password:
+    post:
+      tags:
+        - Auth
+      summary: Reset password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - token
+                - password
+              properties:
+                token:
+                  type: string
+                password:
+                  type: string
+                  format: password
+                  minLength: 6
+      responses:
+        '200':
+          description: Password reset successful
+
+  /auth/change-password:
+    post:
+      tags:
+        - Auth
+      summary: Change password
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - currentPassword
+                - newPassword
+              properties:
+                currentPassword:
+                  type: string
+                newPassword:
+                  type: string
+                  minLength: 6
+      responses:
+        '200':
+          description: Password changed successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /auth/refresh-token:
+    post:
+      tags:
+        - Auth
+      summary: Refresh access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - refreshToken
+              properties:
+                refreshToken:
+                  type: string
+      responses:
+        '200':
+          description: New tokens generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                  refreshToken:
+                    type: string
+
+  /auth/fcm-token:
+    post:
+      tags:
+        - Auth
+      summary: Update FCM token
+      description: Register or update Firebase Cloud Messaging token for push notifications
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - token
+              properties:
+                token:
+                  type: string
+                  description: FCM device token
+                platform:
+                  type: string
+                  enum: [ios, android, web]
+      responses:
+        '200':
+          description: FCM token updated
+
+  /auth/logout:
+    post:
+      tags:
+        - Auth
+      summary: Logout user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Logged out successfully
+
+  /auth/me:
+    get:
+      tags:
+        - Auth
+      summary: Get current user profile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User profile
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/User'

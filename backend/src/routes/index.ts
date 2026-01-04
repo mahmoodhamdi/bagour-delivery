@@ -18,6 +18,13 @@ import {
 } from './transaction.routes';
 import adminRoutes from './admin.routes';
 import notificationRoutes from './notification.routes';
+import reviewRoutes, {
+  restaurantReviewsRouter,
+  customerReviewRouter,
+  restaurantOwnerReviewRouter,
+  adminReviewRouter,
+} from './review.routes';
+import driverProfileRoutes from './driver.routes';
 
 const router = Router();
 
@@ -77,6 +84,24 @@ router.use(`${API_VERSION}/admin`, adminRoutes);
 
 // Notification routes
 router.use(`${API_VERSION}/notifications`, notificationRoutes);
+
+// Review routes (base)
+router.use(`${API_VERSION}/reviews`, reviewRoutes);
+
+// Restaurant reviews (public)
+router.use(`${API_VERSION}/restaurants/:restaurantId/reviews`, restaurantReviewsRouter);
+
+// Customer reviews
+router.use(`${API_VERSION}/customer/reviews`, customerReviewRouter);
+
+// Restaurant owner reviews
+router.use(`${API_VERSION}/restaurant/reviews`, restaurantOwnerReviewRouter);
+
+// Admin reviews
+router.use(`${API_VERSION}/admin/reviews`, adminReviewRouter);
+
+// Driver profile routes
+router.use(`${API_VERSION}/driver`, driverProfileRoutes);
 
 // Health check
 router.get('/health', (_req, res) => {

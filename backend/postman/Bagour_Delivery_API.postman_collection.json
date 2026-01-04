@@ -1,0 +1,1210 @@
+{
+  "info": {
+    "_postman_id": "bagour-delivery-api-v1",
+    "name": "Bagour Delivery API",
+    "description": "Complete API collection for Bagour Delivery food ordering platform.\n\n## Authentication\nMost endpoints require Bearer token authentication. Use the Login endpoints to obtain tokens.\n\n## Environments\n- Development: http://localhost:5000\n- Production: https://api.bagour-delivery.com",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refreshToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "description": "Authentication endpoints for all user roles",
+      "item": [
+        {
+          "name": "Customer",
+          "item": [
+            {
+              "name": "Register Customer",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"أحمد محمد\",\n  \"email\": \"ahmed@example.com\",\n  \"phone\": \"+201234567890\",\n  \"password\": \"password123\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{baseUrl}}/auth/customer/register"
+              }
+            },
+            {
+              "name": "Login Customer",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "var jsonData = pm.response.json();",
+                      "if (jsonData.success && jsonData.data) {",
+                      "    pm.environment.set('accessToken', jsonData.data.accessToken);",
+                      "    pm.environment.set('refreshToken', jsonData.data.refreshToken);",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"customer@test.com\",\n  \"password\": \"password123\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{baseUrl}}/auth/customer/login"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Restaurant",
+          "item": [
+            {
+              "name": "Register Restaurant",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Bagouri Restaurant\",\n  \"nameAr\": \"مطعم الباجوري\",\n  \"email\": \"restaurant@example.com\",\n  \"phone\": \"+201234567891\",\n  \"password\": \"password123\",\n  \"description\": \"Best local food\",\n  \"descriptionAr\": \"أفضل الأطعمة المحلية\",\n  \"cuisineType\": [\"مصري\", \"شرقي\"],\n  \"address\": {\n    \"street\": \"شارع النيل\",\n    \"area\": \"باجور\",\n    \"city\": \"المنوفية\"\n  },\n  \"location\": {\n    \"latitude\": 30.4167,\n    \"longitude\": 30.9667\n  }\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{baseUrl}}/auth/restaurant/register"
+              }
+            },
+            {
+              "name": "Login Restaurant",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "var jsonData = pm.response.json();",
+                      "if (jsonData.success && jsonData.data) {",
+                      "    pm.environment.set('accessToken', jsonData.data.accessToken);",
+                      "    pm.environment.set('refreshToken', jsonData.data.refreshToken);",
+                      "    pm.environment.set('restaurantId', jsonData.data.restaurant._id);",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"restaurant@test.com\",\n  \"password\": \"password123\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{baseUrl}}/auth/restaurant/login"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Driver",
+          "item": [
+            {
+              "name": "Register Driver",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"محمود السائق\",\n  \"email\": \"driver@example.com\",\n  \"phone\": \"+201234567892\",\n  \"password\": \"password123\",\n  \"nationalId\": \"29901011234567\",\n  \"licenseNumber\": \"DL123456\",\n  \"licenseExpiryDate\": \"2027-12-31\",\n  \"vehicleType\": \"motorcycle\",\n  \"vehiclePlate\": \"م ن و 1234\",\n  \"vehicleColor\": \"أحمر\",\n  \"vehicleModel\": \"Honda\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{baseUrl}}/auth/driver/register"
+              }
+            },
+            {
+              "name": "Login Driver",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "var jsonData = pm.response.json();",
+                      "if (jsonData.success && jsonData.data) {",
+                      "    pm.environment.set('accessToken', jsonData.data.accessToken);",
+                      "    pm.environment.set('refreshToken', jsonData.data.refreshToken);",
+                      "    pm.environment.set('driverId', jsonData.data.driver._id);",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"driver@test.com\",\n  \"password\": \"password123\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{baseUrl}}/auth/driver/login"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin",
+          "item": [
+            {
+              "name": "Login Admin",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "var jsonData = pm.response.json();",
+                      "if (jsonData.success && jsonData.data) {",
+                      "    pm.environment.set('accessToken', jsonData.data.accessToken);",
+                      "    pm.environment.set('refreshToken', jsonData.data.refreshToken);",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"admin@bagour-delivery.com\",\n  \"password\": \"admin123\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{baseUrl}}/auth/admin/login"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Common",
+          "item": [
+            {
+              "name": "Verify OTP",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"phone\": \"+201234567890\",\n  \"otp\": \"123456\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{baseUrl}}/auth/verify-otp"
+              }
+            },
+            {
+              "name": "Resend OTP",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"phone\": \"+201234567890\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{baseUrl}}/auth/resend-otp"
+              }
+            },
+            {
+              "name": "Forgot Password",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"user@example.com\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{baseUrl}}/auth/forgot-password"
+              }
+            },
+            {
+              "name": "Reset Password",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"token\": \"reset_token_here\",\n  \"password\": \"newpassword123\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{baseUrl}}/auth/reset-password"
+              }
+            },
+            {
+              "name": "Change Password",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"currentPassword\": \"password123\",\n  \"newPassword\": \"newpassword123\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{baseUrl}}/auth/change-password"
+              }
+            },
+            {
+              "name": "Refresh Token",
+              "request": {
+                "auth": { "type": "noauth" },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{baseUrl}}/auth/refresh-token"
+              }
+            },
+            {
+              "name": "Get Me",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/auth/me"
+              }
+            },
+            {
+              "name": "Update FCM Token",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"token\": \"fcm_device_token\",\n  \"platform\": \"android\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{baseUrl}}/auth/fcm-token"
+              }
+            },
+            {
+              "name": "Logout",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": "{{baseUrl}}/auth/logout"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Restaurants (Public)",
+      "item": [
+        {
+          "name": "Search Restaurants",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/restaurants?page=1&limit=20&search=&cuisine=&isOpen=true",
+              "host": ["{{baseUrl}}"],
+              "path": ["restaurants"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" },
+                { "key": "search", "value": "" },
+                { "key": "cuisine", "value": "" },
+                { "key": "isOpen", "value": "true" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Featured Restaurants",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/restaurants/featured"
+          }
+        },
+        {
+          "name": "Get Nearby Restaurants",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/restaurants/nearby?latitude=30.4167&longitude=30.9667&radius=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["restaurants", "nearby"],
+              "query": [
+                { "key": "latitude", "value": "30.4167" },
+                { "key": "longitude", "value": "30.9667" },
+                { "key": "radius", "value": "5" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Restaurant by Slug",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/restaurants/bagouri-restaurant"
+          }
+        },
+        {
+          "name": "Get Restaurant Menu",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/restaurants/bagouri-restaurant/menu"
+          }
+        },
+        {
+          "name": "Get Restaurant Reviews",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/restaurants/{{restaurantId}}/reviews?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["restaurants", "{{restaurantId}}", "reviews"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Customer",
+      "item": [
+        {
+          "name": "Profile",
+          "item": [
+            {
+              "name": "Get Profile",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/customer/profile"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Addresses",
+          "item": [
+            {
+              "name": "Get Addresses",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/customer/addresses"
+              }
+            },
+            {
+              "name": "Add Address",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"label\": \"المنزل\",\n  \"street\": \"شارع النيل\",\n  \"building\": \"15\",\n  \"floor\": \"3\",\n  \"apartment\": \"12\",\n  \"area\": \"باجور\",\n  \"city\": \"المنوفية\",\n  \"landmark\": \"بجوار مسجد النور\",\n  \"location\": {\n    \"latitude\": 30.4167,\n    \"longitude\": 30.9667\n  },\n  \"isDefault\": true\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{baseUrl}}/customer/addresses"
+              }
+            },
+            {
+              "name": "Update Address",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"label\": \"العمل\",\n  \"street\": \"شارع الجمهورية\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{baseUrl}}/customer/addresses/{{addressId}}"
+              }
+            },
+            {
+              "name": "Set Default Address",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "url": "{{baseUrl}}/customer/addresses/{{addressId}}/default"
+              }
+            },
+            {
+              "name": "Delete Address",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{baseUrl}}/customer/addresses/{{addressId}}"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Favorites",
+          "item": [
+            {
+              "name": "Get Favorites",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/customer/favorites"
+              }
+            },
+            {
+              "name": "Add to Favorites",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": "{{baseUrl}}/customer/favorites/{{restaurantId}}"
+              }
+            },
+            {
+              "name": "Remove from Favorites",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{baseUrl}}/customer/favorites/{{restaurantId}}"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Orders (Customer)",
+      "item": [
+        {
+          "name": "Create Order",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"restaurantId\": \"{{restaurantId}}\",\n  \"items\": [\n    {\n      \"menuItemId\": \"{{menuItemId}}\",\n      \"quantity\": 2,\n      \"selectedAddons\": [\n        { \"addonId\": \"addon_id\", \"quantity\": 1 }\n      ],\n      \"specialInstructions\": \"بدون بصل\"\n    }\n  ],\n  \"deliveryAddress\": {\n    \"street\": \"شارع النيل\",\n    \"building\": \"15\",\n    \"floor\": \"3\",\n    \"apartment\": \"12\",\n    \"area\": \"باجور\",\n    \"landmark\": \"بجوار مسجد النور\",\n    \"latitude\": 30.4167,\n    \"longitude\": 30.9667\n  },\n  \"paymentMethod\": \"cash\",\n  \"couponCode\": \"WELCOME20\",\n  \"customerNotes\": \"الرجاء الاتصال عند الوصول\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/orders"
+          }
+        },
+        {
+          "name": "Get My Orders",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/orders?page=1&limit=10&status=",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "status", "value": "" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Order by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/orders/{{orderId}}"
+          }
+        },
+        {
+          "name": "Cancel Order",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"غيرت رأيي\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/orders/{{orderId}}/cancel"
+          }
+        },
+        {
+          "name": "Rate Order",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"restaurantRating\": 5,\n  \"foodRating\": 4,\n  \"driverRating\": 5,\n  \"comment\": \"طعام ممتاز وخدمة سريعة!\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/orders/{{orderId}}/rate"
+          }
+        },
+        {
+          "name": "Reorder",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/orders/{{orderId}}/reorder"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Restaurant Dashboard",
+      "item": [
+        {
+          "name": "Profile",
+          "item": [
+            {
+              "name": "Get Profile",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/restaurant/profile"
+              }
+            },
+            {
+              "name": "Update Profile",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"description\": \"أفضل مطعم في باجور\",\n  \"phone\": \"+201234567891\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{baseUrl}}/restaurant/profile"
+              }
+            },
+            {
+              "name": "Update Location",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"latitude\": 30.4167,\n  \"longitude\": 30.9667,\n  \"address\": {\n    \"street\": \"شارع النيل\",\n    \"area\": \"باجور\",\n    \"city\": \"المنوفية\"\n  }\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{baseUrl}}/restaurant/location"
+              }
+            },
+            {
+              "name": "Update Working Hours",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"sunday\": { \"open\": \"09:00\", \"close\": \"23:00\", \"isClosed\": false },\n  \"monday\": { \"open\": \"09:00\", \"close\": \"23:00\", \"isClosed\": false },\n  \"tuesday\": { \"open\": \"09:00\", \"close\": \"23:00\", \"isClosed\": false },\n  \"wednesday\": { \"open\": \"09:00\", \"close\": \"23:00\", \"isClosed\": false },\n  \"thursday\": { \"open\": \"09:00\", \"close\": \"23:00\", \"isClosed\": false },\n  \"friday\": { \"open\": \"09:00\", \"close\": \"23:00\", \"isClosed\": true },\n  \"saturday\": { \"open\": \"09:00\", \"close\": \"23:00\", \"isClosed\": false }\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{baseUrl}}/restaurant/working-hours"
+              }
+            },
+            {
+              "name": "Get Stats",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/restaurant/stats"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Orders",
+          "item": [
+            {
+              "name": "Get Orders",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/restaurant/orders"
+              }
+            },
+            {
+              "name": "Get Active Orders",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/restaurant/orders/active"
+              }
+            },
+            {
+              "name": "Confirm Order",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"estimatedTime\": 30\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{baseUrl}}/restaurant/orders/{{orderId}}/confirm"
+              }
+            },
+            {
+              "name": "Reject Order",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"reason\": \"المكونات غير متوفرة\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{baseUrl}}/restaurant/orders/{{orderId}}/reject"
+              }
+            },
+            {
+              "name": "Mark as Preparing",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "url": "{{baseUrl}}/restaurant/orders/{{orderId}}/preparing"
+              }
+            },
+            {
+              "name": "Mark as Ready",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "url": "{{baseUrl}}/restaurant/orders/{{orderId}}/ready"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Menu",
+          "item": [
+            {
+              "name": "Get Categories",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/menu/categories"
+              }
+            },
+            {
+              "name": "Create Category",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Grills\",\n  \"nameAr\": \"المشويات\",\n  \"description\": \"Fresh grilled meats\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{baseUrl}}/menu/categories"
+              }
+            },
+            {
+              "name": "Get Items",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/menu/items"
+              }
+            },
+            {
+              "name": "Create Item",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"categoryId\": \"{{categoryId}}\",\n  \"name\": \"Beef Shawarma\",\n  \"nameAr\": \"شاورما لحم\",\n  \"description\": \"Tender beef shawarma\",\n  \"descriptionAr\": \"شاورما لحم طرية\",\n  \"price\": 45,\n  \"preparationTime\": 15,\n  \"addons\": [\n    { \"name\": \"Extra Cheese\", \"nameAr\": \"جبنة إضافية\", \"price\": 5 },\n    { \"name\": \"Extra Sauce\", \"nameAr\": \"صوص إضافي\", \"price\": 3 }\n  ],\n  \"variations\": [\n    {\n      \"name\": \"Size\",\n      \"nameAr\": \"الحجم\",\n      \"required\": true,\n      \"options\": [\n        { \"name\": \"Regular\", \"nameAr\": \"عادي\", \"price\": 0 },\n        { \"name\": \"Large\", \"nameAr\": \"كبير\", \"price\": 10 }\n      ]\n    }\n  ]\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{baseUrl}}/menu/items"
+              }
+            },
+            {
+              "name": "Toggle Item Availability",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": "{{baseUrl}}/menu/items/{{menuItemId}}/toggle"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reviews",
+          "item": [
+            {
+              "name": "Get My Reviews",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/restaurant/reviews"
+              }
+            },
+            {
+              "name": "Reply to Review",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"reply\": \"شكراً لتقييمك الرائع! نتمنى رؤيتك مجدداً.\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{baseUrl}}/restaurant/reviews/{{reviewId}}/reply"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Driver",
+      "item": [
+        {
+          "name": "Profile",
+          "item": [
+            {
+              "name": "Get Profile",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/driver/profile"
+              }
+            },
+            {
+              "name": "Update Profile",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"vehicleColor\": \"أحمر\",\n  \"vehicleModel\": \"Honda CB500\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{baseUrl}}/driver/profile"
+              }
+            },
+            {
+              "name": "Get Stats",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/driver/stats"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Status",
+          "item": [
+            {
+              "name": "Go Online",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"isOnline\": true\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{baseUrl}}/driver/online"
+              }
+            },
+            {
+              "name": "Go Offline",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"isOnline\": false\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{baseUrl}}/driver/online"
+              }
+            },
+            {
+              "name": "Update Location",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"latitude\": 30.4167,\n  \"longitude\": 30.9667\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{baseUrl}}/driver/location"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Orders",
+          "item": [
+            {
+              "name": "Get Available Orders",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/driver/orders/available?latitude=30.4167&longitude=30.9667",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["driver", "orders", "available"],
+                  "query": [
+                    { "key": "latitude", "value": "30.4167" },
+                    { "key": "longitude", "value": "30.9667" }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get My Orders",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/driver/orders"
+              }
+            },
+            {
+              "name": "Accept Order",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "url": "{{baseUrl}}/driver/orders/{{orderId}}/accept"
+              }
+            },
+            {
+              "name": "Mark Picked Up",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "url": "{{baseUrl}}/driver/orders/{{orderId}}/picked-up"
+              }
+            },
+            {
+              "name": "Mark On The Way",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "url": "{{baseUrl}}/driver/orders/{{orderId}}/on-the-way"
+              }
+            },
+            {
+              "name": "Mark Delivered",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "url": "{{baseUrl}}/driver/orders/{{orderId}}/delivered"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Earnings",
+          "item": [
+            {
+              "name": "Get Earnings",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/driver/earnings"
+              }
+            },
+            {
+              "name": "Request Withdrawal",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"amount\": 500,\n  \"method\": \"bank_transfer\",\n  \"bankDetails\": {\n    \"bankName\": \"البنك الأهلي\",\n    \"accountNumber\": \"1234567890\",\n    \"accountHolder\": \"محمود السائق\"\n  }\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{baseUrl}}/driver/withdrawals"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Coupons",
+      "item": [
+        {
+          "name": "Validate Coupon",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"WELCOME20\",\n  \"orderTotal\": 100,\n  \"restaurantId\": \"{{restaurantId}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/coupons/validate"
+          }
+        },
+        {
+          "name": "Get Available Coupons",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/coupons/available"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin Dashboard",
+      "item": [
+        {
+          "name": "Dashboard",
+          "item": [
+            {
+              "name": "Get Stats",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/admin/dashboard/stats"
+              }
+            },
+            {
+              "name": "Get Revenue Chart",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/admin/dashboard/revenue-chart?period=month"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Restaurants",
+          "item": [
+            {
+              "name": "Get All Restaurants",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/admin/restaurants?status=pending"
+              }
+            },
+            {
+              "name": "Approve Restaurant",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "url": "{{baseUrl}}/admin/restaurants/{{restaurantId}}/approve"
+              }
+            },
+            {
+              "name": "Reject Restaurant",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"reason\": \"المستندات غير مكتملة\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{baseUrl}}/admin/restaurants/{{restaurantId}}/reject"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Drivers",
+          "item": [
+            {
+              "name": "Get All Drivers",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/admin/drivers"
+              }
+            },
+            {
+              "name": "Approve Driver",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "url": "{{baseUrl}}/admin/drivers/{{driverId}}/approve"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Zones",
+          "item": [
+            {
+              "name": "Get All Zones",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/admin/zones"
+              }
+            },
+            {
+              "name": "Create Zone",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Central Bagour\",\n  \"nameAr\": \"وسط باجور\",\n  \"coordinates\": {\n    \"type\": \"Polygon\",\n    \"coordinates\": [[\n      [30.95, 30.40],\n      [30.98, 30.40],\n      [30.98, 30.43],\n      [30.95, 30.43],\n      [30.95, 30.40]\n    ]]\n  },\n  \"deliveryFee\": 10,\n  \"minimumOrder\": 30,\n  \"isActive\": true\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{baseUrl}}/admin/zones"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Settings",
+          "item": [
+            {
+              "name": "Get Settings",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/admin/settings"
+              }
+            },
+            {
+              "name": "Update Settings",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"defaultDeliveryFee\": 10,\n  \"serviceFeePercentage\": 5,\n  \"platformCommission\": 15,\n  \"minimumWithdrawal\": 100\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{baseUrl}}/admin/settings"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Notifications",
+          "item": [
+            {
+              "name": "Broadcast Notification",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"عرض خاص!\",\n  \"titleAr\": \"عرض خاص!\",\n  \"body\": \"احصل على خصم 20% على طلبك القادم\",\n  \"bodyAr\": \"احصل على خصم 20% على طلبك القادم\",\n  \"target\": \"customers\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{baseUrl}}/admin/notifications/broadcast"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Upload",
+      "item": [
+        {
+          "name": "Upload Image",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": "{{baseUrl}}/upload/image"
+          }
+        },
+        {
+          "name": "Upload Restaurant Logo",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "logo",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": "{{baseUrl}}/upload/restaurant/logo"
+          }
+        },
+        {
+          "name": "Upload Menu Item Image",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": "{{baseUrl}}/upload/menu-item"
+          }
+        }
+      ]
+    }
+  ]
+}

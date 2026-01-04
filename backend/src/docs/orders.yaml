@@ -1,0 +1,620 @@
+# Orders API Documentation
+
+paths:
+  # Customer Order Endpoints
+  /orders:
+    post:
+      tags:
+        - Orders
+      summary: Create new order
+      description: Place a new order for delivery
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrder'
+      responses:
+        '201':
+          description: Order created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: تم إنشاء الطلب بنجاح
+                  data:
+                    $ref: '#/components/schemas/Order'
+        '400':
+          description: Validation error or restaurant closed
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+    get:
+      tags:
+        - Orders
+      summary: Get my orders
+      description: Get customer's order history with pagination and filters
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, confirmed, preparing, ready, picked_up, on_the_way, delivered, cancelled]
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Orders retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Order'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+  /orders/{id}:
+    get:
+      tags:
+        - Orders
+      summary: Get order by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Order details
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /orders/{id}/cancel:
+    put:
+      tags:
+        - Orders
+      summary: Cancel order
+      description: Cancel an order. Only allowed before restaurant confirms.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - reason
+              properties:
+                reason:
+                  type: string
+                  example: غيرت رأيي
+      responses:
+        '200':
+          description: Order cancelled
+        '400':
+          description: Order cannot be cancelled at this stage
+
+  /orders/{id}/rate:
+    post:
+      tags:
+        - Orders
+      summary: Rate order
+      description: Rate the completed order, restaurant, food, and driver
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - restaurantRating
+                - foodRating
+              properties:
+                restaurantRating:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+                foodRating:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+                driverRating:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+                comment:
+                  type: string
+                  maxLength: 500
+                images:
+                  type: array
+                  items:
+                    type: string
+                    format: uri
+                  maxItems: 5
+      responses:
+        '200':
+          description: Rating submitted
+
+  /orders/{id}/reorder:
+    post:
+      tags:
+        - Orders
+      summary: Reorder
+      description: Create a new order with same items as a previous order
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: New order created
+
+  # Restaurant Order Endpoints
+  /restaurant/orders:
+    get:
+      tags:
+        - Restaurant Dashboard
+      summary: Get restaurant orders
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Orders list
+
+  /restaurant/orders/active:
+    get:
+      tags:
+        - Restaurant Dashboard
+      summary: Get active orders
+      description: Get orders that are pending, confirmed, or preparing
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Active orders list
+
+  /restaurant/orders/stats:
+    get:
+      tags:
+        - Restaurant Dashboard
+      summary: Get order statistics
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Order statistics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  today:
+                    type: object
+                    properties:
+                      orders:
+                        type: integer
+                      revenue:
+                        type: number
+                  week:
+                    type: object
+                    properties:
+                      orders:
+                        type: integer
+                      revenue:
+                        type: number
+                  pending:
+                    type: integer
+                  preparing:
+                    type: integer
+
+  /restaurant/orders/{id}/confirm:
+    put:
+      tags:
+        - Restaurant Dashboard
+      summary: Confirm order
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                estimatedTime:
+                  type: integer
+                  description: Estimated preparation time in minutes
+                note:
+                  type: string
+      responses:
+        '200':
+          description: Order confirmed
+
+  /restaurant/orders/{id}/reject:
+    put:
+      tags:
+        - Restaurant Dashboard
+      summary: Reject order
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - reason
+              properties:
+                reason:
+                  type: string
+                  example: المكونات غير متوفرة
+      responses:
+        '200':
+          description: Order rejected
+
+  /restaurant/orders/{id}/preparing:
+    put:
+      tags:
+        - Restaurant Dashboard
+      summary: Mark as preparing
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Status updated
+
+  /restaurant/orders/{id}/ready:
+    put:
+      tags:
+        - Restaurant Dashboard
+      summary: Mark as ready
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Status updated
+
+  # Driver Order Endpoints
+  /driver/orders/available:
+    get:
+      tags:
+        - Driver
+      summary: Get available orders
+      description: Get orders ready for pickup near driver location
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: latitude
+          in: query
+          required: true
+          schema:
+            type: number
+        - name: longitude
+          in: query
+          required: true
+          schema:
+            type: number
+        - name: radius
+          in: query
+          schema:
+            type: number
+            default: 5
+            description: Radius in kilometers
+      responses:
+        '200':
+          description: Available orders
+
+  /driver/orders:
+    get:
+      tags:
+        - Driver
+      summary: Get driver orders
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Driver's orders
+
+  /driver/orders/{id}/accept:
+    put:
+      tags:
+        - Driver
+      summary: Accept order for delivery
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Order accepted
+        '400':
+          description: Order already taken or driver busy
+
+  /driver/orders/{id}/picked-up:
+    put:
+      tags:
+        - Driver
+      summary: Mark as picked up
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Status updated
+
+  /driver/orders/{id}/on-the-way:
+    put:
+      tags:
+        - Driver
+      summary: Mark as on the way
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Status updated
+
+  /driver/orders/{id}/delivered:
+    put:
+      tags:
+        - Driver
+      summary: Mark as delivered
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                deliveryNote:
+                  type: string
+                deliveryPhoto:
+                  type: string
+                  format: uri
+      responses:
+        '200':
+          description: Order delivered
+
+  /driver/earnings:
+    get:
+      tags:
+        - Driver
+      summary: Get driver earnings
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [today, week, month, all]
+            default: today
+      responses:
+        '200':
+          description: Earnings summary
+
+  # Admin Order Endpoints
+  /admin/orders:
+    get:
+      tags:
+        - Admin
+      summary: Get all orders
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: restaurantId
+          in: query
+          schema:
+            type: string
+        - name: driverId
+          in: query
+          schema:
+            type: string
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: All orders
+
+  /admin/orders/stats:
+    get:
+      tags:
+        - Admin
+      summary: Get platform order statistics
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Platform statistics
+
+  /admin/orders/{id}/assign-driver:
+    put:
+      tags:
+        - Admin
+      summary: Manually assign driver
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - driverId
+              properties:
+                driverId:
+                  type: string
+      responses:
+        '200':
+          description: Driver assigned
+
+  /admin/orders/{id}/cancel:
+    put:
+      tags:
+        - Admin
+      summary: Cancel order (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - reason
+              properties:
+                reason:
+                  type: string
+                refund:
+                  type: boolean
+                  default: true
+      responses:
+        '200':
+          description: Order cancelled

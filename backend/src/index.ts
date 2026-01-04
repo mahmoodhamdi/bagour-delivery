@@ -30,6 +30,7 @@ const startServer = async (): Promise<void> => {
       logger.info(`🚀 Server running on port ${config.port}`);
       logger.info(`📡 Environment: ${config.nodeEnv}`);
       logger.info(`🔗 API: http://localhost:${config.port}/api/${config.apiVersion}`);
+      logger.info(`📚 Docs: http://localhost:${config.port}/api-docs`);
       logger.info(`❤️  Health: http://localhost:${config.port}/health`);
     });
 

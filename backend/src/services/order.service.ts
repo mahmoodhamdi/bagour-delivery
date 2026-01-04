@@ -965,6 +965,21 @@ class OrderService {
       throw new AppError('تم تقييم هذا الطلب مسبقاً', StatusCodes.CONFLICT);
     }
 
+    // Check review window (7 days from delivery)
+    const deliveredStatus = order.statusHistory?.find(
+      (sh) => sh.status === 'delivered'
+    );
+    const deliveryDate = deliveredStatus?.timestamp || order.updatedAt;
+    const reviewWindowDays = 7;
+    const reviewWindowExpiry = dayjs(deliveryDate).add(reviewWindowDays, 'day');
+
+    if (dayjs().isAfter(reviewWindowExpiry)) {
+      throw new AppError(
+        'انتهت فترة تقييم الطلب (7 أيام من التسليم)',
+        StatusCodes.BAD_REQUEST
+      );
+    }
+
     // Validate ratings
     const validateRating = (value?: number) => {
       if (value !== undefined && (value < 1 || value > 5)) {

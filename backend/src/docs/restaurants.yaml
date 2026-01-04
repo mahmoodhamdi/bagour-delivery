@@ -1,0 +1,448 @@
+# Restaurants API Documentation
+
+paths:
+  # Public Restaurant Endpoints
+  /restaurants:
+    get:
+      tags:
+        - Restaurants
+      summary: Search restaurants
+      description: Browse and search restaurants with various filters
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: search
+          in: query
+          description: Search by name
+          schema:
+            type: string
+        - name: cuisine
+          in: query
+          description: Filter by cuisine type
+          schema:
+            type: string
+        - name: rating
+          in: query
+          description: Minimum rating
+          schema:
+            type: number
+            minimum: 0
+            maximum: 5
+        - name: priceRange
+          in: query
+          schema:
+            type: string
+            enum: [low, medium, high]
+        - name: isOpen
+          in: query
+          schema:
+            type: boolean
+        - name: sortBy
+          in: query
+          schema:
+            type: string
+            enum: [rating, distance, deliveryTime, name]
+            default: rating
+        - name: latitude
+          in: query
+          schema:
+            type: number
+        - name: longitude
+          in: query
+          schema:
+            type: number
+      responses:
+        '200':
+          description: List of restaurants
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Restaurant'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+  /restaurants/featured:
+    get:
+      tags:
+        - Restaurants
+      summary: Get featured restaurants
+      description: Get promoted and featured restaurants
+      responses:
+        '200':
+          description: Featured restaurants
+
+  /restaurants/nearby:
+    get:
+      tags:
+        - Restaurants
+      summary: Get nearby restaurants
+      description: Get restaurants near a location
+      parameters:
+        - name: latitude
+          in: query
+          required: true
+          schema:
+            type: number
+        - name: longitude
+          in: query
+          required: true
+          schema:
+            type: number
+        - name: radius
+          in: query
+          description: Radius in kilometers
+          schema:
+            type: number
+            default: 5
+      responses:
+        '200':
+          description: Nearby restaurants
+
+  /restaurants/{slug}:
+    get:
+      tags:
+        - Restaurants
+      summary: Get restaurant by slug
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Restaurant details
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /restaurants/{slug}/menu:
+    get:
+      tags:
+        - Restaurants
+      summary: Get restaurant menu
+      description: Get full menu with categories and items
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Restaurant menu
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  categories:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: '#/components/schemas/MenuCategory'
+                        - type: object
+                          properties:
+                            items:
+                              type: array
+                              items:
+                                $ref: '#/components/schemas/MenuItem'
+
+  /restaurants/{restaurantId}/reviews:
+    get:
+      tags:
+        - Reviews
+      summary: Get restaurant reviews
+      parameters:
+        - name: restaurantId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: minRating
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 5
+        - name: hasComment
+          in: query
+          schema:
+            type: boolean
+        - name: sortBy
+          in: query
+          schema:
+            type: string
+            enum: [createdAt, restaurantRating]
+      responses:
+        '200':
+          description: Restaurant reviews
+
+  /restaurants/{restaurantId}/reviews/stats:
+    get:
+      tags:
+        - Reviews
+      summary: Get restaurant review statistics
+      parameters:
+        - name: restaurantId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Review statistics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  averageRating:
+                    type: number
+                  totalReviews:
+                    type: integer
+                  ratingDistribution:
+                    type: object
+                    properties:
+                      '1':
+                        type: integer
+                      '2':
+                        type: integer
+                      '3':
+                        type: integer
+                      '4':
+                        type: integer
+                      '5':
+                        type: integer
+                  averageFoodRating:
+                    type: number
+                  averageDriverRating:
+                    type: number
+
+  # Restaurant Owner Dashboard Endpoints
+  /restaurant/profile:
+    get:
+      tags:
+        - Restaurant Dashboard
+      summary: Get restaurant profile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Restaurant profile
+
+    patch:
+      tags:
+        - Restaurant Dashboard
+      summary: Update restaurant profile
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                nameAr:
+                  type: string
+                description:
+                  type: string
+                descriptionAr:
+                  type: string
+                phone:
+                  type: string
+                cuisineType:
+                  type: array
+                  items:
+                    type: string
+                logo:
+                  type: string
+                  format: uri
+                coverImage:
+                  type: string
+                  format: uri
+      responses:
+        '200':
+          description: Profile updated
+
+  /restaurant/location:
+    put:
+      tags:
+        - Restaurant Dashboard
+      summary: Update restaurant location
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - latitude
+                - longitude
+              properties:
+                latitude:
+                  type: number
+                longitude:
+                  type: number
+                address:
+                  type: object
+                  properties:
+                    street:
+                      type: string
+                    area:
+                      type: string
+                    city:
+                      type: string
+      responses:
+        '200':
+          description: Location updated
+
+  /restaurant/working-hours:
+    put:
+      tags:
+        - Restaurant Dashboard
+      summary: Update working hours
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: object
+                properties:
+                  open:
+                    type: string
+                    example: "09:00"
+                  close:
+                    type: string
+                    example: "23:00"
+                  isClosed:
+                    type: boolean
+              example:
+                sunday:
+                  open: "09:00"
+                  close: "23:00"
+                  isClosed: false
+                monday:
+                  open: "09:00"
+                  close: "23:00"
+                  isClosed: false
+      responses:
+        '200':
+          description: Working hours updated
+
+  /restaurant/delivery-settings:
+    put:
+      tags:
+        - Restaurant Dashboard
+      summary: Update delivery settings
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                deliveryRadius:
+                  type: number
+                  description: Radius in kilometers
+                deliveryFee:
+                  type: number
+                minimumOrder:
+                  type: number
+                estimatedDeliveryTime:
+                  type: string
+                  example: "30-45"
+      responses:
+        '200':
+          description: Delivery settings updated
+
+  /restaurant/toggle-pause:
+    post:
+      tags:
+        - Restaurant Dashboard
+      summary: Pause/resume restaurant
+      description: Temporarily pause accepting orders
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                isPaused:
+                  type: boolean
+                reason:
+                  type: string
+                pauseUntil:
+                  type: string
+                  format: date-time
+      responses:
+        '200':
+          description: Status updated
+
+  /restaurant/stats:
+    get:
+      tags:
+        - Restaurant Dashboard
+      summary: Get restaurant dashboard stats
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Dashboard statistics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  todayOrders:
+                    type: integer
+                  todayRevenue:
+                    type: number
+                  weekOrders:
+                    type: integer
+                  weekRevenue:
+                    type: number
+                  monthOrders:
+                    type: integer
+                  monthRevenue:
+                    type: number
+                  rating:
+                    type: number
+                  totalRatings:
+                    type: integer
+                  pendingOrders:
+                    type: integer
