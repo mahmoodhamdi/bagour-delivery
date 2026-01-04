@@ -16,6 +16,7 @@ npm run dev                           # Development server (port 5000)
 npm run build                         # TypeScript compilation
 npm test                              # Jest tests
 npm run test:watch                    # Watch mode
+npm run test:coverage                 # Jest with coverage report
 npm run lint:fix                      # ESLint + fix
 npm run seed                          # Database seeding
 ```
@@ -51,6 +52,13 @@ dart run build_runner build           # Generate Freezed/JSON code
 dart run build_runner build --delete-conflicting-outputs  # Rebuild from scratch
 ```
 
+### Docker Deployment
+```bash
+docker-compose up -d                  # Start all services
+docker-compose up -d backend          # Start backend only
+docker-compose logs -f backend        # View logs
+```
+
 ## Architecture
 
 ### Monorepo Structure
@@ -73,6 +81,7 @@ Key directories:
 - `src/services/` - Business logic (auth, restaurant, menu, order, upload, socket)
 - `src/middleware/` - Auth, validation, error handling, file upload (multer)
 - `src/validators/` - Joi schemas for request validation
+- `src/__tests__/` - Jest tests organized by type (validators, services, integration)
 
 ### Frontend Architecture
 **Dashboards (Next.js 14)**:
@@ -111,6 +120,12 @@ Socket events emitted by server:
 - `order:driver_location` - Driver location during delivery
 - `driver:status` - Driver online/offline status
 
+Socket events clients can emit:
+- `join:user`, `join:restaurant`, `join:driver`, `join:admin` - Join respective rooms
+- `driver:online`, `driver:offline` - Toggle driver availability
+- `driver:location` - Update driver location during delivery
+- `order:subscribe`, `order:unsubscribe` - Track specific order updates
+
 ## Key Patterns
 
 ### Backend Error Handling
@@ -136,6 +151,13 @@ sendPaginated(res, items, { total, page, limit, pages });
 - Dashboards: React Hook Form + Zod
 - Flutter: Form Builder with custom validators in `lib/utils/validators.dart`
 
+### Adding New Backend Endpoints
+1. Create/update validator in `src/validators/`
+2. Add service method in `src/services/`
+3. Add controller in `src/controllers/`
+4. Add route in `src/routes/` with validation middleware
+5. Export from barrel files (`index.ts`) in each directory
+
 ## Environment Configuration
 
 Backend requires `.env` with:
@@ -151,6 +173,21 @@ CORS configured for ports: 3000 (customer web), 3001 (restaurant), 3002 (admin).
 
 All apps support Arabic (RTL) and English. Arabic error messages for user-facing errors. Cairo font for Arabic text in Flutter apps.
 
-## Current Development Status
+## Testing
 
-See PROJECT_PROGRESS.md for detailed milestone tracking.
+### Backend Tests
+```bash
+cd backend
+npm test                              # Run all tests
+npm run test:watch                    # Watch mode
+npm test -- --testPathPattern=auth    # Run specific test file
+```
+Tests use Jest + Supertest. Test files in `src/__tests__/` with `.test.ts` extension.
+
+### Flutter Tests
+```bash
+cd customer-app  # or delivery-app
+flutter test                          # Run all tests
+flutter test test/widget_test.dart    # Single test file
+flutter test --coverage               # With coverage
+```

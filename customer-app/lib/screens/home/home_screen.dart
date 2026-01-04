@@ -5,6 +5,8 @@ import '../../config/theme.dart';
 import '../../config/routes.dart';
 import '../../providers/restaurant_provider.dart';
 import '../favorites/favorites_screen.dart';
+import '../order/order_history_screen.dart';
+import '../profile/profile_screen.dart';
 import 'widgets/restaurant_card.dart';
 import 'widgets/category_chip.dart';
 import 'widgets/search_bar_widget.dart';
@@ -40,9 +42,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         index: _currentIndex,
         children: const [
           HomeTabContent(),
-          OrdersPlaceholder(),
+          OrderHistoryScreen(),
           FavoritesScreen(),
-          ProfilePlaceholder(),
+          ProfileScreen(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -378,26 +380,3 @@ class HomeTabContent extends ConsumerWidget {
   }
 }
 
-// Placeholder widgets for other tabs
-class OrdersPlaceholder extends StatelessWidget {
-  const OrdersPlaceholder({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text('الطلبات'),
-    );
-  }
-}
-
-
-class ProfilePlaceholder extends StatelessWidget {
-  const ProfilePlaceholder({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text('حسابي'),
-    );
-  }
-}

@@ -1,10 +1,18 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../screens/splash/splash_screen.dart';
+import '../screens/onboarding/onboarding_screen.dart';
+import '../screens/auth/auth_screens.dart';
 import '../screens/home/home_screen.dart';
 import '../screens/orders/available_orders_screen.dart';
 import '../screens/orders/active_delivery_screen.dart';
 import '../screens/earnings/earnings_screen.dart';
 import '../screens/earnings/request_withdrawal_screen.dart';
+import '../screens/profile/profile_screen.dart';
+import '../screens/profile/edit_profile_screen.dart';
+import '../screens/profile/documents_screen.dart';
+import '../screens/profile/vehicle_screen.dart';
+import '../screens/settings/settings_screen.dart';
+import '../screens/settings/support_screen.dart';
 import '../screens/notifications/notifications_screen.dart';
 
 class AppRoutes {
@@ -41,51 +49,54 @@ class AppRoutes {
   static const String support = '/support';
 }
 
-// Placeholder for screens not yet implemented
-class PlaceholderScreen extends StatelessWidget {
-  final String title;
-  const PlaceholderScreen({super.key, required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(title)),
-      body: Center(child: Text('$title Screen')),
-    );
-  }
-}
-
 final GoRouter appRouter = GoRouter(
   initialLocation: AppRoutes.splash,
   routes: [
+    // Splash & Auth
     GoRoute(
       path: AppRoutes.splash,
-      builder: (context, state) => const PlaceholderScreen(title: 'Splash'),
+      builder: (context, state) => const SplashScreen(),
     ),
     GoRoute(
       path: AppRoutes.onboarding,
-      builder: (context, state) => const PlaceholderScreen(title: 'Onboarding'),
+      builder: (context, state) => const OnboardingScreen(),
     ),
     GoRoute(
       path: AppRoutes.login,
-      builder: (context, state) => const PlaceholderScreen(title: 'Login'),
+      builder: (context, state) => const LoginScreen(),
     ),
     GoRoute(
       path: AppRoutes.register,
-      builder: (context, state) => const PlaceholderScreen(title: 'Register'),
+      builder: (context, state) => const RegisterScreen(),
     ),
     GoRoute(
       path: AppRoutes.otp,
-      builder: (context, state) => const PlaceholderScreen(title: 'OTP Verification'),
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>?;
+        return OtpScreen(
+          identifier: extra?['phone'] ?? extra?['email'] ?? '',
+          type: extra?['type'] ?? 'phone_verification',
+        );
+      },
     ),
     GoRoute(
       path: AppRoutes.forgotPassword,
-      builder: (context, state) => const PlaceholderScreen(title: 'Forgot Password'),
+      builder: (context, state) => const ForgotPasswordScreen(),
     ),
+    GoRoute(
+      path: AppRoutes.resetPassword,
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>?;
+        return ResetPasswordScreen(email: extra?['email'] ?? '');
+      },
+    ),
+
+    // Home
     GoRoute(
       path: AppRoutes.home,
       builder: (context, state) => const HomeScreen(),
     ),
+
     // Orders
     GoRoute(
       path: AppRoutes.orders,
@@ -109,6 +120,7 @@ final GoRouter appRouter = GoRouter(
         return ActiveDeliveryScreen(orderId: id);
       },
     ),
+
     // Earnings
     GoRoute(
       path: AppRoutes.earnings,
@@ -126,34 +138,37 @@ final GoRouter appRouter = GoRouter(
       path: AppRoutes.requestWithdrawal,
       builder: (context, state) => const RequestWithdrawalScreen(),
     ),
+
     // Profile
     GoRoute(
       path: AppRoutes.profile,
-      builder: (context, state) => const PlaceholderScreen(title: 'Profile'),
+      builder: (context, state) => const ProfileScreen(),
     ),
     GoRoute(
       path: AppRoutes.editProfile,
-      builder: (context, state) => const PlaceholderScreen(title: 'Edit Profile'),
+      builder: (context, state) => const EditProfileScreen(),
     ),
     GoRoute(
       path: AppRoutes.documents,
-      builder: (context, state) => const PlaceholderScreen(title: 'Documents'),
+      builder: (context, state) => const DocumentsScreen(),
     ),
     GoRoute(
       path: AppRoutes.vehicle,
-      builder: (context, state) => const PlaceholderScreen(title: 'Vehicle'),
+      builder: (context, state) => const VehicleScreen(),
     ),
+
+    // Settings & Others
     GoRoute(
       path: AppRoutes.notifications,
       builder: (context, state) => const NotificationsScreen(),
     ),
     GoRoute(
       path: AppRoutes.settings,
-      builder: (context, state) => const PlaceholderScreen(title: 'Settings'),
+      builder: (context, state) => const SettingsScreen(),
     ),
     GoRoute(
       path: AppRoutes.support,
-      builder: (context, state) => const PlaceholderScreen(title: 'Support'),
+      builder: (context, state) => const SupportScreen(),
     ),
   ],
 );

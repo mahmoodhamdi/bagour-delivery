@@ -152,9 +152,10 @@ class RestaurantSearchNotifier extends StateNotifier<RestaurantSearchState> {
     final result = await _service.searchRestaurants(params);
 
     if (result.success) {
+      final data = result.data ?? <Restaurant>[];
       final newRestaurants = params.page == 1
-          ? result.data ?? []
-          : [...state.restaurants, ...result.data ?? []];
+          ? data
+          : [...state.restaurants, ...data];
 
       state = state.copyWith(
         restaurants: newRestaurants,

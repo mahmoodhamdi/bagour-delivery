@@ -39,6 +39,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> _checkAuthStatus() async {
+    await checkAuthStatus();
+  }
+
+  Future<void> checkAuthStatus() async {
     state = const AuthState.loading();
     try {
       final isLoggedIn = await _authService.isLoggedIn();
