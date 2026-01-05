@@ -38,6 +38,7 @@ export interface AuthResponse {
 export interface LoginRequest {
   email: string;
   password: string;
+  role?: string;
 }
 
 // Create axios instance
@@ -122,7 +123,10 @@ export default api;
 // Auth API functions
 export const authApi = {
   login: async (data: LoginRequest): Promise<ApiResponse<AuthResponse>> => {
-    const response = await api.post<ApiResponse<AuthResponse>>(API_ENDPOINTS.login, data);
+    const response = await api.post<ApiResponse<AuthResponse>>(
+      API_ENDPOINTS.login,
+      { ...data, role: 'admin' }
+    );
     return response.data;
   },
 
