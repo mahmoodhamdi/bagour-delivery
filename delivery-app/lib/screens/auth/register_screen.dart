@@ -66,19 +66,20 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           DriverRegisterRequest(
             name: _nameController.text.trim(),
             email: _emailController.text.trim(),
-            phone: _phoneController.text.trim(),
             password: _passwordController.text,
-            nationalId: _nationalIdController.text.trim(),
-            vehicleType: _selectedVehicleType,
-            vehicleModel: _vehicleModelController.text.trim().isNotEmpty
-                ? _vehicleModelController.text.trim()
+            role: 'driver',
+            phone: _phoneController.text.trim().isNotEmpty
+                ? _phoneController.text.trim()
                 : null,
-            vehicleColor: _vehicleColorController.text.trim().isNotEmpty
-                ? _vehicleColorController.text.trim()
-                : null,
-            vehiclePlateNumber: _vehiclePlateController.text.trim(),
-            licenseNumber: _licenseNumberController.text.trim(),
-            licenseExpiryDate: _licenseExpiryDate,
+            driverData: {
+              'nationalId': _nationalIdController.text.trim(),
+              'vehicleType': _selectedVehicleType,
+              'vehicleModel': _vehicleModelController.text.trim(),
+              'vehicleColor': _vehicleColorController.text.trim(),
+              'vehiclePlateNumber': _vehiclePlateController.text.trim(),
+              'licenseNumber': _licenseNumberController.text.trim(),
+              'licenseExpiryDate': _licenseExpiryDate.toIso8601String(),
+            },
           ),
         );
 
@@ -87,15 +88,30 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
     final authState = ref.read(authProvider);
     authState.mapOrNull(
-      authenticated: (_) {
-        context.go(
+      requiresVerification: (state) {
+        context.push(
           AppRoutes.otp,
           extra: {
-            'phone': _phoneController.text.trim(),
-            'type': 'phone_verification',
+            'email': state.email,
+            'type': 'email_verification',
           },
         );
       },
+      error: (error) => _showError(error.message),
+    );
+  }
+
+  Future<void> _signInWithGoogle() async {
+    setState(() => _isLoading = true);
+
+    await ref.read(authProvider.notifier).signInWithGoogle();
+
+    if (!mounted) return;
+    setState(() => _isLoading = false);
+
+    final authState = ref.read(authProvider);
+    authState.mapOrNull(
+      authenticated: (_) => context.go(AppRoutes.home),
       error: (error) => _showError(error.message),
     );
   }
