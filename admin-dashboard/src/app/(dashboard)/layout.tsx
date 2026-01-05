@@ -27,6 +27,7 @@ import {
   Store,
   Truck,
   ShoppingBag,
+  Star,
   Ticket,
   MapPin,
   BarChart3,
@@ -60,6 +61,11 @@ const menuItems = [
     title: 'الطلبات',
     url: '/orders',
     icon: ShoppingBag,
+  },
+  {
+    title: 'التقييمات',
+    url: '/reviews',
+    icon: Star,
   },
   {
     title: 'الكوبونات',
