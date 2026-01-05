@@ -44,8 +44,15 @@ export const config = {
     hmacSecret: process.env.PAYMOB_HMAC_SECRET || '',
   },
 
-  // Google Maps
+  // Google Cloud & Maps
   googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY || '',
+  googleCloudApiKey: process.env.GOOGLE_CLOUD_API_KEY || '',
+
+  // Resend (Email Service)
+  resend: {
+    apiKey: process.env.RESEND_API_KEY || '',
+    fromEmail: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
+  },
 
   // App Settings
   defaultCommission: parseInt(process.env.DEFAULT_COMMISSION || '15', 10),
