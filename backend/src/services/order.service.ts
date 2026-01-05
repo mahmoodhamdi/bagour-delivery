@@ -5,12 +5,14 @@ import { Order, IOrder, IOrderItem, IDeliveryAddress } from '../models/Order';
 import { Restaurant } from '../models/Restaurant';
 import { MenuItem } from '../models/MenuItem';
 import { Customer } from '../models/Customer';
+import { User } from '../models/User';
 import { Coupon } from '../models/Coupon';
 import { AppError } from '../utils/errors';
 import { StatusCodes } from 'http-status-codes';
 import { OrderStatus, PaymentMethod, IPaginatedResult } from '../types';
 import dayjs from 'dayjs';
 import { notificationService } from './notification.service';
+import { socketService } from './socket.service';
 import { logger } from '../utils/logger';
 
 // Types
@@ -196,6 +198,13 @@ class OrderService {
       }
     } catch (notifError) {
       logger.error(`Failed to send new order notification: ${notifError}`);
+    }
+
+    // Emit real-time socket event to restaurant
+    try {
+      socketService.notifyNewOrder(order, restaurant._id.toString());
+    } catch (socketError) {
+      logger.error(`Failed to emit new order socket event: ${socketError}`);
     }
 
     return order;
@@ -775,6 +784,9 @@ class OrderService {
       );
     }
 
+    // Store previous status for socket notification
+    const previousStatus = order.status;
+
     // Update status
     order.status = newStatus;
     order.statusHistory.push({
@@ -824,6 +836,44 @@ class OrderService {
       }
     } catch (notifError) {
       logger.error(`Failed to send order status notification: ${notifError}`);
+    }
+
+    // Emit real-time socket event for order status update
+    try {
+      socketService.notifyOrderStatusUpdate(
+        order,
+        previousStatus,
+        order.customerId?.toString(),
+        order.restaurantId?.toString(),
+        order.driverId?.toString()
+      );
+
+      // If order is ready, broadcast to available drivers
+      if (newStatus === 'ready' && !order.driverId) {
+        const restaurant = await Restaurant.findById(order.restaurantId).select('name address location');
+        if (restaurant && restaurant.location) {
+          const restaurantData = {
+            name: restaurant.name,
+            address: restaurant.address || '',
+            location: {
+              lat: restaurant.location.coordinates[1],
+              lng: restaurant.location.coordinates[0],
+            },
+          };
+          socketService.notifyDriversOfAvailableOrder(order, restaurantData);
+        }
+      }
+
+      // If order is delivered, send specific delivery notification
+      if (newStatus === 'delivered') {
+        socketService.notifyOrderDelivered(
+          order,
+          order.customerId?.toString() || '',
+          order.restaurantId?.toString() || ''
+        );
+      }
+    } catch (socketError) {
+      logger.error(`Failed to emit order status socket event: ${socketError}`);
     }
 
     return order;
@@ -913,6 +963,20 @@ class OrderService {
       logger.error(`Failed to send cancellation notification: ${notifError}`);
     }
 
+    // Emit real-time socket event for order cancellation
+    try {
+      socketService.notifyOrderCancelled(
+        order,
+        order.customerId?.toString(),
+        order.restaurantId?.toString(),
+        cancelledBy,
+        reason,
+        order.driverId?.toString()
+      );
+    } catch (socketError) {
+      logger.error(`Failed to emit order cancelled socket event: ${socketError}`);
+    }
+
     return order;
   }
 
@@ -960,6 +1024,27 @@ class OrderService {
       }
     } catch (notifError) {
       logger.error(`Failed to send order assigned notification: ${notifError}`);
+    }
+
+    // Emit real-time socket event for driver assignment
+    try {
+      const driverUser = await User.findById(driver.userId).select('name phone');
+      if (driverUser) {
+        const driverData = {
+          id: driver._id.toString(),
+          name: driverUser.name,
+          phone: driverUser.phone,
+          vehicleType: driver.vehicleType,
+          vehiclePlate: driver.vehiclePlate,
+        };
+        socketService.notifyDriverAssigned(
+          order,
+          order.customerId?.toString() || '',
+          driverData
+        );
+      }
+    } catch (socketError) {
+      logger.error(`Failed to emit driver assigned socket event: ${socketError}`);
     }
 
     return order;
