@@ -1,6 +1,7 @@
 import swaggerJsdoc from 'swagger-jsdoc';
 import { Express } from 'express';
 import swaggerUi from 'swagger-ui-express';
+import redoc from 'redoc-express';
 
 const options: swaggerJsdoc.Options = {
   definition: {
@@ -699,6 +700,40 @@ export const setupSwagger = (app: Express): void => {
     res.setHeader('Content-Type', 'application/json');
     res.send(swaggerSpec);
   });
+
+  // Serve Redoc documentation
+  app.get(
+    '/api-redoc',
+    redoc({
+      title: 'Bagour Delivery API Documentation',
+      specUrl: '/api-docs.json',
+      redocOptions: {
+        theme: {
+          colors: {
+            primary: {
+              main: '#10b981',
+            },
+          },
+          typography: {
+            fontFamily: 'Cairo, sans-serif',
+            fontSize: '14px',
+            headings: {
+              fontFamily: 'Cairo, sans-serif',
+            },
+          },
+        },
+        hideDownloadButton: false,
+        hideHostname: false,
+        expandResponses: '200,201',
+        requiredPropsFirst: true,
+        sortPropsAlphabetically: true,
+        noAutoAuth: false,
+        pathInMiddlePanel: true,
+        nativeScrollbars: false,
+        expandSingleSchemaField: true,
+      },
+    })
+  );
 };
 
 export default swaggerSpec;
