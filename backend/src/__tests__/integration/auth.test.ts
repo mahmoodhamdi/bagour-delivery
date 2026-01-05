@@ -2,10 +2,10 @@ import request from 'supertest';
 import express, { ErrorRequestHandler } from 'express';
 import { validate } from '../../middleware/validate';
 import {
-  customerRegisterSchema,
+  registerSchema,
   loginSchema,
   forgotPasswordSchema,
-  verifyOtpSchema,
+  verifyEmailSchema,
   refreshTokenSchema,
 } from '../../validators/auth.validator';
 import { AppError } from '../../utils/errors';
@@ -32,7 +32,7 @@ const createTestApp = () => {
   app.use(express.json());
 
   // Test routes that only test validation
-  app.post('/customer/register', validate(customerRegisterSchema), (_req, res) => {
+  app.post('/register', validate(registerSchema), (_req, res) => {
     res.json({ success: true });
   });
 
@@ -44,7 +44,7 @@ const createTestApp = () => {
     res.json({ success: true });
   });
 
-  app.post('/verify-otp', validate(verifyOtpSchema), (_req, res) => {
+  app.post('/verify-email', validate(verifyEmailSchema), (_req, res) => {
     res.json({ success: true });
   });
 
@@ -61,10 +61,10 @@ const createTestApp = () => {
 const app = createTestApp();
 
 describe('Auth API Validation', () => {
-  describe('POST /customer/register', () => {
+  describe('POST /register', () => {
     it('should reject empty body', async () => {
       const response = await request(app)
-        .post('/customer/register')
+        .post('/register')
         .send({});
 
       expect(response.status).toBe(400);
@@ -73,12 +73,13 @@ describe('Auth API Validation', () => {
 
     it('should reject invalid email format', async () => {
       const response = await request(app)
-        .post('/customer/register')
+        .post('/register')
         .send({
           name: 'Test User',
           email: 'invalid-email',
           phone: '01012345678',
           password: 'password123',
+          role: 'customer',
         });
 
       expect(response.status).toBe(400);
@@ -87,12 +88,13 @@ describe('Auth API Validation', () => {
 
     it('should reject invalid phone number', async () => {
       const response = await request(app)
-        .post('/customer/register')
+        .post('/register')
         .send({
           name: 'Test User',
           email: 'test@example.com',
           phone: '123456789',
           password: 'password123',
+          role: 'customer',
         });
 
       expect(response.status).toBe(400);
@@ -101,12 +103,13 @@ describe('Auth API Validation', () => {
 
     it('should reject short password', async () => {
       const response = await request(app)
-        .post('/customer/register')
+        .post('/register')
         .send({
           name: 'Test User',
           email: 'test@example.com',
           phone: '01012345678',
           password: 'short',
+          role: 'customer',
         });
 
       expect(response.status).toBe(400);
@@ -115,11 +118,12 @@ describe('Auth API Validation', () => {
 
     it('should reject missing name', async () => {
       const response = await request(app)
-        .post('/customer/register')
+        .post('/register')
         .send({
           email: 'test@example.com',
           phone: '01012345678',
           password: 'password123',
+          role: 'customer',
         });
 
       expect(response.status).toBe(400);
@@ -128,12 +132,13 @@ describe('Auth API Validation', () => {
 
     it('should accept valid registration data', async () => {
       const response = await request(app)
-        .post('/customer/register')
+        .post('/register')
         .send({
           name: 'Test User',
           email: 'test@example.com',
           phone: '01012345678',
           password: 'password123',
+          role: 'customer',
         });
 
       expect(response.status).toBe(200);
@@ -220,13 +225,12 @@ describe('Auth API Validation', () => {
     });
   });
 
-  describe('POST /verify-otp', () => {
-    it('should reject without phone or email', async () => {
+  describe('POST /verify-email', () => {
+    it('should reject without email', async () => {
       const response = await request(app)
-        .post('/verify-otp')
+        .post('/verify-email')
         .send({
           otp: '123456',
-          type: 'phone_verification',
         });
 
       expect(response.status).toBe(400);
@@ -235,11 +239,10 @@ describe('Auth API Validation', () => {
 
     it('should reject invalid OTP format', async () => {
       const response = await request(app)
-        .post('/verify-otp')
+        .post('/verify-email')
         .send({
-          phone: '01012345678',
+          email: 'test@example.com',
           otp: '12345', // 5 digits instead of 6
-          type: 'phone_verification',
         });
 
       expect(response.status).toBe(400);
@@ -248,11 +251,10 @@ describe('Auth API Validation', () => {
 
     it('should accept valid OTP data', async () => {
       const response = await request(app)
-        .post('/verify-otp')
+        .post('/verify-email')
         .send({
-          phone: '01012345678',
+          email: 'test@example.com',
           otp: '123456',
-          type: 'phone_verification',
         });
 
       expect(response.status).toBe(200);
