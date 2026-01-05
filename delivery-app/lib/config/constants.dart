@@ -73,14 +73,24 @@ class AppConstants {
 }
 
 class ApiEndpoints {
-  // Auth
-  static const String login = '/auth/driver/login';
-  static const String register = '/auth/driver/register';
-  static const String verifyOtp = '/auth/verify-otp';
+  // Auth - Unified Registration & Login
+  static const String register = '/auth/register';
+  static const String login = '/auth/login';
+  static const String googleSignIn = '/auth/google';
+
+  // Email Verification
+  static const String verifyEmail = '/auth/verify-email';
   static const String resendOtp = '/auth/resend-otp';
+
+  // Password Management
   static const String forgotPassword = '/auth/forgot-password';
   static const String resetPassword = '/auth/reset-password';
+  static const String changePassword = '/auth/change-password';
+
+  // Token & Session
   static const String refreshToken = '/auth/refresh-token';
+  static const String fcmToken = '/auth/fcm-token';
+  static const String me = '/auth/me';
   static const String logout = '/auth/logout';
 
   // Driver Profile
