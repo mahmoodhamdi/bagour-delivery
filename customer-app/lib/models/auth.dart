@@ -11,10 +11,23 @@ class AuthResponse with _$AuthResponse {
     required String accessToken,
     required String refreshToken,
     CustomerProfile? profile,
+    bool? isNewUser,
   }) = _AuthResponse;
 
   factory AuthResponse.fromJson(Map<String, dynamic> json) =>
       _$AuthResponseFromJson(json);
+}
+
+@freezed
+class PendingVerificationResponse with _$PendingVerificationResponse {
+  const factory PendingVerificationResponse({
+    required bool requiresVerification,
+    required String email,
+    String? message,
+  }) = _PendingVerificationResponse;
+
+  factory PendingVerificationResponse.fromJson(Map<String, dynamic> json) =>
+      _$PendingVerificationResponseFromJson(json);
 }
 
 @freezed
@@ -33,8 +46,9 @@ class CustomerRegisterRequest with _$CustomerRegisterRequest {
   const factory CustomerRegisterRequest({
     required String name,
     required String email,
-    required String phone,
     required String password,
+    @Default('customer') String role,
+    String? phone,
     String? referralCode,
   }) = _CustomerRegisterRequest;
 
@@ -47,6 +61,7 @@ class LoginRequest with _$LoginRequest {
   const factory LoginRequest({
     required String email,
     required String password,
+    String? role,
   }) = _LoginRequest;
 
   factory LoginRequest.fromJson(Map<String, dynamic> json) =>
@@ -54,24 +69,31 @@ class LoginRequest with _$LoginRequest {
 }
 
 @freezed
-class VerifyOtpRequest with _$VerifyOtpRequest {
-  const factory VerifyOtpRequest({
-    String? phone,
-    String? email,
-    required String otp,
-    required String type,
-  }) = _VerifyOtpRequest;
+class GoogleSignInRequest with _$GoogleSignInRequest {
+  const factory GoogleSignInRequest({
+    required String idToken,
+    @Default('customer') String role,
+  }) = _GoogleSignInRequest;
 
-  factory VerifyOtpRequest.fromJson(Map<String, dynamic> json) =>
-      _$VerifyOtpRequestFromJson(json);
+  factory GoogleSignInRequest.fromJson(Map<String, dynamic> json) =>
+      _$GoogleSignInRequestFromJson(json);
+}
+
+@freezed
+class VerifyEmailRequest with _$VerifyEmailRequest {
+  const factory VerifyEmailRequest({
+    required String email,
+    required String otp,
+  }) = _VerifyEmailRequest;
+
+  factory VerifyEmailRequest.fromJson(Map<String, dynamic> json) =>
+      _$VerifyEmailRequestFromJson(json);
 }
 
 @freezed
 class ResendOtpRequest with _$ResendOtpRequest {
   const factory ResendOtpRequest({
-    String? phone,
-    String? email,
-    required String type,
+    required String email,
   }) = _ResendOtpRequest;
 
   factory ResendOtpRequest.fromJson(Map<String, dynamic> json) =>

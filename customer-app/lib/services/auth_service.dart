@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import '../config/constants.dart';
 import '../models/models.dart';
 import 'api_service.dart';
@@ -7,14 +8,41 @@ import 'api_service.dart';
 class AuthService {
   final ApiService _api;
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: ['email', 'profile'],
+  );
 
   AuthService(this._api);
 
-  // Register customer
-  Future<AuthResponse> registerCustomer(CustomerRegisterRequest request) async {
+  // Register with Email + Password (sends OTP)
+  Future<PendingVerificationResponse> register(
+    CustomerRegisterRequest request,
+  ) async {
     try {
       final response = await _api.post(
-        AppEndpoints.customerRegister,
+        AppEndpoints.register,
+        data: request.toJson(),
+      );
+
+      if (response.data['success'] == true) {
+        return PendingVerificationResponse(
+          requiresVerification: true,
+          email: request.email,
+          message: response.data['message'],
+        );
+      }
+
+      throw Exception(response.data['message'] ?? 'فشل في التسجيل');
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    }
+  }
+
+  // Verify Email with OTP
+  Future<AuthResponse> verifyEmail(VerifyEmailRequest request) async {
+    try {
+      final response = await _api.post(
+        AppEndpoints.verifyEmail,
         data: request.toJson(),
       );
 
@@ -35,22 +63,33 @@ class AuthService {
         return authResponse;
       }
 
-      throw Exception(response.data['message'] ?? 'فشل في التسجيل');
+      throw Exception(response.data['message'] ?? 'فشل في التحقق');
     } on DioException catch (e) {
       throw _handleDioError(e);
     }
   }
 
-  // Login
-  Future<AuthResponse> login(LoginRequest request) async {
+  // Login with Email + Password
+  Future<dynamic> login(LoginRequest request) async {
     try {
       final response = await _api.post(
-        AppEndpoints.customerLogin,
+        AppEndpoints.login,
         data: request.toJson(),
       );
 
       if (response.data['success'] == true) {
         final data = response.data['data'];
+
+        // Check if requires verification
+        if (data['requiresVerification'] == true) {
+          return PendingVerificationResponse(
+            requiresVerification: true,
+            email: data['email'],
+            message: response.data['message'],
+          );
+        }
+
+        // Successful login
         final authResponse = AuthResponse(
           user: User.fromJson(data['user']),
           accessToken: data['accessToken'],
@@ -72,23 +111,62 @@ class AuthService {
     }
   }
 
-  // Verify OTP
-  Future<void> verifyOtp(VerifyOtpRequest request) async {
+  // Sign In with Google
+  Future<AuthResponse> signInWithGoogle() async {
     try {
+      // Trigger Google Sign-In flow
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+
+      if (googleUser == null) {
+        throw Exception('تم إلغاء تسجيل الدخول');
+      }
+
+      // Get authentication details
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+
+      if (googleAuth.idToken == null) {
+        throw Exception('فشل في الحصول على رمز التحقق');
+      }
+
+      // Send ID token to backend
+      final request = GoogleSignInRequest(
+        idToken: googleAuth.idToken!,
+        role: 'customer',
+      );
+
       final response = await _api.post(
-        AppEndpoints.verifyOtp,
+        AppEndpoints.googleSignIn,
         data: request.toJson(),
       );
 
-      if (response.data['success'] != true) {
-        throw Exception(response.data['message'] ?? 'فشل في التحقق');
+      if (response.data['success'] == true) {
+        final data = response.data['data'];
+        final authResponse = AuthResponse(
+          user: User.fromJson(data['user']),
+          accessToken: data['accessToken'],
+          refreshToken: data['refreshToken'],
+          profile: data['profile'] != null
+              ? CustomerProfile.fromJson(data['profile'])
+              : null,
+          isNewUser: data['isNewUser'] ?? false,
+        );
+
+        await _saveTokens(authResponse.accessToken, authResponse.refreshToken);
+        await _saveUser(authResponse.user);
+
+        return authResponse;
       }
+
+      throw Exception(response.data['message'] ?? 'فشل في تسجيل الدخول');
     } on DioException catch (e) {
       throw _handleDioError(e);
+    } catch (e) {
+      throw Exception(e.toString());
     }
   }
 
-  // Resend OTP
+  // Resend Email OTP
   Future<void> resendOtp(ResendOtpRequest request) async {
     try {
       final response = await _api.post(
@@ -104,7 +182,7 @@ class AuthService {
     }
   }
 
-  // Forgot password
+  // Forgot password - Send reset OTP
   Future<void> forgotPassword(ForgotPasswordRequest request) async {
     try {
       final response = await _api.post(
@@ -120,7 +198,7 @@ class AuthService {
     }
   }
 
-  // Reset password
+  // Reset password with OTP
   Future<void> resetPassword(ResetPasswordRequest request) async {
     try {
       final response = await _api.post(
@@ -136,7 +214,7 @@ class AuthService {
     }
   }
 
-  // Change password
+  // Change password (authenticated users)
   Future<void> changePassword(ChangePasswordRequest request) async {
     try {
       final response = await _api.post(
@@ -189,6 +267,7 @@ class AuthService {
     } catch (_) {
       // Ignore logout errors
     } finally {
+      await _googleSignIn.signOut();
       await clearTokens();
     }
   }

@@ -53,8 +53,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           CustomerRegisterRequest(
             name: _nameController.text.trim(),
             email: _emailController.text.trim(),
-            phone: _phoneController.text.trim(),
             password: _passwordController.text,
+            role: 'customer',
+            phone: _phoneController.text.trim().isNotEmpty
+                ? _phoneController.text.trim()
+                : null,
             referralCode: _referralCodeController.text.trim().isNotEmpty
                 ? _referralCodeController.text.trim()
                 : null,
@@ -66,16 +69,31 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
     final authState = ref.read(authProvider);
     authState.mapOrNull(
-      authenticated: (_) {
+      requiresVerification: (state) {
         // Navigate to OTP verification
-        context.go(
+        context.push(
           AppRoutes.otp,
           extra: {
-            'phone': _phoneController.text.trim(),
-            'type': 'phone_verification',
+            'email': state.email,
+            'type': 'email_verification',
           },
         );
       },
+      error: (error) => _showError(error.message),
+    );
+  }
+
+  Future<void> _signInWithGoogle() async {
+    setState(() => _isLoading = true);
+
+    await ref.read(authProvider.notifier).signInWithGoogle();
+
+    if (!mounted) return;
+    setState(() => _isLoading = false);
+
+    final authState = ref.read(authProvider);
+    authState.mapOrNull(
+      authenticated: (_) => context.go(AppRoutes.home),
       error: (error) => _showError(error.message),
     );
   }
@@ -150,22 +168,22 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // Phone field
+                // Phone field (optional)
                 TextFormField(
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
                   textDirection: TextDirection.ltr,
                   decoration: const InputDecoration(
-                    labelText: 'رقم الهاتف',
+                    labelText: 'رقم الهاتف (اختياري)',
                     prefixIcon: Icon(Icons.phone_outlined),
                     hintText: '01XXXXXXXXX',
                   ),
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'رقم الهاتف مطلوب';
-                    }
-                    if (!RegExp(r'^01[0125][0-9]{8}$').hasMatch(value)) {
-                      return 'رقم الهاتف غير صالح';
+                    // Optional field, only validate if not empty
+                    if (value != null && value.isNotEmpty) {
+                      if (!RegExp(r'^01[0125][0-9]{8}$').hasMatch(value)) {
+                        return 'رقم الهاتف غير صالح';
+                      }
                     }
                     return null;
                   },
@@ -306,6 +324,37 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           ),
                         )
                       : const Text('إنشاء حساب'),
+                ),
+                const SizedBox(height: 24),
+
+                // Divider
+                Row(
+                  children: [
+                    const Expanded(child: Divider()),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(
+                        'أو',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: AppColors.textSecondary,
+                            ),
+                      ),
+                    ),
+                    const Expanded(child: Divider()),
+                  ],
+                ),
+                const SizedBox(height: 24),
+
+                // Google Sign In
+                OutlinedButton.icon(
+                  onPressed: _isLoading ? null : _signInWithGoogle,
+                  icon: Image.network(
+                    'https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg',
+                    width: 24,
+                    height: 24,
+                    errorBuilder: (_, __, ___) => const Icon(Icons.g_mobiledata),
+                  ),
+                  label: const Text('المتابعة بحساب Google'),
                 ),
                 const SizedBox(height: 24),
 

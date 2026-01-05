@@ -24,6 +24,7 @@ mixin _$AuthResponse {
   String get accessToken => throw _privateConstructorUsedError;
   String get refreshToken => throw _privateConstructorUsedError;
   CustomerProfile? get profile => throw _privateConstructorUsedError;
+  bool? get isNewUser => throw _privateConstructorUsedError;
 
   /// Serializes this AuthResponse to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -45,7 +46,8 @@ abstract class $AuthResponseCopyWith<$Res> {
       {User user,
       String accessToken,
       String refreshToken,
-      CustomerProfile? profile});
+      CustomerProfile? profile,
+      bool? isNewUser});
 
   $UserCopyWith<$Res> get user;
   $CustomerProfileCopyWith<$Res>? get profile;
@@ -70,6 +72,7 @@ class _$AuthResponseCopyWithImpl<$Res, $Val extends AuthResponse>
     Object? accessToken = null,
     Object? refreshToken = null,
     Object? profile = freezed,
+    Object? isNewUser = freezed,
   }) {
     return _then(_value.copyWith(
       user: null == user
@@ -88,6 +91,10 @@ class _$AuthResponseCopyWithImpl<$Res, $Val extends AuthResponse>
           ? _value.profile
           : profile // ignore: cast_nullable_to_non_nullable
               as CustomerProfile?,
+      isNewUser: freezed == isNewUser
+          ? _value.isNewUser
+          : isNewUser // ignore: cast_nullable_to_non_nullable
+              as bool?,
     ) as $Val);
   }
 
@@ -128,7 +135,8 @@ abstract class _$$AuthResponseImplCopyWith<$Res>
       {User user,
       String accessToken,
       String refreshToken,
-      CustomerProfile? profile});
+      CustomerProfile? profile,
+      bool? isNewUser});
 
   @override
   $UserCopyWith<$Res> get user;
@@ -153,6 +161,7 @@ class __$$AuthResponseImplCopyWithImpl<$Res>
     Object? accessToken = null,
     Object? refreshToken = null,
     Object? profile = freezed,
+    Object? isNewUser = freezed,
   }) {
     return _then(_$AuthResponseImpl(
       user: null == user
@@ -171,6 +180,10 @@ class __$$AuthResponseImplCopyWithImpl<$Res>
           ? _value.profile
           : profile // ignore: cast_nullable_to_non_nullable
               as CustomerProfile?,
+      isNewUser: freezed == isNewUser
+          ? _value.isNewUser
+          : isNewUser // ignore: cast_nullable_to_non_nullable
+              as bool?,
     ));
   }
 }
@@ -182,7 +195,8 @@ class _$AuthResponseImpl implements _AuthResponse {
       {required this.user,
       required this.accessToken,
       required this.refreshToken,
-      this.profile});
+      this.profile,
+      this.isNewUser});
 
   factory _$AuthResponseImpl.fromJson(Map<String, dynamic> json) =>
       _$$AuthResponseImplFromJson(json);
@@ -195,10 +209,12 @@ class _$AuthResponseImpl implements _AuthResponse {
   final String refreshToken;
   @override
   final CustomerProfile? profile;
+  @override
+  final bool? isNewUser;
 
   @override
   String toString() {
-    return 'AuthResponse(user: $user, accessToken: $accessToken, refreshToken: $refreshToken, profile: $profile)';
+    return 'AuthResponse(user: $user, accessToken: $accessToken, refreshToken: $refreshToken, profile: $profile, isNewUser: $isNewUser)';
   }
 
   @override
@@ -211,13 +227,15 @@ class _$AuthResponseImpl implements _AuthResponse {
                 other.accessToken == accessToken) &&
             (identical(other.refreshToken, refreshToken) ||
                 other.refreshToken == refreshToken) &&
-            (identical(other.profile, profile) || other.profile == profile));
+            (identical(other.profile, profile) || other.profile == profile) &&
+            (identical(other.isNewUser, isNewUser) ||
+                other.isNewUser == isNewUser));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, user, accessToken, refreshToken, profile);
+  int get hashCode => Object.hash(
+      runtimeType, user, accessToken, refreshToken, profile, isNewUser);
 
   /// Create a copy of AuthResponse
   /// with the given fields replaced by the non-null parameter values.
@@ -240,7 +258,8 @@ abstract class _AuthResponse implements AuthResponse {
       {required final User user,
       required final String accessToken,
       required final String refreshToken,
-      final CustomerProfile? profile}) = _$AuthResponseImpl;
+      final CustomerProfile? profile,
+      final bool? isNewUser}) = _$AuthResponseImpl;
 
   factory _AuthResponse.fromJson(Map<String, dynamic> json) =
       _$AuthResponseImpl.fromJson;
@@ -253,6 +272,8 @@ abstract class _AuthResponse implements AuthResponse {
   String get refreshToken;
   @override
   CustomerProfile? get profile;
+  @override
+  bool? get isNewUser;
 
   /// Create a copy of AuthResponse
   /// with the given fields replaced by the non-null parameter values.
@@ -260,6 +281,204 @@ abstract class _AuthResponse implements AuthResponse {
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$AuthResponseImplCopyWith<_$AuthResponseImpl> get copyWith =>
       throw _privateConstructorUsedError;
+}
+
+PendingVerificationResponse _$PendingVerificationResponseFromJson(
+    Map<String, dynamic> json) {
+  return _PendingVerificationResponse.fromJson(json);
+}
+
+/// @nodoc
+mixin _$PendingVerificationResponse {
+  bool get requiresVerification => throw _privateConstructorUsedError;
+  String get email => throw _privateConstructorUsedError;
+  String? get message => throw _privateConstructorUsedError;
+
+  /// Serializes this PendingVerificationResponse to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of PendingVerificationResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $PendingVerificationResponseCopyWith<PendingVerificationResponse>
+      get copyWith => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $PendingVerificationResponseCopyWith<$Res> {
+  factory $PendingVerificationResponseCopyWith(
+          PendingVerificationResponse value,
+          $Res Function(PendingVerificationResponse) then) =
+      _$PendingVerificationResponseCopyWithImpl<$Res,
+          PendingVerificationResponse>;
+  @useResult
+  $Res call({bool requiresVerification, String email, String? message});
+}
+
+/// @nodoc
+class _$PendingVerificationResponseCopyWithImpl<$Res,
+        $Val extends PendingVerificationResponse>
+    implements $PendingVerificationResponseCopyWith<$Res> {
+  _$PendingVerificationResponseCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of PendingVerificationResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? requiresVerification = null,
+    Object? email = null,
+    Object? message = freezed,
+  }) {
+    return _then(_value.copyWith(
+      requiresVerification: null == requiresVerification
+          ? _value.requiresVerification
+          : requiresVerification // ignore: cast_nullable_to_non_nullable
+              as bool,
+      email: null == email
+          ? _value.email
+          : email // ignore: cast_nullable_to_non_nullable
+              as String,
+      message: freezed == message
+          ? _value.message
+          : message // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$PendingVerificationResponseImplCopyWith<$Res>
+    implements $PendingVerificationResponseCopyWith<$Res> {
+  factory _$$PendingVerificationResponseImplCopyWith(
+          _$PendingVerificationResponseImpl value,
+          $Res Function(_$PendingVerificationResponseImpl) then) =
+      __$$PendingVerificationResponseImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({bool requiresVerification, String email, String? message});
+}
+
+/// @nodoc
+class __$$PendingVerificationResponseImplCopyWithImpl<$Res>
+    extends _$PendingVerificationResponseCopyWithImpl<$Res,
+        _$PendingVerificationResponseImpl>
+    implements _$$PendingVerificationResponseImplCopyWith<$Res> {
+  __$$PendingVerificationResponseImplCopyWithImpl(
+      _$PendingVerificationResponseImpl _value,
+      $Res Function(_$PendingVerificationResponseImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of PendingVerificationResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? requiresVerification = null,
+    Object? email = null,
+    Object? message = freezed,
+  }) {
+    return _then(_$PendingVerificationResponseImpl(
+      requiresVerification: null == requiresVerification
+          ? _value.requiresVerification
+          : requiresVerification // ignore: cast_nullable_to_non_nullable
+              as bool,
+      email: null == email
+          ? _value.email
+          : email // ignore: cast_nullable_to_non_nullable
+              as String,
+      message: freezed == message
+          ? _value.message
+          : message // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$PendingVerificationResponseImpl
+    implements _PendingVerificationResponse {
+  const _$PendingVerificationResponseImpl(
+      {required this.requiresVerification, required this.email, this.message});
+
+  factory _$PendingVerificationResponseImpl.fromJson(
+          Map<String, dynamic> json) =>
+      _$$PendingVerificationResponseImplFromJson(json);
+
+  @override
+  final bool requiresVerification;
+  @override
+  final String email;
+  @override
+  final String? message;
+
+  @override
+  String toString() {
+    return 'PendingVerificationResponse(requiresVerification: $requiresVerification, email: $email, message: $message)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$PendingVerificationResponseImpl &&
+            (identical(other.requiresVerification, requiresVerification) ||
+                other.requiresVerification == requiresVerification) &&
+            (identical(other.email, email) || other.email == email) &&
+            (identical(other.message, message) || other.message == message));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, requiresVerification, email, message);
+
+  /// Create a copy of PendingVerificationResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$PendingVerificationResponseImplCopyWith<_$PendingVerificationResponseImpl>
+      get copyWith => __$$PendingVerificationResponseImplCopyWithImpl<
+          _$PendingVerificationResponseImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$PendingVerificationResponseImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _PendingVerificationResponse
+    implements PendingVerificationResponse {
+  const factory _PendingVerificationResponse(
+      {required final bool requiresVerification,
+      required final String email,
+      final String? message}) = _$PendingVerificationResponseImpl;
+
+  factory _PendingVerificationResponse.fromJson(Map<String, dynamic> json) =
+      _$PendingVerificationResponseImpl.fromJson;
+
+  @override
+  bool get requiresVerification;
+  @override
+  String get email;
+  @override
+  String? get message;
+
+  /// Create a copy of PendingVerificationResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$PendingVerificationResponseImplCopyWith<_$PendingVerificationResponseImpl>
+      get copyWith => throw _privateConstructorUsedError;
 }
 
 TokenPair _$TokenPairFromJson(Map<String, dynamic> json) {
@@ -440,8 +659,9 @@ CustomerRegisterRequest _$CustomerRegisterRequestFromJson(
 mixin _$CustomerRegisterRequest {
   String get name => throw _privateConstructorUsedError;
   String get email => throw _privateConstructorUsedError;
-  String get phone => throw _privateConstructorUsedError;
   String get password => throw _privateConstructorUsedError;
+  String get role => throw _privateConstructorUsedError;
+  String? get phone => throw _privateConstructorUsedError;
   String? get referralCode => throw _privateConstructorUsedError;
 
   /// Serializes this CustomerRegisterRequest to a JSON map.
@@ -463,8 +683,9 @@ abstract class $CustomerRegisterRequestCopyWith<$Res> {
   $Res call(
       {String name,
       String email,
-      String phone,
       String password,
+      String role,
+      String? phone,
       String? referralCode});
 }
 
@@ -486,8 +707,9 @@ class _$CustomerRegisterRequestCopyWithImpl<$Res,
   $Res call({
     Object? name = null,
     Object? email = null,
-    Object? phone = null,
     Object? password = null,
+    Object? role = null,
+    Object? phone = freezed,
     Object? referralCode = freezed,
   }) {
     return _then(_value.copyWith(
@@ -499,14 +721,18 @@ class _$CustomerRegisterRequestCopyWithImpl<$Res,
           ? _value.email
           : email // ignore: cast_nullable_to_non_nullable
               as String,
-      phone: null == phone
-          ? _value.phone
-          : phone // ignore: cast_nullable_to_non_nullable
-              as String,
       password: null == password
           ? _value.password
           : password // ignore: cast_nullable_to_non_nullable
               as String,
+      role: null == role
+          ? _value.role
+          : role // ignore: cast_nullable_to_non_nullable
+              as String,
+      phone: freezed == phone
+          ? _value.phone
+          : phone // ignore: cast_nullable_to_non_nullable
+              as String?,
       referralCode: freezed == referralCode
           ? _value.referralCode
           : referralCode // ignore: cast_nullable_to_non_nullable
@@ -527,8 +753,9 @@ abstract class _$$CustomerRegisterRequestImplCopyWith<$Res>
   $Res call(
       {String name,
       String email,
-      String phone,
       String password,
+      String role,
+      String? phone,
       String? referralCode});
 }
 
@@ -549,8 +776,9 @@ class __$$CustomerRegisterRequestImplCopyWithImpl<$Res>
   $Res call({
     Object? name = null,
     Object? email = null,
-    Object? phone = null,
     Object? password = null,
+    Object? role = null,
+    Object? phone = freezed,
     Object? referralCode = freezed,
   }) {
     return _then(_$CustomerRegisterRequestImpl(
@@ -562,14 +790,18 @@ class __$$CustomerRegisterRequestImplCopyWithImpl<$Res>
           ? _value.email
           : email // ignore: cast_nullable_to_non_nullable
               as String,
-      phone: null == phone
-          ? _value.phone
-          : phone // ignore: cast_nullable_to_non_nullable
-              as String,
       password: null == password
           ? _value.password
           : password // ignore: cast_nullable_to_non_nullable
               as String,
+      role: null == role
+          ? _value.role
+          : role // ignore: cast_nullable_to_non_nullable
+              as String,
+      phone: freezed == phone
+          ? _value.phone
+          : phone // ignore: cast_nullable_to_non_nullable
+              as String?,
       referralCode: freezed == referralCode
           ? _value.referralCode
           : referralCode // ignore: cast_nullable_to_non_nullable
@@ -584,8 +816,9 @@ class _$CustomerRegisterRequestImpl implements _CustomerRegisterRequest {
   const _$CustomerRegisterRequestImpl(
       {required this.name,
       required this.email,
-      required this.phone,
       required this.password,
+      this.role = 'customer',
+      this.phone,
       this.referralCode});
 
   factory _$CustomerRegisterRequestImpl.fromJson(Map<String, dynamic> json) =>
@@ -596,15 +829,18 @@ class _$CustomerRegisterRequestImpl implements _CustomerRegisterRequest {
   @override
   final String email;
   @override
-  final String phone;
-  @override
   final String password;
+  @override
+  @JsonKey()
+  final String role;
+  @override
+  final String? phone;
   @override
   final String? referralCode;
 
   @override
   String toString() {
-    return 'CustomerRegisterRequest(name: $name, email: $email, phone: $phone, password: $password, referralCode: $referralCode)';
+    return 'CustomerRegisterRequest(name: $name, email: $email, password: $password, role: $role, phone: $phone, referralCode: $referralCode)';
   }
 
   @override
@@ -614,17 +850,18 @@ class _$CustomerRegisterRequestImpl implements _CustomerRegisterRequest {
             other is _$CustomerRegisterRequestImpl &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.email, email) || other.email == email) &&
-            (identical(other.phone, phone) || other.phone == phone) &&
             (identical(other.password, password) ||
                 other.password == password) &&
+            (identical(other.role, role) || other.role == role) &&
+            (identical(other.phone, phone) || other.phone == phone) &&
             (identical(other.referralCode, referralCode) ||
                 other.referralCode == referralCode));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, name, email, phone, password, referralCode);
+  int get hashCode => Object.hash(
+      runtimeType, name, email, password, role, phone, referralCode);
 
   /// Create a copy of CustomerRegisterRequest
   /// with the given fields replaced by the non-null parameter values.
@@ -647,8 +884,9 @@ abstract class _CustomerRegisterRequest implements CustomerRegisterRequest {
   const factory _CustomerRegisterRequest(
       {required final String name,
       required final String email,
-      required final String phone,
       required final String password,
+      final String role,
+      final String? phone,
       final String? referralCode}) = _$CustomerRegisterRequestImpl;
 
   factory _CustomerRegisterRequest.fromJson(Map<String, dynamic> json) =
@@ -659,9 +897,11 @@ abstract class _CustomerRegisterRequest implements CustomerRegisterRequest {
   @override
   String get email;
   @override
-  String get phone;
-  @override
   String get password;
+  @override
+  String get role;
+  @override
+  String? get phone;
   @override
   String? get referralCode;
 
@@ -681,6 +921,7 @@ LoginRequest _$LoginRequestFromJson(Map<String, dynamic> json) {
 mixin _$LoginRequest {
   String get email => throw _privateConstructorUsedError;
   String get password => throw _privateConstructorUsedError;
+  String? get role => throw _privateConstructorUsedError;
 
   /// Serializes this LoginRequest to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -698,7 +939,7 @@ abstract class $LoginRequestCopyWith<$Res> {
           LoginRequest value, $Res Function(LoginRequest) then) =
       _$LoginRequestCopyWithImpl<$Res, LoginRequest>;
   @useResult
-  $Res call({String email, String password});
+  $Res call({String email, String password, String? role});
 }
 
 /// @nodoc
@@ -718,6 +959,7 @@ class _$LoginRequestCopyWithImpl<$Res, $Val extends LoginRequest>
   $Res call({
     Object? email = null,
     Object? password = null,
+    Object? role = freezed,
   }) {
     return _then(_value.copyWith(
       email: null == email
@@ -728,6 +970,10 @@ class _$LoginRequestCopyWithImpl<$Res, $Val extends LoginRequest>
           ? _value.password
           : password // ignore: cast_nullable_to_non_nullable
               as String,
+      role: freezed == role
+          ? _value.role
+          : role // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -740,7 +986,7 @@ abstract class _$$LoginRequestImplCopyWith<$Res>
       __$$LoginRequestImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String email, String password});
+  $Res call({String email, String password, String? role});
 }
 
 /// @nodoc
@@ -758,6 +1004,7 @@ class __$$LoginRequestImplCopyWithImpl<$Res>
   $Res call({
     Object? email = null,
     Object? password = null,
+    Object? role = freezed,
   }) {
     return _then(_$LoginRequestImpl(
       email: null == email
@@ -768,6 +1015,10 @@ class __$$LoginRequestImplCopyWithImpl<$Res>
           ? _value.password
           : password // ignore: cast_nullable_to_non_nullable
               as String,
+      role: freezed == role
+          ? _value.role
+          : role // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -775,7 +1026,8 @@ class __$$LoginRequestImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$LoginRequestImpl implements _LoginRequest {
-  const _$LoginRequestImpl({required this.email, required this.password});
+  const _$LoginRequestImpl(
+      {required this.email, required this.password, this.role});
 
   factory _$LoginRequestImpl.fromJson(Map<String, dynamic> json) =>
       _$$LoginRequestImplFromJson(json);
@@ -784,10 +1036,12 @@ class _$LoginRequestImpl implements _LoginRequest {
   final String email;
   @override
   final String password;
+  @override
+  final String? role;
 
   @override
   String toString() {
-    return 'LoginRequest(email: $email, password: $password)';
+    return 'LoginRequest(email: $email, password: $password, role: $role)';
   }
 
   @override
@@ -797,12 +1051,13 @@ class _$LoginRequestImpl implements _LoginRequest {
             other is _$LoginRequestImpl &&
             (identical(other.email, email) || other.email == email) &&
             (identical(other.password, password) ||
-                other.password == password));
+                other.password == password) &&
+            (identical(other.role, role) || other.role == role));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, email, password);
+  int get hashCode => Object.hash(runtimeType, email, password, role);
 
   /// Create a copy of LoginRequest
   /// with the given fields replaced by the non-null parameter values.
@@ -823,7 +1078,8 @@ class _$LoginRequestImpl implements _LoginRequest {
 abstract class _LoginRequest implements LoginRequest {
   const factory _LoginRequest(
       {required final String email,
-      required final String password}) = _$LoginRequestImpl;
+      required final String password,
+      final String? role}) = _$LoginRequestImpl;
 
   factory _LoginRequest.fromJson(Map<String, dynamic> json) =
       _$LoginRequestImpl.fromJson;
@@ -832,6 +1088,8 @@ abstract class _LoginRequest implements LoginRequest {
   String get email;
   @override
   String get password;
+  @override
+  String? get role;
 
   /// Create a copy of LoginRequest
   /// with the given fields replaced by the non-null parameter values.
@@ -841,122 +1099,100 @@ abstract class _LoginRequest implements LoginRequest {
       throw _privateConstructorUsedError;
 }
 
-VerifyOtpRequest _$VerifyOtpRequestFromJson(Map<String, dynamic> json) {
-  return _VerifyOtpRequest.fromJson(json);
+GoogleSignInRequest _$GoogleSignInRequestFromJson(Map<String, dynamic> json) {
+  return _GoogleSignInRequest.fromJson(json);
 }
 
 /// @nodoc
-mixin _$VerifyOtpRequest {
-  String? get phone => throw _privateConstructorUsedError;
-  String? get email => throw _privateConstructorUsedError;
-  String get otp => throw _privateConstructorUsedError;
-  String get type => throw _privateConstructorUsedError;
+mixin _$GoogleSignInRequest {
+  String get idToken => throw _privateConstructorUsedError;
+  String get role => throw _privateConstructorUsedError;
 
-  /// Serializes this VerifyOtpRequest to a JSON map.
+  /// Serializes this GoogleSignInRequest to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
-  /// Create a copy of VerifyOtpRequest
+  /// Create a copy of GoogleSignInRequest
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $VerifyOtpRequestCopyWith<VerifyOtpRequest> get copyWith =>
+  $GoogleSignInRequestCopyWith<GoogleSignInRequest> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $VerifyOtpRequestCopyWith<$Res> {
-  factory $VerifyOtpRequestCopyWith(
-          VerifyOtpRequest value, $Res Function(VerifyOtpRequest) then) =
-      _$VerifyOtpRequestCopyWithImpl<$Res, VerifyOtpRequest>;
+abstract class $GoogleSignInRequestCopyWith<$Res> {
+  factory $GoogleSignInRequestCopyWith(
+          GoogleSignInRequest value, $Res Function(GoogleSignInRequest) then) =
+      _$GoogleSignInRequestCopyWithImpl<$Res, GoogleSignInRequest>;
   @useResult
-  $Res call({String? phone, String? email, String otp, String type});
+  $Res call({String idToken, String role});
 }
 
 /// @nodoc
-class _$VerifyOtpRequestCopyWithImpl<$Res, $Val extends VerifyOtpRequest>
-    implements $VerifyOtpRequestCopyWith<$Res> {
-  _$VerifyOtpRequestCopyWithImpl(this._value, this._then);
+class _$GoogleSignInRequestCopyWithImpl<$Res, $Val extends GoogleSignInRequest>
+    implements $GoogleSignInRequestCopyWith<$Res> {
+  _$GoogleSignInRequestCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of VerifyOtpRequest
+  /// Create a copy of GoogleSignInRequest
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? phone = freezed,
-    Object? email = freezed,
-    Object? otp = null,
-    Object? type = null,
+    Object? idToken = null,
+    Object? role = null,
   }) {
     return _then(_value.copyWith(
-      phone: freezed == phone
-          ? _value.phone
-          : phone // ignore: cast_nullable_to_non_nullable
-              as String?,
-      email: freezed == email
-          ? _value.email
-          : email // ignore: cast_nullable_to_non_nullable
-              as String?,
-      otp: null == otp
-          ? _value.otp
-          : otp // ignore: cast_nullable_to_non_nullable
+      idToken: null == idToken
+          ? _value.idToken
+          : idToken // ignore: cast_nullable_to_non_nullable
               as String,
-      type: null == type
-          ? _value.type
-          : type // ignore: cast_nullable_to_non_nullable
+      role: null == role
+          ? _value.role
+          : role // ignore: cast_nullable_to_non_nullable
               as String,
     ) as $Val);
   }
 }
 
 /// @nodoc
-abstract class _$$VerifyOtpRequestImplCopyWith<$Res>
-    implements $VerifyOtpRequestCopyWith<$Res> {
-  factory _$$VerifyOtpRequestImplCopyWith(_$VerifyOtpRequestImpl value,
-          $Res Function(_$VerifyOtpRequestImpl) then) =
-      __$$VerifyOtpRequestImplCopyWithImpl<$Res>;
+abstract class _$$GoogleSignInRequestImplCopyWith<$Res>
+    implements $GoogleSignInRequestCopyWith<$Res> {
+  factory _$$GoogleSignInRequestImplCopyWith(_$GoogleSignInRequestImpl value,
+          $Res Function(_$GoogleSignInRequestImpl) then) =
+      __$$GoogleSignInRequestImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String? phone, String? email, String otp, String type});
+  $Res call({String idToken, String role});
 }
 
 /// @nodoc
-class __$$VerifyOtpRequestImplCopyWithImpl<$Res>
-    extends _$VerifyOtpRequestCopyWithImpl<$Res, _$VerifyOtpRequestImpl>
-    implements _$$VerifyOtpRequestImplCopyWith<$Res> {
-  __$$VerifyOtpRequestImplCopyWithImpl(_$VerifyOtpRequestImpl _value,
-      $Res Function(_$VerifyOtpRequestImpl) _then)
+class __$$GoogleSignInRequestImplCopyWithImpl<$Res>
+    extends _$GoogleSignInRequestCopyWithImpl<$Res, _$GoogleSignInRequestImpl>
+    implements _$$GoogleSignInRequestImplCopyWith<$Res> {
+  __$$GoogleSignInRequestImplCopyWithImpl(_$GoogleSignInRequestImpl _value,
+      $Res Function(_$GoogleSignInRequestImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of VerifyOtpRequest
+  /// Create a copy of GoogleSignInRequest
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? phone = freezed,
-    Object? email = freezed,
-    Object? otp = null,
-    Object? type = null,
+    Object? idToken = null,
+    Object? role = null,
   }) {
-    return _then(_$VerifyOtpRequestImpl(
-      phone: freezed == phone
-          ? _value.phone
-          : phone // ignore: cast_nullable_to_non_nullable
-              as String?,
-      email: freezed == email
-          ? _value.email
-          : email // ignore: cast_nullable_to_non_nullable
-              as String?,
-      otp: null == otp
-          ? _value.otp
-          : otp // ignore: cast_nullable_to_non_nullable
+    return _then(_$GoogleSignInRequestImpl(
+      idToken: null == idToken
+          ? _value.idToken
+          : idToken // ignore: cast_nullable_to_non_nullable
               as String,
-      type: null == type
-          ? _value.type
-          : type // ignore: cast_nullable_to_non_nullable
+      role: null == role
+          ? _value.role
+          : role // ignore: cast_nullable_to_non_nullable
               as String,
     ));
   }
@@ -964,83 +1200,240 @@ class __$$VerifyOtpRequestImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$VerifyOtpRequestImpl implements _VerifyOtpRequest {
-  const _$VerifyOtpRequestImpl(
-      {this.phone, this.email, required this.otp, required this.type});
+class _$GoogleSignInRequestImpl implements _GoogleSignInRequest {
+  const _$GoogleSignInRequestImpl(
+      {required this.idToken, this.role = 'customer'});
 
-  factory _$VerifyOtpRequestImpl.fromJson(Map<String, dynamic> json) =>
-      _$$VerifyOtpRequestImplFromJson(json);
+  factory _$GoogleSignInRequestImpl.fromJson(Map<String, dynamic> json) =>
+      _$$GoogleSignInRequestImplFromJson(json);
 
   @override
-  final String? phone;
+  final String idToken;
   @override
-  final String? email;
-  @override
-  final String otp;
-  @override
-  final String type;
+  @JsonKey()
+  final String role;
 
   @override
   String toString() {
-    return 'VerifyOtpRequest(phone: $phone, email: $email, otp: $otp, type: $type)';
+    return 'GoogleSignInRequest(idToken: $idToken, role: $role)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$VerifyOtpRequestImpl &&
-            (identical(other.phone, phone) || other.phone == phone) &&
-            (identical(other.email, email) || other.email == email) &&
-            (identical(other.otp, otp) || other.otp == otp) &&
-            (identical(other.type, type) || other.type == type));
+            other is _$GoogleSignInRequestImpl &&
+            (identical(other.idToken, idToken) || other.idToken == idToken) &&
+            (identical(other.role, role) || other.role == role));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, phone, email, otp, type);
+  int get hashCode => Object.hash(runtimeType, idToken, role);
 
-  /// Create a copy of VerifyOtpRequest
+  /// Create a copy of GoogleSignInRequest
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$VerifyOtpRequestImplCopyWith<_$VerifyOtpRequestImpl> get copyWith =>
-      __$$VerifyOtpRequestImplCopyWithImpl<_$VerifyOtpRequestImpl>(
+  _$$GoogleSignInRequestImplCopyWith<_$GoogleSignInRequestImpl> get copyWith =>
+      __$$GoogleSignInRequestImplCopyWithImpl<_$GoogleSignInRequestImpl>(
           this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$VerifyOtpRequestImplToJson(
+    return _$$GoogleSignInRequestImplToJson(
       this,
     );
   }
 }
 
-abstract class _VerifyOtpRequest implements VerifyOtpRequest {
-  const factory _VerifyOtpRequest(
-      {final String? phone,
-      final String? email,
-      required final String otp,
-      required final String type}) = _$VerifyOtpRequestImpl;
+abstract class _GoogleSignInRequest implements GoogleSignInRequest {
+  const factory _GoogleSignInRequest(
+      {required final String idToken,
+      final String role}) = _$GoogleSignInRequestImpl;
 
-  factory _VerifyOtpRequest.fromJson(Map<String, dynamic> json) =
-      _$VerifyOtpRequestImpl.fromJson;
+  factory _GoogleSignInRequest.fromJson(Map<String, dynamic> json) =
+      _$GoogleSignInRequestImpl.fromJson;
 
   @override
-  String? get phone;
+  String get idToken;
   @override
-  String? get email;
-  @override
-  String get otp;
-  @override
-  String get type;
+  String get role;
 
-  /// Create a copy of VerifyOtpRequest
+  /// Create a copy of GoogleSignInRequest
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$VerifyOtpRequestImplCopyWith<_$VerifyOtpRequestImpl> get copyWith =>
+  _$$GoogleSignInRequestImplCopyWith<_$GoogleSignInRequestImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+VerifyEmailRequest _$VerifyEmailRequestFromJson(Map<String, dynamic> json) {
+  return _VerifyEmailRequest.fromJson(json);
+}
+
+/// @nodoc
+mixin _$VerifyEmailRequest {
+  String get email => throw _privateConstructorUsedError;
+  String get otp => throw _privateConstructorUsedError;
+
+  /// Serializes this VerifyEmailRequest to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of VerifyEmailRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $VerifyEmailRequestCopyWith<VerifyEmailRequest> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $VerifyEmailRequestCopyWith<$Res> {
+  factory $VerifyEmailRequestCopyWith(
+          VerifyEmailRequest value, $Res Function(VerifyEmailRequest) then) =
+      _$VerifyEmailRequestCopyWithImpl<$Res, VerifyEmailRequest>;
+  @useResult
+  $Res call({String email, String otp});
+}
+
+/// @nodoc
+class _$VerifyEmailRequestCopyWithImpl<$Res, $Val extends VerifyEmailRequest>
+    implements $VerifyEmailRequestCopyWith<$Res> {
+  _$VerifyEmailRequestCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of VerifyEmailRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? email = null,
+    Object? otp = null,
+  }) {
+    return _then(_value.copyWith(
+      email: null == email
+          ? _value.email
+          : email // ignore: cast_nullable_to_non_nullable
+              as String,
+      otp: null == otp
+          ? _value.otp
+          : otp // ignore: cast_nullable_to_non_nullable
+              as String,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$VerifyEmailRequestImplCopyWith<$Res>
+    implements $VerifyEmailRequestCopyWith<$Res> {
+  factory _$$VerifyEmailRequestImplCopyWith(_$VerifyEmailRequestImpl value,
+          $Res Function(_$VerifyEmailRequestImpl) then) =
+      __$$VerifyEmailRequestImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String email, String otp});
+}
+
+/// @nodoc
+class __$$VerifyEmailRequestImplCopyWithImpl<$Res>
+    extends _$VerifyEmailRequestCopyWithImpl<$Res, _$VerifyEmailRequestImpl>
+    implements _$$VerifyEmailRequestImplCopyWith<$Res> {
+  __$$VerifyEmailRequestImplCopyWithImpl(_$VerifyEmailRequestImpl _value,
+      $Res Function(_$VerifyEmailRequestImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of VerifyEmailRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? email = null,
+    Object? otp = null,
+  }) {
+    return _then(_$VerifyEmailRequestImpl(
+      email: null == email
+          ? _value.email
+          : email // ignore: cast_nullable_to_non_nullable
+              as String,
+      otp: null == otp
+          ? _value.otp
+          : otp // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$VerifyEmailRequestImpl implements _VerifyEmailRequest {
+  const _$VerifyEmailRequestImpl({required this.email, required this.otp});
+
+  factory _$VerifyEmailRequestImpl.fromJson(Map<String, dynamic> json) =>
+      _$$VerifyEmailRequestImplFromJson(json);
+
+  @override
+  final String email;
+  @override
+  final String otp;
+
+  @override
+  String toString() {
+    return 'VerifyEmailRequest(email: $email, otp: $otp)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$VerifyEmailRequestImpl &&
+            (identical(other.email, email) || other.email == email) &&
+            (identical(other.otp, otp) || other.otp == otp));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, email, otp);
+
+  /// Create a copy of VerifyEmailRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$VerifyEmailRequestImplCopyWith<_$VerifyEmailRequestImpl> get copyWith =>
+      __$$VerifyEmailRequestImplCopyWithImpl<_$VerifyEmailRequestImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$VerifyEmailRequestImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _VerifyEmailRequest implements VerifyEmailRequest {
+  const factory _VerifyEmailRequest(
+      {required final String email,
+      required final String otp}) = _$VerifyEmailRequestImpl;
+
+  factory _VerifyEmailRequest.fromJson(Map<String, dynamic> json) =
+      _$VerifyEmailRequestImpl.fromJson;
+
+  @override
+  String get email;
+  @override
+  String get otp;
+
+  /// Create a copy of VerifyEmailRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$VerifyEmailRequestImplCopyWith<_$VerifyEmailRequestImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -1050,9 +1443,7 @@ ResendOtpRequest _$ResendOtpRequestFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$ResendOtpRequest {
-  String? get phone => throw _privateConstructorUsedError;
-  String? get email => throw _privateConstructorUsedError;
-  String get type => throw _privateConstructorUsedError;
+  String get email => throw _privateConstructorUsedError;
 
   /// Serializes this ResendOtpRequest to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -1070,7 +1461,7 @@ abstract class $ResendOtpRequestCopyWith<$Res> {
           ResendOtpRequest value, $Res Function(ResendOtpRequest) then) =
       _$ResendOtpRequestCopyWithImpl<$Res, ResendOtpRequest>;
   @useResult
-  $Res call({String? phone, String? email, String type});
+  $Res call({String email});
 }
 
 /// @nodoc
@@ -1088,22 +1479,12 @@ class _$ResendOtpRequestCopyWithImpl<$Res, $Val extends ResendOtpRequest>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? phone = freezed,
-    Object? email = freezed,
-    Object? type = null,
+    Object? email = null,
   }) {
     return _then(_value.copyWith(
-      phone: freezed == phone
-          ? _value.phone
-          : phone // ignore: cast_nullable_to_non_nullable
-              as String?,
-      email: freezed == email
+      email: null == email
           ? _value.email
           : email // ignore: cast_nullable_to_non_nullable
-              as String?,
-      type: null == type
-          ? _value.type
-          : type // ignore: cast_nullable_to_non_nullable
               as String,
     ) as $Val);
   }
@@ -1117,7 +1498,7 @@ abstract class _$$ResendOtpRequestImplCopyWith<$Res>
       __$$ResendOtpRequestImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String? phone, String? email, String type});
+  $Res call({String email});
 }
 
 /// @nodoc
@@ -1133,22 +1514,12 @@ class __$$ResendOtpRequestImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? phone = freezed,
-    Object? email = freezed,
-    Object? type = null,
+    Object? email = null,
   }) {
     return _then(_$ResendOtpRequestImpl(
-      phone: freezed == phone
-          ? _value.phone
-          : phone // ignore: cast_nullable_to_non_nullable
-              as String?,
-      email: freezed == email
+      email: null == email
           ? _value.email
           : email // ignore: cast_nullable_to_non_nullable
-              as String?,
-      type: null == type
-          ? _value.type
-          : type // ignore: cast_nullable_to_non_nullable
               as String,
     ));
   }
@@ -1157,21 +1528,17 @@ class __$$ResendOtpRequestImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$ResendOtpRequestImpl implements _ResendOtpRequest {
-  const _$ResendOtpRequestImpl({this.phone, this.email, required this.type});
+  const _$ResendOtpRequestImpl({required this.email});
 
   factory _$ResendOtpRequestImpl.fromJson(Map<String, dynamic> json) =>
       _$$ResendOtpRequestImplFromJson(json);
 
   @override
-  final String? phone;
-  @override
-  final String? email;
-  @override
-  final String type;
+  final String email;
 
   @override
   String toString() {
-    return 'ResendOtpRequest(phone: $phone, email: $email, type: $type)';
+    return 'ResendOtpRequest(email: $email)';
   }
 
   @override
@@ -1179,14 +1546,12 @@ class _$ResendOtpRequestImpl implements _ResendOtpRequest {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$ResendOtpRequestImpl &&
-            (identical(other.phone, phone) || other.phone == phone) &&
-            (identical(other.email, email) || other.email == email) &&
-            (identical(other.type, type) || other.type == type));
+            (identical(other.email, email) || other.email == email));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, phone, email, type);
+  int get hashCode => Object.hash(runtimeType, email);
 
   /// Create a copy of ResendOtpRequest
   /// with the given fields replaced by the non-null parameter values.
@@ -1206,20 +1571,14 @@ class _$ResendOtpRequestImpl implements _ResendOtpRequest {
 }
 
 abstract class _ResendOtpRequest implements ResendOtpRequest {
-  const factory _ResendOtpRequest(
-      {final String? phone,
-      final String? email,
-      required final String type}) = _$ResendOtpRequestImpl;
+  const factory _ResendOtpRequest({required final String email}) =
+      _$ResendOtpRequestImpl;
 
   factory _ResendOtpRequest.fromJson(Map<String, dynamic> json) =
       _$ResendOtpRequestImpl.fromJson;
 
   @override
-  String? get phone;
-  @override
-  String? get email;
-  @override
-  String get type;
+  String get email;
 
   /// Create a copy of ResendOtpRequest
   /// with the given fields replaced by the non-null parameter values.
