@@ -38,7 +38,18 @@ import {
   ChefHat,
   Package,
   AlertCircle,
+  Download,
+  FileSpreadsheet,
+  FileText,
 } from 'lucide-react';
+import { exportOrdersReport } from '@/lib/export';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { format } from 'date-fns';
 
 type OrderStatus = Order['status'];
 type TabValue = 'active' | 'completed' | 'all';
@@ -273,17 +284,65 @@ export default function OrdersPage() {
             إدارة ومتابعة طلبات المطعم
           </p>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleRefresh}
-          disabled={isRefreshing}
-        >
-          <RefreshCw
-            className={`h-4 w-4 ml-2 ${isRefreshing ? 'animate-spin' : ''}`}
-          />
-          تحديث
-        </Button>
+        <div className="flex gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Download className="h-4 w-4 ml-2" />
+                تصدير
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onClick={() => exportOrdersReport({
+                  orders: getDisplayOrders().map(order => ({
+                    orderNumber: order.orderNumber,
+                    customerName: order.customer.name,
+                    total: order.total,
+                    status: ORDER_STATUSES[order.status]?.label || order.status,
+                    createdAt: format(new Date(order.createdAt), 'dd/MM/yyyy HH:mm'),
+                  })),
+                  summary: {
+                    totalOrders: getDisplayOrders().length,
+                    totalRevenue: getDisplayOrders().reduce((sum, o) => sum + o.total, 0),
+                  },
+                }, 'csv')}
+              >
+                <FileSpreadsheet className="h-4 w-4 ml-2" />
+                تصدير Excel (CSV)
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => exportOrdersReport({
+                  orders: getDisplayOrders().map(order => ({
+                    orderNumber: order.orderNumber,
+                    customerName: order.customer.name,
+                    total: order.total,
+                    status: ORDER_STATUSES[order.status]?.label || order.status,
+                    createdAt: format(new Date(order.createdAt), 'dd/MM/yyyy HH:mm'),
+                  })),
+                  summary: {
+                    totalOrders: getDisplayOrders().length,
+                    totalRevenue: getDisplayOrders().reduce((sum, o) => sum + o.total, 0),
+                  },
+                }, 'pdf')}
+              >
+                <FileText className="h-4 w-4 ml-2" />
+                تصدير PDF
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+          >
+            <RefreshCw
+              className={`h-4 w-4 ml-2 ${isRefreshing ? 'animate-spin' : ''}`}
+            />
+            تحديث
+          </Button>
+        </div>
       </div>
 
       {/* Tabs */}
