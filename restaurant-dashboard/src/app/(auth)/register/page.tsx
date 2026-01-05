@@ -7,9 +7,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
-import Cookies from 'js-cookie';
-import { useAuthStore } from '@/stores/auth';
-import { ROUTES, STORAGE_KEYS } from '@/config/constants';
+import { ROUTES } from '@/config/constants';
 import { authApi, getErrorMessage } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -81,7 +79,6 @@ type RegisterFormData = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { setAuth } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -158,19 +155,10 @@ export default function RegisterPage() {
       });
 
       if (response.success && response.data) {
-        const { accessToken, refreshToken, user, restaurant } = response.data;
+        toast.success(response.data.message || 'تم إنشاء الحساب بنجاح. يرجى التحقق من بريدك الإلكتروني');
 
-        // Save tokens
-        Cookies.set(STORAGE_KEYS.accessToken, accessToken, { expires: 7 });
-        Cookies.set(STORAGE_KEYS.refreshToken, refreshToken, { expires: 30 });
-
-        // Update store
-        setAuth(user, restaurant);
-
-        toast.success('تم إنشاء الحساب بنجاح');
-
-        // Redirect to OTP verification
-        router.push(`/verify-otp?email=${encodeURIComponent(data.email)}&type=registration`);
+        // Redirect to email verification
+        router.push(`/verify-email?email=${encodeURIComponent(data.email)}`);
       } else {
         toast.error(response.message || 'فشل في إنشاء الحساب');
       }
