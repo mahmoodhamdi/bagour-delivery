@@ -26,12 +26,22 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   BarChart3,
+  Download,
+  FileSpreadsheet,
+  FileText,
 } from 'lucide-react';
 import { earningsApi, ordersApi, type Order, getErrorMessage } from '@/lib/api';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Legend } from 'recharts';
 import { format, subDays, startOfDay, endOfDay } from 'date-fns';
 import { ar } from 'date-fns/locale';
+import { exportAnalyticsReport } from '@/lib/export';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface AnalyticsData {
   totalOrders: number;
@@ -252,7 +262,7 @@ export default function AnalyticsPage() {
           <h1 className="text-3xl font-bold">التحليلات</h1>
           <p className="text-muted-foreground">تقارير وإحصائيات شاملة عن أداء مطعمك</p>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           <Select value={selectedPeriod} onValueChange={(value) => setSelectedPeriod(value as any)}>
             <SelectTrigger className="w-36">
               <SelectValue />
@@ -263,6 +273,38 @@ export default function AnalyticsPage() {
               <SelectItem value="all">الكل</SelectItem>
             </SelectContent>
           </Select>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                <Download className="h-4 w-4 ml-2" />
+                تصدير التقرير
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onClick={() => analyticsData && exportAnalyticsReport({
+                  totalOrders: analyticsData.totalOrders,
+                  totalRevenue: analyticsData.totalRevenue,
+                  averageOrderValue: analyticsData.averageOrderValue,
+                  popularItems: analyticsData.popularItems,
+                }, 'csv')}
+              >
+                <FileSpreadsheet className="h-4 w-4 ml-2" />
+                تصدير Excel (CSV)
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => analyticsData && exportAnalyticsReport({
+                  totalOrders: analyticsData.totalOrders,
+                  totalRevenue: analyticsData.totalRevenue,
+                  averageOrderValue: analyticsData.averageOrderValue,
+                  popularItems: analyticsData.popularItems,
+                }, 'pdf')}
+              >
+                <FileText className="h-4 w-4 ml-2" />
+                تصدير PDF
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Button onClick={fetchAnalytics} variant="outline" size="icon">
             <RefreshCw className="h-4 w-4" />
           </Button>
