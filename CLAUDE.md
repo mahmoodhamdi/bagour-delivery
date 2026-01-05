@@ -4,7 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Bagour Delivery is a food delivery platform monorepo for Bagour city, Egypt. It consists of 6 projects serving 4 user roles (Customer, Restaurant Owner, Delivery Driver, Admin).
+Bagour Delivery is a food delivery platform monorepo for Bagour city, Egypt. It consists of 6 projects serving 4 user roles:
+- **customer** - Orders food via mobile app
+- **restaurant** - Manages menu and accepts orders via web dashboard
+- **driver** (also `delivery`) - Delivers orders via mobile app
+- **admin** - Platform management via web dashboard
 
 ## Development Commands
 
@@ -86,9 +90,10 @@ Key directories:
 ### Frontend Architecture
 **Dashboards (Next.js 14)**:
 - App Router with route groups: `(auth)/` for login/register, `(dashboard)/` for main app
-- Zustand stores in `src/stores/` for state management
+- Zustand stores in `src/stores/` for state management (auth, menu, orders)
 - shadcn/ui components in `src/components/ui/`
-- API service with axios in `src/services/api.ts` or `src/lib/api.ts`
+- API service with axios in `src/lib/api.ts` - uses interceptors for auto token injection and 401 refresh handling
+- Auth store pattern: `useAuthStore()` with `login()`, `logout()`, `checkAuth()`, persisted to localStorage
 
 **Flutter Apps**:
 - Riverpod for state management with StateNotifier pattern
@@ -96,6 +101,8 @@ Key directories:
 - GoRouter for navigation (routes in `lib/config/routes.dart`)
 - Services in `lib/services/`, Providers in `lib/providers/`
 - Models generate `*.freezed.dart` and `*.g.dart` files (never edit these manually)
+- API calls via `ApiService` singleton with Dio interceptors for auth
+- Auth state via `AuthNotifier` with `flutter_secure_storage` for tokens
 
 ### Real-time Communication
 Socket.io configured for live order updates. Room-based messaging pattern:
@@ -126,6 +133,35 @@ Socket events clients can emit:
 - `driver:location` - Update driver location during delivery
 - `order:subscribe`, `order:unsubscribe` - Track specific order updates
 
+Chat events:
+- `chat:message` - New message received (emitted to participants and order room)
+- `chat:read` - Messages marked as read
+
+### Order Status Flow
+Order statuses progress in this sequence:
+`pending` → `confirmed` → `preparing` → `ready` → `picked_up` → `on_the_way` → `delivered`
+
+Or can be `cancelled` at any point before `delivered`. Order number format: `BAG-YYMMDD-XXXX` (e.g., `BAG-241215-0042`).
+
+### Chat System
+Order-based chat with three chat types per order:
+- `customer_restaurant` - Between customer and restaurant
+- `customer_driver` - Between customer and driver
+- `restaurant_driver` - Between restaurant and driver
+
+Message types: `text`, `image`, `location`. Chats are deactivated when order completes/cancels.
+
+### Data Model Relationships
+Key entities and their relationships:
+- **User** - Base authentication entity. One User → one of (Customer, Restaurant owner, Driver)
+- **Customer** - Has userId ref, manages addresses and favorites
+- **Restaurant** - Has userId ref (owner), contains menu categories
+- **Driver** - Has userId ref, tracks location and vehicle info
+- **Order** - Links Customer, Restaurant, Driver. Contains order items (snapshots of menu items at time of order)
+- **Chat** - Per-order, per-participant-pair (customer↔restaurant, customer↔driver, restaurant↔driver)
+
+Payment methods: `cash`, `card`, `wallet`. Payment statuses: `pending`, `paid`, `failed`, `refunded`.
+
 ## Key Patterns
 
 ### Backend Error Handling
@@ -151,12 +187,58 @@ sendPaginated(res, items, { total, page, limit, pages });
 - Dashboards: React Hook Form + Zod
 - Flutter: Form Builder with custom validators in `lib/utils/validators.dart`
 
+### Authentication Middleware
+Use middleware from `@middleware/auth`:
+```typescript
+import { authenticate, authorize, optionalAuth, verifyRestaurantOwner, verifyDriver } from '@middleware/auth';
+
+// Require authentication
+router.get('/profile', authenticate, getProfile);
+
+// Require specific roles
+router.post('/admin/users', authenticate, authorize('admin'), createUser);
+
+// Optional auth (user may or may not be logged in)
+router.get('/restaurants', optionalAuth, getRestaurants);
+
+// Verify ownership
+router.put('/restaurants/:id', authenticate, verifyRestaurantOwner, updateRestaurant);
+```
+
 ### Adding New Backend Endpoints
 1. Create/update validator in `src/validators/`
 2. Add service method in `src/services/`
 3. Add controller in `src/controllers/`
 4. Add route in `src/routes/` with validation middleware
 5. Export from barrel files (`index.ts`) in each directory
+
+## API Structure
+
+All backend routes are versioned under `/api/v1/`:
+- `/api/v1/auth` - Authentication (login, register, refresh, password reset)
+- `/api/v1/customers` - Customer profile and addresses
+- `/api/v1/restaurants` - Restaurant listings and details
+- `/api/v1/menu` - Menu items and categories
+- `/api/v1/orders` - Order management
+- `/api/v1/drivers` - Driver management
+- `/api/v1/payments` - Payment processing (Paymob)
+- `/api/v1/wallet` - Wallet operations
+- `/api/v1/chats` - Real-time messaging
+- `/api/v1/reviews` - Ratings and reviews
+- `/api/v1/notifications` - Push notifications
+- `/api/v1/coupons` - Discount codes
+- `/api/v1/transactions` - Payment history
+- `/api/v1/admin` - Admin operations
+- `/api/v1/upload` - File uploads (Cloudinary)
+
+Rate limiting: Auth routes 10 req/15min, general routes 100 req/15min.
+
+### Authentication Flow
+JWT-based with access + refresh tokens:
+1. Login/Register returns `accessToken` (15min) and `refreshToken` (7d)
+2. Access token sent in `Authorization: Bearer <token>` header
+3. On 401, client calls `/api/v1/auth/refresh` with refresh token
+4. Tokens stored: dashboards use localStorage, Flutter apps use `flutter_secure_storage`
 
 ## Environment Configuration
 

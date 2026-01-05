@@ -11,7 +11,7 @@ class WalletScreen extends ConsumerStatefulWidget {
   ConsumerState<WalletScreen> createState() => _WalletScreenState();
 }
 
-class _WalletScreenState extends ConsumerState<WalletScreen> {
+class _WalletScreenState extends ConsumerState<WalletScreen> with WidgetsBindingObserver {
   bool _isLoading = false;
   WalletBalance? _balance;
   List<WalletTransaction> _transactions = [];
@@ -21,7 +21,22 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _loadWalletData();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Reload data when app comes back to foreground (after payment)
+    if (state == AppLifecycleState.resumed) {
+      _loadWalletData();
+    }
   }
 
   Future<void> _loadWalletData() async {
@@ -173,6 +188,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
           extra: {
             'paymentUrl': response.paymentUrl,
             'orderId': response.transactionId,
+            'isWalletTopup': true,
           },
         );
       }

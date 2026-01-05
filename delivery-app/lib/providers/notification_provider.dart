@@ -1,11 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 import '../services/notification_service.dart';
 import '../services/api_service.dart';
 import '../config/constants.dart';
-import 'order_provider.dart' show apiServiceProvider;
 
-// Notification service provider
+// Notification service provider (singleton)
 final notificationServiceProvider = Provider<NotificationService>((ref) {
   return NotificationService();
 });
@@ -17,7 +17,10 @@ class NotificationState {
   final int unreadCount;
   final List<NotificationItem> notifications;
   final bool isLoading;
+  final bool hasMore;
+  final int currentPage;
   final String? error;
+  final bool isOnline;
 
   const NotificationState({
     this.isInitialized = false,
@@ -25,7 +28,10 @@ class NotificationState {
     this.unreadCount = 0,
     this.notifications = const [],
     this.isLoading = false,
+    this.hasMore = true,
+    this.currentPage = 1,
     this.error,
+    this.isOnline = false,
   });
 
   NotificationState copyWith({
@@ -34,7 +40,10 @@ class NotificationState {
     int? unreadCount,
     List<NotificationItem>? notifications,
     bool? isLoading,
+    bool? hasMore,
+    int? currentPage,
     String? error,
+    bool? isOnline,
   }) {
     return NotificationState(
       isInitialized: isInitialized ?? this.isInitialized,
@@ -42,7 +51,10 @@ class NotificationState {
       unreadCount: unreadCount ?? this.unreadCount,
       notifications: notifications ?? this.notifications,
       isLoading: isLoading ?? this.isLoading,
+      hasMore: hasMore ?? this.hasMore,
+      currentPage: currentPage ?? this.currentPage,
       error: error,
+      isOnline: isOnline ?? this.isOnline,
     );
   }
 }
@@ -58,6 +70,7 @@ class NotificationItem {
   final bool isRead;
   final DateTime createdAt;
   final Map<String, dynamic>? data;
+  final String? image;
 
   NotificationItem({
     required this.id,
@@ -69,6 +82,7 @@ class NotificationItem {
     required this.isRead,
     required this.createdAt,
     this.data,
+    this.image,
   });
 
   factory NotificationItem.fromJson(Map<String, dynamic> json) {
@@ -83,8 +97,34 @@ class NotificationItem {
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'])
           : DateTime.now(),
-      data: json['data'],
+      data: json['data'] as Map<String, dynamic>?,
+      image: json['image'],
     );
+  }
+
+  NotificationItem copyWith({bool? isRead}) {
+    return NotificationItem(
+      id: id,
+      title: title,
+      titleAr: titleAr,
+      body: body,
+      bodyAr: bodyAr,
+      type: type,
+      isRead: isRead ?? this.isRead,
+      createdAt: createdAt,
+      data: data,
+      image: image,
+    );
+  }
+
+  /// Get localized title based on language
+  String getTitle(String languageCode) {
+    return languageCode == 'ar' ? titleAr : title;
+  }
+
+  /// Get localized body based on language
+  String getBody(String languageCode) {
+    return languageCode == 'ar' ? bodyAr : body;
   }
 }
 
@@ -96,6 +136,7 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
   NotificationNotifier(this._notificationService, this._apiService)
       : super(const NotificationState());
 
+  /// Initialize notifications - call this after driver login
   Future<void> initialize({String? driverId}) async {
     if (state.isInitialized) return;
 
@@ -114,7 +155,7 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
       // Register token with backend
       await _registerToken();
 
-      // Subscribe to driver topics
+      // Subscribe to driver topics if driverId provided
       if (driverId != null) {
         await _notificationService.subscribeToDriverTopics(driverId);
       }
@@ -122,8 +163,14 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
       // Fetch initial notifications
       await fetchNotifications();
     } catch (e) {
+      debugPrint('Error initializing notifications: $e');
       state = state.copyWith(error: e.toString());
     }
+  }
+
+  /// Set navigation context for notification handling
+  void setNavigationContext(BuildContext context) {
+    _notificationService.setNavigationContext(context);
   }
 
   Future<void> _registerToken() async {
@@ -135,7 +182,9 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
         ApiEndpoints.registerFcm,
         data: {'token': token},
       );
+      debugPrint('FCM token registered with backend');
     } catch (e) {
+      debugPrint('Error registering FCM token: $e');
       // Silently fail - token registration is not critical
     }
   }
@@ -148,43 +197,84 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
   }
 
   void _onMessageReceived(RemoteMessage message) {
+    debugPrint('Notification received in provider: ${message.notification?.title}');
     // Refresh notifications and unread count
-    fetchNotifications();
-    fetchUnreadCount();
+    fetchNotifications(refresh: true);
   }
 
   void _onMessageOpenedApp(RemoteMessage message) {
-    // Handle navigation based on notification data
-    final data = message.data;
-    if (data.containsKey('orderId')) {
-      // Navigate to order details
+    debugPrint('App opened from notification: ${message.data}');
+    // Navigation is handled by NotificationService
+  }
+
+  /// Toggle online status - subscribes/unsubscribes from available orders
+  Future<void> toggleOnlineStatus(bool isOnline) async {
+    try {
+      if (isOnline) {
+        await _notificationService.subscribeToAvailableOrders();
+      } else {
+        await _notificationService.unsubscribeFromAvailableOrders();
+      }
+      state = state.copyWith(isOnline: isOnline);
+    } catch (e) {
+      debugPrint('Error toggling online status: $e');
     }
   }
 
-  Future<void> fetchNotifications({int page = 1}) async {
-    if (page == 1) {
+  /// Subscribe to a specific zone for nearby orders
+  Future<void> subscribeToZone(String zoneId) async {
+    await _notificationService.subscribeToZone(zoneId);
+  }
+
+  /// Unsubscribe from a zone
+  Future<void> unsubscribeFromZone(String zoneId) async {
+    await _notificationService.unsubscribeFromZone(zoneId);
+  }
+
+  /// Fetch notifications from backend
+  Future<void> fetchNotifications({int page = 1, bool refresh = false}) async {
+    if (state.isLoading && !refresh) return;
+
+    if (refresh) {
+      state = state.copyWith(currentPage: 1, hasMore: true);
+    }
+
+    final targetPage = refresh ? 1 : page;
+    if (targetPage == 1) {
       state = state.copyWith(isLoading: true, error: null);
     }
 
     try {
       final response = await _apiService.get(
         ApiEndpoints.notifications,
-        queryParameters: {'page': page, 'limit': 20},
+        queryParameters: {
+          'page': targetPage,
+          'limit': AppConstants.defaultPageSize,
+        },
       );
 
       if (response.statusCode == 200) {
-        final data = response.data['data'];
-        final items = (data['data'] as List)
+        final responseData = response.data['data'];
+        final items = (responseData['data'] as List)
             .map((json) => NotificationItem.fromJson(json))
             .toList();
 
+        final total = responseData['total'] ?? 0;
+        final hasMore = items.length >= AppConstants.defaultPageSize &&
+            (targetPage * AppConstants.defaultPageSize) < total;
+
         state = state.copyWith(
-          notifications: page == 1 ? items : [...state.notifications, ...items],
-          unreadCount: data['unreadCount'] ?? 0,
+          notifications: targetPage == 1
+              ? items
+              : [...state.notifications, ...items],
+          unreadCount: responseData['unreadCount'] ?? 0,
           isLoading: false,
+          hasMore: hasMore,
+          currentPage: targetPage,
         );
       }
     } catch (e) {
+      debugPrint('Error fetching notifications: $e');
       state = state.copyWith(
         isLoading: false,
         error: e.toString(),
@@ -192,6 +282,13 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
     }
   }
 
+  /// Load more notifications (pagination)
+  Future<void> loadMore() async {
+    if (!state.hasMore || state.isLoading) return;
+    await fetchNotifications(page: state.currentPage + 1);
+  }
+
+  /// Fetch unread count only
   Future<void> fetchUnreadCount() async {
     try {
       final response = await _apiService.get(
@@ -204,10 +301,12 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
         );
       }
     } catch (e) {
+      debugPrint('Error fetching unread count: $e');
       // Silently fail
     }
   }
 
+  /// Mark a notification as read
   Future<void> markAsRead(String notificationId) async {
     try {
       await _apiService.put(
@@ -217,17 +316,7 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
       // Update local state
       final updatedNotifications = state.notifications.map((n) {
         if (n.id == notificationId) {
-          return NotificationItem(
-            id: n.id,
-            title: n.title,
-            titleAr: n.titleAr,
-            body: n.body,
-            bodyAr: n.bodyAr,
-            type: n.type,
-            isRead: true,
-            createdAt: n.createdAt,
-            data: n.data,
-          );
+          return n.copyWith(isRead: true);
         }
         return n;
       }).toList();
@@ -237,10 +326,11 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
         unreadCount: state.unreadCount > 0 ? state.unreadCount - 1 : 0,
       );
     } catch (e) {
-      // Silently fail
+      debugPrint('Error marking notification as read: $e');
     }
   }
 
+  /// Mark all notifications as read
   Future<void> markAllAsRead() async {
     try {
       await _apiService.put(
@@ -248,29 +338,24 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
       );
 
       // Update local state
-      final updatedNotifications = state.notifications.map((n) {
-        return NotificationItem(
-          id: n.id,
-          title: n.title,
-          titleAr: n.titleAr,
-          body: n.body,
-          bodyAr: n.bodyAr,
-          type: n.type,
-          isRead: true,
-          createdAt: n.createdAt,
-          data: n.data,
-        );
-      }).toList();
+      final updatedNotifications =
+          state.notifications.map((n) => n.copyWith(isRead: true)).toList();
 
       state = state.copyWith(
         notifications: updatedNotifications,
         unreadCount: 0,
       );
     } catch (e) {
-      // Silently fail
+      debugPrint('Error marking all as read: $e');
     }
   }
 
+  /// Clear all local notifications
+  Future<void> clearLocalNotifications() async {
+    await _notificationService.clearAllNotifications();
+  }
+
+  /// Unregister FCM token (call on logout)
   Future<void> unregisterToken() async {
     final token = _notificationService.fcmToken;
     if (token == null) return;
@@ -280,13 +365,32 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
         ApiEndpoints.registerFcm,
         data: {'token': token},
       );
+      await _notificationService.deleteToken();
+      debugPrint('FCM token unregistered');
     } catch (e) {
-      // Silently fail
+      debugPrint('Error unregistering FCM token: $e');
     }
+  }
+
+  /// Cleanup on logout
+  Future<void> cleanup({String? driverId}) async {
+    if (driverId != null) {
+      await _notificationService.unsubscribeFromDriverTopics(driverId);
+    }
+    await _notificationService.unsubscribeFromAvailableOrders();
+    await unregisterToken();
+    await clearLocalNotifications();
+
+    state = const NotificationState();
   }
 }
 
-// Provider
+// API service provider (import from your actual location)
+final apiServiceProvider = Provider<ApiService>((ref) {
+  return ApiService();
+});
+
+// Main provider
 final notificationProvider =
     StateNotifierProvider<NotificationNotifier, NotificationState>((ref) {
   final notificationService = ref.watch(notificationServiceProvider);
@@ -294,7 +398,27 @@ final notificationProvider =
   return NotificationNotifier(notificationService, apiService);
 });
 
-// Unread count provider for easy access
+// Unread count provider for easy access in UI
 final unreadNotificationCountProvider = Provider<int>((ref) {
   return ref.watch(notificationProvider).unreadCount;
+});
+
+// Loading state provider
+final notificationsLoadingProvider = Provider<bool>((ref) {
+  return ref.watch(notificationProvider).isLoading;
+});
+
+// Notifications list provider
+final notificationsListProvider = Provider<List<NotificationItem>>((ref) {
+  return ref.watch(notificationProvider).notifications;
+});
+
+// Has more provider for pagination
+final notificationsHasMoreProvider = Provider<bool>((ref) {
+  return ref.watch(notificationProvider).hasMore;
+});
+
+// Online status provider
+final driverOnlineStatusProvider = Provider<bool>((ref) {
+  return ref.watch(notificationProvider).isOnline;
 });
