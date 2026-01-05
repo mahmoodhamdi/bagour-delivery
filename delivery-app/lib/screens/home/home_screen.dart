@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:geolocator/geolocator.dart';
 import '../../config/theme.dart';
 import '../../config/routes.dart';
 import '../../providers/order_provider.dart';
+import '../../providers/auth_provider.dart';
+import '../../services/location_service.dart';
+import '../../services/socket_service.dart';
+import '../../services/api_service.dart';
+import '../../config/constants.dart';
 import '../../models/order.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -16,11 +22,24 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   bool _isOnline = false;
   bool _isTogglingStatus = false;
+  late LocationService _locationService;
+  late SocketService _socketService;
+  late ApiService _apiService;
 
   @override
   void initState() {
     super.initState();
+    _locationService = ref.read(locationServiceProvider);
+    _socketService = ref.read(socketServiceProvider);
+    _apiService = ref.read(apiServiceProvider);
     _loadData();
+  }
+
+  @override
+  void dispose() {
+    // Stop location tracking on dispose
+    _locationService.stopLocationTracking();
+    super.dispose();
   }
 
   Future<void> _loadData() async {
@@ -33,17 +52,93 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Future<void> _toggleOnlineStatus() async {
     setState(() => _isTogglingStatus = true);
 
-    // TODO: Call API to toggle online status
-    await Future.delayed(const Duration(milliseconds: 500));
+    try {
+      final user = ref.read(currentUserProvider);
+      if (user == null) {
+        throw Exception('المستخدم غير مسجل الدخول');
+      }
 
-    setState(() {
-      _isOnline = !_isOnline;
-      _isTogglingStatus = false;
-    });
+      // Get current location first if going online
+      if (!_isOnline) {
+        final hasPermission = await _locationService.checkAndRequestPermission();
+        if (!hasPermission) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('يجب السماح بالوصول إلى الموقع للعمل')),
+            );
+          }
+          setState(() => _isTogglingStatus = false);
+          return;
+        }
 
-    if (_isOnline) {
-      // Start fetching available orders
-      ref.read(availableOrdersProvider.notifier).fetchAvailableOrders();
+        final position = await _locationService.getCurrentLocation();
+        if (position == null) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('فشل الحصول على الموقع الحالي')),
+            );
+          }
+          setState(() => _isTogglingStatus = false);
+          return;
+        }
+      }
+
+      // Call API to toggle status
+      final response = await _apiService.post(ApiEndpoints.toggleOnline);
+
+      if (response.data['success']) {
+        setState(() {
+          _isOnline = !_isOnline;
+        });
+
+        if (_isOnline) {
+          // Emit driver online status via socket
+          _socketService.setDriverOnline(user.id);
+
+          // Start location tracking
+          await _locationService.startLocationTracking(
+            onLocationUpdate: (Position position) {
+              // Location updates are automatically sent to server
+              // Socket location updates are sent when on active delivery
+            },
+            onError: (String error) {
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('خطأ في تتبع الموقع: $error')),
+                );
+              }
+            },
+          );
+
+          // Start fetching available orders
+          ref.read(availableOrdersProvider.notifier).fetchAvailableOrders();
+        } else {
+          // Emit driver offline status via socket
+          _socketService.setDriverOffline(user.id);
+
+          // Stop location tracking
+          _locationService.stopLocationTracking();
+        }
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(_isOnline ? 'أنت متصل الآن' : 'أنت غير متصل الآن'),
+              backgroundColor: _isOnline ? Colors.green : Colors.grey,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('فشل تغيير الحالة: ${e.toString()}')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isTogglingStatus = false);
+      }
     }
   }
 

@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import '../models/models.dart';
 import '../services/auth_service.dart';
+import '../services/socket_service.dart';
 import 'order_provider.dart' show apiServiceProvider;
 
 part 'auth_provider.freezed.dart';
@@ -24,8 +25,9 @@ class AuthState with _$AuthState {
 
 class AuthNotifier extends StateNotifier<AuthState> {
   final AuthService _authService;
+  final SocketService _socketService;
 
-  AuthNotifier(this._authService) : super(const AuthState.initial()) {
+  AuthNotifier(this._authService, this._socketService) : super(const AuthState.initial()) {
     _checkAuthStatus();
   }
 
@@ -40,6 +42,16 @@ class AuthNotifier extends StateNotifier<AuthState> {
       if (isLoggedIn) {
         final user = await _authService.getMe();
         state = AuthState.authenticated(user: user);
+
+        // Connect to socket on authentication
+        if (user.role == UserRole.driver) {
+          try {
+            await _socketService.connect(user.id);
+          } catch (e) {
+            // Socket connection failure shouldn't prevent authentication
+            print('Socket connection failed: $e');
+          }
+        }
       } else {
         state = const AuthState.unauthenticated();
       }
@@ -71,6 +83,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
         user: response.user,
         driver: response.driver,
       );
+
+      // Connect to socket on successful verification
+      try {
+        await _socketService.connect(response.user.id);
+      } catch (e) {
+        // Socket connection failure shouldn't prevent authentication
+        print('Socket connection failed: $e');
+      }
     } catch (e) {
       state = AuthState.error(e.toString().replaceAll('Exception: ', ''));
     }
@@ -92,6 +112,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
           user: response.user,
           driver: response.driver,
         );
+
+        // Connect to socket on successful login
+        try {
+          await _socketService.connect(response.user.id);
+        } catch (e) {
+          // Socket connection failure shouldn't prevent authentication
+          print('Socket connection failed: $e');
+        }
       }
     } catch (e) {
       state = AuthState.error(e.toString().replaceAll('Exception: ', ''));
@@ -107,6 +135,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
         user: response.user,
         driver: response.driver,
       );
+
+      // Connect to socket on successful Google sign-in
+      try {
+        await _socketService.connect(response.user.id);
+      } catch (e) {
+        // Socket connection failure shouldn't prevent authentication
+        print('Socket connection failed: $e');
+      }
     } catch (e) {
       state = AuthState.error(e.toString().replaceAll('Exception: ', ''));
     }
@@ -180,6 +216,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
   // Logout
   Future<void> logout({String? fcmToken}) async {
     state = const AuthState.loading();
+
+    // Disconnect socket before logout
+    _socketService.disconnect();
+
     await _authService.logout(fcmToken: fcmToken);
     state = const AuthState.unauthenticated();
   }
@@ -200,7 +240,8 @@ final authServiceProvider = Provider<AuthService>((ref) {
 
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   final authService = ref.watch(authServiceProvider);
-  return AuthNotifier(authService);
+  final socketService = ref.watch(socketServiceProvider);
+  return AuthNotifier(authService, socketService);
 });
 
 // Helper providers
