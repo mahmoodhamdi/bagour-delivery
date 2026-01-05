@@ -812,6 +812,103 @@ export const earningsApi = {
   },
 };
 
+// Review types
+export interface Review {
+  _id: string;
+  orderId: string;
+  customerId: string;
+  restaurantId: string;
+  driverId?: string;
+  customer?: {
+    name: string;
+    avatar?: string;
+  };
+  restaurantRating: number;
+  foodRating: number;
+  driverRating?: number;
+  comment?: string;
+  images: string[];
+  restaurantReply?: string;
+  repliedAt?: string;
+  isVisible: boolean;
+  isReported: boolean;
+  reportReason?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ReviewStats {
+  totalReviews: number;
+  averageRestaurantRating: number;
+  averageFoodRating: number;
+  averageDriverRating: number;
+  ratingDistribution: {
+    1: number;
+    2: number;
+    3: number;
+    4: number;
+    5: number;
+  };
+  repliedCount: number;
+  replyRate: number;
+}
+
+export interface ReviewsListResponse {
+  reviews: Review[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    pages: number;
+  };
+}
+
+// Reviews API functions
+export const reviewsApi = {
+  getReviews: async (params?: {
+    page?: number;
+    limit?: number;
+    rating?: number;
+    hasReply?: boolean;
+  }): Promise<ApiResponse<ReviewsListResponse>> => {
+    const response = await api.get<ApiResponse<ReviewsListResponse>>(
+      API_ENDPOINTS.reviews,
+      { params }
+    );
+    return response.data;
+  },
+
+  getStats: async (): Promise<ApiResponse<ReviewStats>> => {
+    const response = await api.get<ApiResponse<ReviewStats>>(
+      API_ENDPOINTS.reviewStats
+    );
+    return response.data;
+  },
+
+  replyToReview: async (reviewId: string, reply: string): Promise<ApiResponse<{ review: Review }>> => {
+    const response = await api.post<ApiResponse<{ review: Review }>>(
+      API_ENDPOINTS.replyToReview.replace(':id', reviewId),
+      { reply }
+    );
+    return response.data;
+  },
+
+  updateReply: async (reviewId: string, reply: string): Promise<ApiResponse<{ review: Review }>> => {
+    const response = await api.put<ApiResponse<{ review: Review }>>(
+      API_ENDPOINTS.replyToReview.replace(':id', reviewId),
+      { reply }
+    );
+    return response.data;
+  },
+
+  deleteReply: async (reviewId: string): Promise<ApiResponse<{ review: Review }>> => {
+    const response = await api.delete<ApiResponse<{ review: Review }>>(
+      API_ENDPOINTS.replyToReview.replace(':id', reviewId)
+    );
+    return response.data;
+  },
+};
+
 // Error handling helper
 export const getErrorMessage = (error: unknown): string => {
   if (axios.isAxiosError(error)) {
