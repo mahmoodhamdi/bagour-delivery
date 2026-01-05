@@ -31,7 +31,8 @@ export type TransactionType =
   | 'driver_payout'
   | 'refund'
   | 'withdrawal'
-  | 'bonus';
+  | 'bonus'
+  | 'wallet_topup';
 
 // Coupon type
 export type CouponType = 'percentage' | 'fixed';

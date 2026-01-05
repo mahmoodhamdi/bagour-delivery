@@ -18,6 +18,7 @@ export {
 } from './customer.controller';
 export * from './coupon.controller';
 export * from './payment.controller';
+export * from './wallet.controller';
 export * from './transaction.controller';
 export * from './admin.controller';
 export * from './notification.controller';

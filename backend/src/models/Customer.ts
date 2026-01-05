@@ -25,6 +25,9 @@ export interface ICustomer extends Document {
   loyaltyPoints: number;
   totalOrders: number;
   totalSpent: number;
+  walletBalance: number;
+  totalWalletTopups: number;
+  totalWalletSpent: number;
   referralCode: string;
   referredBy?: Types.ObjectId;
   createdAt: Date;
@@ -127,6 +130,21 @@ const customerSchema = new Schema<ICustomer>(
       min: 0,
     },
     totalSpent: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    walletBalance: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    totalWalletTopups: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    totalWalletSpent: {
       type: Number,
       default: 0,
       min: 0,

@@ -7,6 +7,7 @@ export * from './socket.service';
 export * from './customer.service';
 export * from './coupon.service';
 export * from './paymob.service';
+export * from './wallet.service';
 export * from './transaction.service';
 export * from './admin.service';
 export * from './notification.service';
