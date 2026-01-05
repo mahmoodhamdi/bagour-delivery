@@ -18,6 +18,8 @@ import '../screens/notifications/notifications_screen.dart';
 import '../screens/profile/profile_screen.dart';
 import '../screens/profile/edit_profile_screen.dart';
 import '../screens/settings/settings_screen.dart';
+import '../screens/rating/rate_order_screen.dart';
+import '../screens/wallet/wallet_screen.dart';
 
 class AppRoutes {
   static const String splash = '/';
@@ -35,6 +37,7 @@ class AppRoutes {
   static const String orderTracking = '/order/:id';
   static const String orderHistory = '/orders';
   static const String orderDetails = '/orders/:id';
+  static const String rateOrder = '/orders/:id/rate';
   static const String profile = '/profile';
   static const String editProfile = '/profile/edit';
   static const String addresses = '/addresses';
@@ -43,6 +46,7 @@ class AppRoutes {
   static const String favorites = '/favorites';
   static const String notifications = '/notifications';
   static const String settings = '/settings';
+  static const String wallet = '/wallet';
   static const String payment = '/payment';
   static const String paymentSuccess = '/payment/success';
   static const String paymentFailed = '/payment/failed';
@@ -123,6 +127,18 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) => const OrderHistoryScreen(),
     ),
     GoRoute(
+      path: AppRoutes.rateOrder,
+      builder: (context, state) {
+        final orderId = state.pathParameters['id']!;
+        final extra = state.extra as Map<String, dynamic>?;
+        return RateOrderScreen(
+          orderId: orderId,
+          restaurantName: extra?['restaurantName'] ?? '',
+          driverName: extra?['driverName'],
+        );
+      },
+    ),
+    GoRoute(
       path: AppRoutes.profile,
       builder: (context, state) => const ProfileScreen(),
     ),
@@ -156,6 +172,10 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.settings,
       builder: (context, state) => const SettingsScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.wallet,
+      builder: (context, state) => const WalletScreen(),
     ),
     GoRoute(
       path: AppRoutes.payment,

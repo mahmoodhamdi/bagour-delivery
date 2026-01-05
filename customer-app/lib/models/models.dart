@@ -6,3 +6,4 @@ export 'restaurant.dart';
 export 'cart.dart';
 export 'address.dart';
 export 'order.dart';
+export 'review.dart';
