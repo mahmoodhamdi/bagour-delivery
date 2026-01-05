@@ -44,7 +44,7 @@ class CheckoutPaymentSection extends StatelessWidget {
           icon: Icons.credit_card,
           title: 'بطاقة ائتمانية',
           subtitle: 'ادفع ببطاقة الائتمان',
-          enabled: false, // TODO: Enable when payment gateway is ready
+          enabled: true,
         ),
         const SizedBox(height: 8),
         _buildPaymentOption(
@@ -53,7 +53,7 @@ class CheckoutPaymentSection extends StatelessWidget {
           icon: Icons.account_balance_wallet,
           title: 'المحفظة',
           subtitle: 'ادفع من رصيد محفظتك',
-          enabled: false, // TODO: Enable when wallet is implemented
+          enabled: true,
         ),
       ],
     );

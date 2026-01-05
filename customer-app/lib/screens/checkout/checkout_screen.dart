@@ -4,9 +4,8 @@ import 'package:go_router/go_router.dart';
 import '../../config/theme.dart';
 import '../../config/routes.dart';
 import '../../models/address.dart';
-import '../../providers/cart_provider.dart';
-import '../../providers/address_provider.dart';
-import '../../providers/order_provider.dart';
+import '../../providers/providers.dart';
+import '../../services/services.dart';
 import 'widgets/checkout_address_section.dart';
 import 'widgets/checkout_payment_section.dart';
 import 'widgets/checkout_items_section.dart';
@@ -268,6 +267,42 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       final notes = ref.read(checkoutNotesProvider);
       final paymentMethod = ref.read(selectedPaymentMethodProvider);
 
+      // For wallet payment, check balance first
+      if (paymentMethod == PaymentMethod.wallet) {
+        final walletService = ref.read(walletServiceProvider);
+        try {
+          final balance = await walletService.getBalance();
+          if (balance.balance < cart.total) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'رصيد محفظتك غير كافٍ. الرصيد الحالي: ${balance.balance.toStringAsFixed(2)} ج.م',
+                  ),
+                  backgroundColor: AppColors.error,
+                  action: SnackBarAction(
+                    label: 'شحن المحفظة',
+                    textColor: Colors.white,
+                    onPressed: () => context.push(AppRoutes.wallet),
+                  ),
+                ),
+              );
+            }
+            return;
+          }
+        } catch (e) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('فشل التحقق من رصيد المحفظة'),
+                backgroundColor: AppColors.error,
+              ),
+            );
+          }
+          return;
+        }
+      }
+
       // Prepare order items
       final orderItems = cart.items.map((item) => {
         'menuItemId': item.menuItemId,
@@ -294,12 +329,92 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         notes: notes,
       );
 
-      if (orderId != null) {
-        // Clear cart after successful order
+      if (orderId == null) {
+        final error = ref.read(orderCreationProvider).error;
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(error ?? 'فشل إنشاء الطلب'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+        return;
+      }
+
+      // Handle payment based on method
+      if (paymentMethod == PaymentMethod.card) {
+        // Initiate card payment
+        final success = await ref
+            .read(paymentProvider.notifier)
+            .initiateCardPayment(orderId);
+
+        if (success) {
+          final paymentUrl = ref.read(paymentProvider).paymentUrl;
+          if (paymentUrl != null && mounted) {
+            // Clear cart before going to payment
+            await ref.read(cartProvider.notifier).clearCart();
+
+            // Navigate to payment webview
+            context.push(
+              AppRoutes.payment,
+              extra: {
+                'paymentUrl': paymentUrl,
+                'orderId': orderId,
+              },
+            );
+          }
+        } else {
+          final error = ref.read(paymentProvider).error;
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(error ?? 'فشل في بدء عملية الدفع'),
+                backgroundColor: AppColors.error,
+              ),
+            );
+          }
+        }
+      } else if (paymentMethod == PaymentMethod.wallet) {
+        // Initiate wallet payment
+        final user = ref.read(currentUserProvider);
+        if (user == null) return;
+
+        final success = await ref
+            .read(paymentProvider.notifier)
+            .initiateWalletPayment(orderId, user.phone);
+
+        if (success) {
+          final paymentUrl = ref.read(paymentProvider).paymentUrl;
+          if (paymentUrl != null && mounted) {
+            // Clear cart before going to payment
+            await ref.read(cartProvider.notifier).clearCart();
+
+            // Navigate to payment webview
+            context.push(
+              AppRoutes.payment,
+              extra: {
+                'paymentUrl': paymentUrl,
+                'orderId': orderId,
+              },
+            );
+          }
+        } else {
+          final error = ref.read(paymentProvider).error;
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(error ?? 'فشل في بدء عملية الدفع'),
+                backgroundColor: AppColors.error,
+              ),
+            );
+          }
+        }
+      } else {
+        // Cash on delivery - clear cart and navigate to order tracking
         await ref.read(cartProvider.notifier).clearCart();
 
         if (mounted) {
-          // Show success and navigate to order tracking
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('تم تأكيد طلبك بنجاح!'),
@@ -307,18 +422,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             ),
           );
 
-          // Navigate to order tracking
           context.go('/order/$orderId');
-        }
-      } else {
-        final error = ref.read(orderCreationProvider).error;
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(error ?? 'فشل تأكيد الطلب'),
-              backgroundColor: AppColors.error,
-            ),
-          );
         }
       }
     } catch (e) {

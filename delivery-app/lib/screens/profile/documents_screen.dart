@@ -1,13 +1,24 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../config/theme.dart';
 import '../../providers/auth_provider.dart';
+import '../../services/upload_service.dart';
 
-class DocumentsScreen extends ConsumerWidget {
+class DocumentsScreen extends ConsumerStatefulWidget {
   const DocumentsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<DocumentsScreen> createState() => _DocumentsScreenState();
+}
+
+class _DocumentsScreenState extends ConsumerState<DocumentsScreen> {
+  final ImagePicker _picker = ImagePicker();
+  bool _isUploading = false;
+
+  @override
+  Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
 
     return Scaffold(
@@ -151,7 +162,7 @@ class DocumentsScreen extends ConsumerWidget {
                     label: 'الكاميرا',
                     onTap: () {
                       Navigator.pop(context);
-                      // TODO: Open camera
+                      _pickAndUploadImage(documentType, ImageSource.camera);
                     },
                   ),
                 ),
@@ -162,7 +173,7 @@ class DocumentsScreen extends ConsumerWidget {
                     label: 'المعرض',
                     onTap: () {
                       Navigator.pop(context);
-                      // TODO: Open gallery
+                      _pickAndUploadImage(documentType, ImageSource.gallery);
                     },
                   ),
                 ),
@@ -173,6 +184,83 @@ class DocumentsScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _pickAndUploadImage(String documentType, ImageSource source) async {
+    try {
+      // Pick image
+      final XFile? image = await _picker.pickImage(
+        source: source,
+        imageQuality: 85,
+      );
+
+      if (image == null || !mounted) return;
+
+      setState(() => _isUploading = true);
+
+      // Show loading dialog
+      if (mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => const Center(
+            child: CircularProgressIndicator(),
+          ),
+        );
+      }
+
+      // Upload image
+      final uploadService = ref.read(uploadServiceProvider);
+      final imageUrl = await uploadService.uploadImage(File(image.path));
+
+      // Update documents
+      String documentKey = '';
+      switch (documentType) {
+        case 'البطاقة الشخصية':
+          documentKey = 'nationalIdImage';
+          break;
+        case 'رخصة القيادة':
+          documentKey = 'licenseImage';
+          break;
+        case 'رخصة المركبة':
+          documentKey = 'vehicleRegistration';
+          break;
+        case 'الفيش الجنائي':
+          documentKey = 'criminalRecord';
+          break;
+      }
+
+      if (documentKey.isNotEmpty) {
+        await uploadService.updateDocuments({documentKey: imageUrl});
+
+        // Refresh auth state to get updated driver data
+        await ref.read(authProvider.notifier).refreshUser();
+      }
+
+      if (mounted) {
+        Navigator.pop(context); // Close loading dialog
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('تم رفع المستند بنجاح!'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        Navigator.pop(context); // Close loading dialog
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('فشل رفع المستند: ${e.toString()}'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isUploading = false);
+      }
+    }
   }
 
   Color _getStatusColor(String status) {
