@@ -81,6 +81,20 @@ delivery-app/pubspec.lock
 .next/
 .vercel
 
-# Misc
+# Firebase
+**/google-services.json
+**/GoogleService-Info.plist
+**/firebase_options.dart
+*-firebase-adminsdk-*.json
+firebase-debug.log
+.firebase/
+
+# Security Keys
 *.pem
+*.p12
+*.key
+*.keystore
+*.jks
+
+# Misc
 .cache/
