@@ -22,6 +22,9 @@ import '../screens/rating/rate_order_screen.dart';
 import '../screens/wallet/wallet_screen.dart';
 import '../screens/legal/privacy_policy_screen.dart';
 import '../screens/legal/terms_screen.dart';
+import '../screens/address/map_picker_screen.dart';
+import '../screens/menu/menu_item_details_screen.dart';
+import '../models/restaurant.dart';
 
 class AppRoutes {
   static const String splash = '/';
@@ -34,6 +37,7 @@ class AppRoutes {
   static const String home = '/home';
   static const String search = '/search';
   static const String restaurant = '/restaurant/:id';
+  static const String menuItem = '/menu-item';
   static const String cart = '/cart';
   static const String checkout = '/checkout';
   static const String orderTracking = '/order/:id';
@@ -45,6 +49,7 @@ class AppRoutes {
   static const String addresses = '/addresses';
   static const String addAddress = '/addresses/add';
   static const String editAddress = '/addresses/:id';
+  static const String mapPicker = '/addresses/map-picker';
   static const String favorites = '/favorites';
   static const String notifications = '/notifications';
   static const String settings = '/settings';
@@ -112,6 +117,18 @@ final GoRouter appRouter = GoRouter(
       },
     ),
     GoRoute(
+      path: AppRoutes.menuItem,
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>;
+        final menuItem = extra['menuItem'] as MenuItem;
+        final restaurant = extra['restaurant'] as Restaurant;
+        return MenuItemDetailsScreen(
+          menuItem: menuItem,
+          restaurant: restaurant,
+        );
+      },
+    ),
+    GoRoute(
       path: AppRoutes.cart,
       builder: (context, state) => const CartScreen(),
     ),
@@ -163,6 +180,16 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) {
         final addressId = state.pathParameters['id']!;
         return AddEditAddressScreen(addressId: addressId);
+      },
+    ),
+    GoRoute(
+      path: AppRoutes.mapPicker,
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>?;
+        return MapPickerScreen(
+          initialLat: extra?['latitude'] as double?,
+          initialLng: extra?['longitude'] as double?,
+        );
       },
     ),
     GoRoute(
