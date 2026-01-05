@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import '../config/constants.dart';
 import '../models/models.dart';
 import 'api_service.dart';
@@ -7,30 +8,28 @@ import 'api_service.dart';
 class AuthService {
   final ApiService _api;
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: ['email', 'profile'],
+  );
 
   AuthService(this._api);
 
-  Future<AuthResponse> registerDriver(DriverRegisterRequest request) async {
+  // Register Driver with Email + Password (sends OTP)
+  Future<PendingVerificationResponse> register(
+    DriverRegisterRequest request,
+  ) async {
     try {
       final response = await _api.post(
         ApiEndpoints.register,
-        data: {
-          ...request.toJson(),
-          'licenseExpiryDate': request.licenseExpiryDate.toIso8601String(),
-        },
+        data: request.toJson(),
       );
 
       if (response.data['success'] == true) {
-        final data = response.data['data'];
-        final authResponse = AuthResponse(
-          user: User.fromJson(data['user']),
-          accessToken: data['accessToken'],
-          refreshToken: data['refreshToken'],
-          driver: data['driver'] != null ? DriverProfile.fromJson(data['driver']) : null,
+        return PendingVerificationResponse(
+          requiresVerification: true,
+          email: request.email,
+          message: response.data['message'],
         );
-
-        await _saveTokens(authResponse.accessToken, authResponse.refreshToken);
-        return authResponse;
       }
 
       throw Exception(response.data['message'] ?? 'فشل في التسجيل');
@@ -39,9 +38,13 @@ class AuthService {
     }
   }
 
-  Future<AuthResponse> login(LoginRequest request) async {
+  // Verify Email with OTP
+  Future<AuthResponse> verifyEmail(VerifyEmailRequest request) async {
     try {
-      final response = await _api.post(ApiEndpoints.login, data: request.toJson());
+      final response = await _api.post(
+        ApiEndpoints.verifyEmail,
+        data: request.toJson(),
+      );
 
       if (response.data['success'] == true) {
         final data = response.data['data'];
@@ -49,10 +52,56 @@ class AuthService {
           user: User.fromJson(data['user']),
           accessToken: data['accessToken'],
           refreshToken: data['refreshToken'],
-          driver: data['driver'] != null ? DriverProfile.fromJson(data['driver']) : null,
+          driver: data['profile'] != null
+              ? DriverProfile.fromJson(data['profile'])
+              : null,
         );
 
         await _saveTokens(authResponse.accessToken, authResponse.refreshToken);
+        await _saveUser(authResponse.user);
+
+        return authResponse;
+      }
+
+      throw Exception(response.data['message'] ?? 'فشل في التحقق');
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    }
+  }
+
+  // Login with Email + Password
+  Future<dynamic> login(LoginRequest request) async {
+    try {
+      final response = await _api.post(
+        ApiEndpoints.login,
+        data: request.toJson(),
+      );
+
+      if (response.data['success'] == true) {
+        final data = response.data['data'];
+
+        // Check if requires verification
+        if (data['requiresVerification'] == true) {
+          return PendingVerificationResponse(
+            requiresVerification: true,
+            email: data['email'],
+            message: response.data['message'],
+          );
+        }
+
+        // Successful login
+        final authResponse = AuthResponse(
+          user: User.fromJson(data['user']),
+          accessToken: data['accessToken'],
+          refreshToken: data['refreshToken'],
+          driver: data['profile'] != null
+              ? DriverProfile.fromJson(data['profile'])
+              : null,
+        );
+
+        await _saveTokens(authResponse.accessToken, authResponse.refreshToken);
+        await _saveUser(authResponse.user);
+
         return authResponse;
       }
 
@@ -62,20 +111,69 @@ class AuthService {
     }
   }
 
-  Future<void> verifyOtp(VerifyOtpRequest request) async {
+  // Sign In with Google
+  Future<AuthResponse> signInWithGoogle() async {
     try {
-      final response = await _api.post(ApiEndpoints.verifyOtp, data: request.toJson());
-      if (response.data['success'] != true) {
-        throw Exception(response.data['message'] ?? 'فشل في التحقق');
+      // Trigger Google Sign-In flow
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+
+      if (googleUser == null) {
+        throw Exception('تم إلغاء تسجيل الدخول');
       }
+
+      // Get authentication details
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+
+      if (googleAuth.idToken == null) {
+        throw Exception('فشل في الحصول على رمز التحقق');
+      }
+
+      // Send ID token to backend
+      final request = GoogleSignInRequest(
+        idToken: googleAuth.idToken!,
+        role: 'driver',
+      );
+
+      final response = await _api.post(
+        ApiEndpoints.googleSignIn,
+        data: request.toJson(),
+      );
+
+      if (response.data['success'] == true) {
+        final data = response.data['data'];
+        final authResponse = AuthResponse(
+          user: User.fromJson(data['user']),
+          accessToken: data['accessToken'],
+          refreshToken: data['refreshToken'],
+          driver: data['profile'] != null
+              ? DriverProfile.fromJson(data['profile'])
+              : null,
+          isNewUser: data['isNewUser'] ?? false,
+        );
+
+        await _saveTokens(authResponse.accessToken, authResponse.refreshToken);
+        await _saveUser(authResponse.user);
+
+        return authResponse;
+      }
+
+      throw Exception(response.data['message'] ?? 'فشل في تسجيل الدخول');
     } on DioException catch (e) {
       throw _handleDioError(e);
+    } catch (e) {
+      throw Exception(e.toString());
     }
   }
 
+  // Resend Email OTP
   Future<void> resendOtp(ResendOtpRequest request) async {
     try {
-      final response = await _api.post(ApiEndpoints.resendOtp, data: request.toJson());
+      final response = await _api.post(
+        ApiEndpoints.resendOtp,
+        data: request.toJson(),
+      );
+
       if (response.data['success'] != true) {
         throw Exception(response.data['message'] ?? 'فشل في إرسال الرمز');
       }
@@ -84,9 +182,14 @@ class AuthService {
     }
   }
 
+  // Forgot password - Send reset OTP
   Future<void> forgotPassword(ForgotPasswordRequest request) async {
     try {
-      final response = await _api.post(ApiEndpoints.forgotPassword, data: request.toJson());
+      final response = await _api.post(
+        ApiEndpoints.forgotPassword,
+        data: request.toJson(),
+      );
+
       if (response.data['success'] != true) {
         throw Exception(response.data['message'] ?? 'فشل في إرسال الرمز');
       }
@@ -95,9 +198,14 @@ class AuthService {
     }
   }
 
+  // Reset password with OTP
   Future<void> resetPassword(ResetPasswordRequest request) async {
     try {
-      final response = await _api.post(ApiEndpoints.resetPassword, data: request.toJson());
+      final response = await _api.post(
+        ApiEndpoints.resetPassword,
+        data: request.toJson(),
+      );
+
       if (response.data['success'] != true) {
         throw Exception(response.data['message'] ?? 'فشل في تغيير كلمة المرور');
       }
@@ -106,34 +214,84 @@ class AuthService {
     }
   }
 
+  // Change password (authenticated users)
+  Future<void> changePassword(ChangePasswordRequest request) async {
+    try {
+      final response = await _api.post(
+        ApiEndpoints.changePassword,
+        data: request.toJson(),
+      );
+
+      if (response.data['success'] != true) {
+        throw Exception(response.data['message'] ?? 'فشل في تغيير كلمة المرور');
+      }
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    }
+  }
+
+  // Get current user
   Future<User> getMe() async {
     try {
-      final response = await _api.get(ApiEndpoints.driverProfile);
+      final response = await _api.get(ApiEndpoints.me);
+
       if (response.data['success'] == true) {
         return User.fromJson(response.data['data']['user']);
       }
+
       throw Exception(response.data['message'] ?? 'فشل في جلب البيانات');
     } on DioException catch (e) {
       throw _handleDioError(e);
     }
   }
 
+  // Update FCM token
+  Future<void> updateFcmToken(UpdateFcmTokenRequest request) async {
+    try {
+      await _api.post(
+        ApiEndpoints.fcmToken,
+        data: request.toJson(),
+      );
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    }
+  }
+
+  // Logout
   Future<void> logout({String? fcmToken}) async {
     try {
-      await _api.post(ApiEndpoints.logout, data: fcmToken != null ? {'fcmToken': fcmToken} : null);
+      await _api.post(
+        ApiEndpoints.logout,
+        data: fcmToken != null ? {'fcmToken': fcmToken} : null,
+      );
     } catch (_) {
+      // Ignore logout errors
     } finally {
+      await _googleSignIn.signOut();
       await clearTokens();
     }
   }
 
+  // Token management
   Future<void> _saveTokens(String accessToken, String refreshToken) async {
     await _storage.write(key: AppConstants.accessTokenKey, value: accessToken);
     await _storage.write(key: AppConstants.refreshTokenKey, value: refreshToken);
   }
 
-  Future<String?> getAccessToken() => _storage.read(key: AppConstants.accessTokenKey);
-  Future<String?> getRefreshToken() => _storage.read(key: AppConstants.refreshTokenKey);
+  Future<void> _saveUser(User user) async {
+    await _storage.write(
+      key: AppConstants.driverDataKey,
+      value: user.toJson().toString(),
+    );
+  }
+
+  Future<String?> getAccessToken() async {
+    return _storage.read(key: AppConstants.accessTokenKey);
+  }
+
+  Future<String?> getRefreshToken() async {
+    return _storage.read(key: AppConstants.refreshTokenKey);
+  }
 
   Future<void> clearTokens() async {
     await _storage.delete(key: AppConstants.accessTokenKey);
@@ -146,6 +304,7 @@ class AuthService {
     return token != null && token.isNotEmpty;
   }
 
+  // Error handling
   Exception _handleDioError(DioException e) {
     if (e.response != null) {
       final data = e.response?.data;
@@ -153,6 +312,7 @@ class AuthService {
         return Exception(data['message']);
       }
     }
+
     switch (e.type) {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:

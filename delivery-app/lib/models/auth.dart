@@ -35,10 +35,23 @@ class AuthResponse with _$AuthResponse {
     required String accessToken,
     required String refreshToken,
     DriverProfile? driver,
+    bool? isNewUser,
   }) = _AuthResponse;
 
   factory AuthResponse.fromJson(Map<String, dynamic> json) =>
       _$AuthResponseFromJson(json);
+}
+
+@freezed
+class PendingVerificationResponse with _$PendingVerificationResponse {
+  const factory PendingVerificationResponse({
+    required bool requiresVerification,
+    required String email,
+    String? message,
+  }) = _PendingVerificationResponse;
+
+  factory PendingVerificationResponse.fromJson(Map<String, dynamic> json) =>
+      _$PendingVerificationResponseFromJson(json);
 }
 
 @freezed
@@ -57,15 +70,10 @@ class DriverRegisterRequest with _$DriverRegisterRequest {
   const factory DriverRegisterRequest({
     required String name,
     required String email,
-    required String phone,
     required String password,
-    required String nationalId,
-    required String vehicleType,
-    String? vehicleModel,
-    String? vehicleColor,
-    required String vehiclePlateNumber,
-    required String licenseNumber,
-    required DateTime licenseExpiryDate,
+    @Default('driver') String role,
+    String? phone,
+    Map<String, dynamic>? driverData,
   }) = _DriverRegisterRequest;
 
   factory DriverRegisterRequest.fromJson(Map<String, dynamic> json) =>
@@ -73,10 +81,22 @@ class DriverRegisterRequest with _$DriverRegisterRequest {
 }
 
 @freezed
+class GoogleSignInRequest with _$GoogleSignInRequest {
+  const factory GoogleSignInRequest({
+    required String idToken,
+    @Default('driver') String role,
+  }) = _GoogleSignInRequest;
+
+  factory GoogleSignInRequest.fromJson(Map<String, dynamic> json) =>
+      _$GoogleSignInRequestFromJson(json);
+}
+
+@freezed
 class LoginRequest with _$LoginRequest {
   const factory LoginRequest({
     required String email,
     required String password,
+    String? role,
   }) = _LoginRequest;
 
   factory LoginRequest.fromJson(Map<String, dynamic> json) =>
@@ -84,24 +104,20 @@ class LoginRequest with _$LoginRequest {
 }
 
 @freezed
-class VerifyOtpRequest with _$VerifyOtpRequest {
-  const factory VerifyOtpRequest({
-    String? phone,
-    String? email,
+class VerifyEmailRequest with _$VerifyEmailRequest {
+  const factory VerifyEmailRequest({
+    required String email,
     required String otp,
-    required String type,
-  }) = _VerifyOtpRequest;
+  }) = _VerifyEmailRequest;
 
-  factory VerifyOtpRequest.fromJson(Map<String, dynamic> json) =>
-      _$VerifyOtpRequestFromJson(json);
+  factory VerifyEmailRequest.fromJson(Map<String, dynamic> json) =>
+      _$VerifyEmailRequestFromJson(json);
 }
 
 @freezed
 class ResendOtpRequest with _$ResendOtpRequest {
   const factory ResendOtpRequest({
-    String? phone,
-    String? email,
-    required String type,
+    required String email,
   }) = _ResendOtpRequest;
 
   factory ResendOtpRequest.fromJson(Map<String, dynamic> json) =>

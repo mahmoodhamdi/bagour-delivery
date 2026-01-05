@@ -52,6 +52,7 @@ _$AuthResponseImpl _$$AuthResponseImplFromJson(Map<String, dynamic> json) =>
       driver: json['driver'] == null
           ? null
           : DriverProfile.fromJson(json['driver'] as Map<String, dynamic>),
+      isNewUser: json['isNewUser'] as bool?,
     );
 
 Map<String, dynamic> _$$AuthResponseImplToJson(_$AuthResponseImpl instance) =>
@@ -60,6 +61,23 @@ Map<String, dynamic> _$$AuthResponseImplToJson(_$AuthResponseImpl instance) =>
       'accessToken': instance.accessToken,
       'refreshToken': instance.refreshToken,
       'driver': instance.driver,
+      'isNewUser': instance.isNewUser,
+    };
+
+_$PendingVerificationResponseImpl _$$PendingVerificationResponseImplFromJson(
+        Map<String, dynamic> json) =>
+    _$PendingVerificationResponseImpl(
+      requiresVerification: json['requiresVerification'] as bool,
+      email: json['email'] as String,
+      message: json['message'] as String?,
+    );
+
+Map<String, dynamic> _$$PendingVerificationResponseImplToJson(
+        _$PendingVerificationResponseImpl instance) =>
+    <String, dynamic>{
+      'requiresVerification': instance.requiresVerification,
+      'email': instance.email,
+      'message': instance.message,
     };
 
 _$TokenPairImpl _$$TokenPairImplFromJson(Map<String, dynamic> json) =>
@@ -79,15 +97,10 @@ _$DriverRegisterRequestImpl _$$DriverRegisterRequestImplFromJson(
     _$DriverRegisterRequestImpl(
       name: json['name'] as String,
       email: json['email'] as String,
-      phone: json['phone'] as String,
       password: json['password'] as String,
-      nationalId: json['nationalId'] as String,
-      vehicleType: json['vehicleType'] as String,
-      vehicleModel: json['vehicleModel'] as String?,
-      vehicleColor: json['vehicleColor'] as String?,
-      vehiclePlateNumber: json['vehiclePlateNumber'] as String,
-      licenseNumber: json['licenseNumber'] as String,
-      licenseExpiryDate: DateTime.parse(json['licenseExpiryDate'] as String),
+      role: json['role'] as String? ?? 'driver',
+      phone: json['phone'] as String?,
+      driverData: json['driverData'] as Map<String, dynamic>?,
     );
 
 Map<String, dynamic> _$$DriverRegisterRequestImplToJson(
@@ -95,61 +108,64 @@ Map<String, dynamic> _$$DriverRegisterRequestImplToJson(
     <String, dynamic>{
       'name': instance.name,
       'email': instance.email,
-      'phone': instance.phone,
       'password': instance.password,
-      'nationalId': instance.nationalId,
-      'vehicleType': instance.vehicleType,
-      'vehicleModel': instance.vehicleModel,
-      'vehicleColor': instance.vehicleColor,
-      'vehiclePlateNumber': instance.vehiclePlateNumber,
-      'licenseNumber': instance.licenseNumber,
-      'licenseExpiryDate': instance.licenseExpiryDate.toIso8601String(),
+      'role': instance.role,
+      'phone': instance.phone,
+      'driverData': instance.driverData,
+    };
+
+_$GoogleSignInRequestImpl _$$GoogleSignInRequestImplFromJson(
+        Map<String, dynamic> json) =>
+    _$GoogleSignInRequestImpl(
+      idToken: json['idToken'] as String,
+      role: json['role'] as String? ?? 'driver',
+    );
+
+Map<String, dynamic> _$$GoogleSignInRequestImplToJson(
+        _$GoogleSignInRequestImpl instance) =>
+    <String, dynamic>{
+      'idToken': instance.idToken,
+      'role': instance.role,
     };
 
 _$LoginRequestImpl _$$LoginRequestImplFromJson(Map<String, dynamic> json) =>
     _$LoginRequestImpl(
       email: json['email'] as String,
       password: json['password'] as String,
+      role: json['role'] as String?,
     );
 
 Map<String, dynamic> _$$LoginRequestImplToJson(_$LoginRequestImpl instance) =>
     <String, dynamic>{
       'email': instance.email,
       'password': instance.password,
+      'role': instance.role,
     };
 
-_$VerifyOtpRequestImpl _$$VerifyOtpRequestImplFromJson(
+_$VerifyEmailRequestImpl _$$VerifyEmailRequestImplFromJson(
         Map<String, dynamic> json) =>
-    _$VerifyOtpRequestImpl(
-      phone: json['phone'] as String?,
-      email: json['email'] as String?,
+    _$VerifyEmailRequestImpl(
+      email: json['email'] as String,
       otp: json['otp'] as String,
-      type: json['type'] as String,
     );
 
-Map<String, dynamic> _$$VerifyOtpRequestImplToJson(
-        _$VerifyOtpRequestImpl instance) =>
+Map<String, dynamic> _$$VerifyEmailRequestImplToJson(
+        _$VerifyEmailRequestImpl instance) =>
     <String, dynamic>{
-      'phone': instance.phone,
       'email': instance.email,
       'otp': instance.otp,
-      'type': instance.type,
     };
 
 _$ResendOtpRequestImpl _$$ResendOtpRequestImplFromJson(
         Map<String, dynamic> json) =>
     _$ResendOtpRequestImpl(
-      phone: json['phone'] as String?,
-      email: json['email'] as String?,
-      type: json['type'] as String,
+      email: json['email'] as String,
     );
 
 Map<String, dynamic> _$$ResendOtpRequestImplToJson(
         _$ResendOtpRequestImpl instance) =>
     <String, dynamic>{
-      'phone': instance.phone,
       'email': instance.email,
-      'type': instance.type,
     };
 
 _$ForgotPasswordRequestImpl _$$ForgotPasswordRequestImplFromJson(
