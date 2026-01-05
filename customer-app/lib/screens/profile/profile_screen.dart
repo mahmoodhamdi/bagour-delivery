@@ -181,10 +181,7 @@ class ProfileScreen extends ConsumerWidget {
                 _MenuItem(
                   icon: Icons.help_outline,
                   title: 'المساعدة والدعم',
-                  onTap: () {
-                    // Show support dialog
-                    _showSupportDialog(context);
-                  },
+                  onTap: () => context.push(AppRoutes.help),
                 ),
                 _MenuItem(
                   icon: Icons.info_outline,
