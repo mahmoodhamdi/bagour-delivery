@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../config/theme.dart';
 import '../../config/constants.dart';
+import '../../config/routes.dart';
 import '../../models/address.dart';
 import '../../providers/address_provider.dart';
 
@@ -246,13 +247,34 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
                     bottom: 8,
                     right: 8,
                     child: TextButton.icon(
-                      onPressed: () {
-                        // TODO: Open map picker
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('سيتم إضافة اختيار الموقع قريباً'),
-                          ),
-                        );
+                      onPressed: () async {
+                        final result = await context.push(
+                          AppRoutes.mapPicker,
+                          extra: {
+                            'latitude': _latitude,
+                            'longitude': _longitude,
+                          },
+                        ) as Map<String, dynamic>?;
+
+                        if (result != null && mounted) {
+                          setState(() {
+                            _latitude = result['latitude'] as double;
+                            _longitude = result['longitude'] as double;
+
+                            // Optionally auto-fill address field if empty
+                            if (result['address'] != null &&
+                                _addressController.text.isEmpty) {
+                              _addressController.text = result['address'] as String;
+                            }
+                          });
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('تم تحديد الموقع بنجاح'),
+                              backgroundColor: AppColors.success,
+                            ),
+                          );
+                        }
                       },
                       icon: const Icon(Icons.my_location),
                       label: const Text('اختر الموقع'),

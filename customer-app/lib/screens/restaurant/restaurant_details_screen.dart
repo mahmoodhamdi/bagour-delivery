@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../config/theme.dart';
+import '../../config/routes.dart';
 import '../../providers/restaurant_provider.dart';
 import '../../models/restaurant.dart';
 import 'widgets/menu_item_card.dart';
@@ -196,7 +198,7 @@ class _RestaurantDetailsScreenState
               child: TabBarView(
                 controller: _tabController,
                 children: state.menu.map((category) {
-                  return _buildMenuCategory(context, category);
+                  return _buildMenuCategory(context, category, restaurant);
                 }).toList(),
               ),
             )
@@ -410,7 +412,7 @@ class _RestaurantDetailsScreenState
     );
   }
 
-  Widget _buildMenuCategory(BuildContext context, MenuCategory category) {
+  Widget _buildMenuCategory(BuildContext context, MenuCategory category, Restaurant restaurant) {
     if (category.items.isEmpty) {
       return const Center(
         child: Text('لا توجد أصناف في هذا القسم'),
@@ -427,10 +429,23 @@ class _RestaurantDetailsScreenState
           child: MenuItemCard(
             item: item,
             onTap: () {
-              // TODO: Show item details modal
+              context.push(
+                AppRoutes.menuItem,
+                extra: {
+                  'menuItem': item,
+                  'restaurant': restaurant,
+                },
+              );
             },
             onAddToCart: () {
-              // TODO: Add to cart
+              // Quick add without customization
+              context.push(
+                AppRoutes.menuItem,
+                extra: {
+                  'menuItem': item,
+                  'restaurant': restaurant,
+                },
+              );
             },
           ),
         );
