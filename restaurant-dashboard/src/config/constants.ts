@@ -75,10 +75,11 @@ export const ROUTES = {
 };
 
 export const API_ENDPOINTS = {
-  // Auth
-  login: '/auth/restaurant/login',
-  register: '/auth/restaurant/register',
-  verifyOtp: '/auth/verify-otp',
+  // Auth - Unified endpoints with role parameter
+  login: '/auth/login',
+  register: '/auth/register',
+  googleSignIn: '/auth/google',
+  verifyEmail: '/auth/verify-email',
   resendOtp: '/auth/resend-otp',
   forgotPassword: '/auth/forgot-password',
   resetPassword: '/auth/reset-password',

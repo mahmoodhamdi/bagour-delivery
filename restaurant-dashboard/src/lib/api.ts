@@ -64,6 +64,7 @@ export interface AuthResponse {
 export interface LoginRequest {
   email: string;
   password: string;
+  role?: string;
 }
 
 export interface RegisterRequest {
@@ -72,6 +73,7 @@ export interface RegisterRequest {
   email: string;
   phone: string;
   password: string;
+  role?: string;
   address: {
     street: string;
     area: string;
@@ -82,11 +84,27 @@ export interface RegisterRequest {
   minimumOrder?: number;
 }
 
+export interface GoogleSignInRequest {
+  idToken: string;
+  role?: string;
+}
+
+export interface VerifyEmailRequest {
+  email: string;
+  otp: string;
+}
+
 export interface VerifyOtpRequest {
   email?: string;
   phone?: string;
   otp: string;
   type: 'registration' | 'password_reset';
+}
+
+export interface PendingVerificationResponse {
+  requiresVerification: boolean;
+  email: string;
+  message?: string;
 }
 
 export interface ForgotPasswordRequest {
@@ -171,23 +189,42 @@ api.interceptors.response.use(
 
 // Auth API functions
 export const authApi = {
-  login: async (data: LoginRequest): Promise<ApiResponse<AuthResponse>> => {
-    const response = await api.post<ApiResponse<AuthResponse>>(API_ENDPOINTS.login, data);
+  login: async (data: LoginRequest): Promise<ApiResponse<AuthResponse | PendingVerificationResponse>> => {
+    const response = await api.post<ApiResponse<AuthResponse | PendingVerificationResponse>>(
+      API_ENDPOINTS.login,
+      { ...data, role: 'restaurant' }
+    );
     return response.data;
   },
 
-  register: async (data: RegisterRequest): Promise<ApiResponse<AuthResponse>> => {
-    const response = await api.post<ApiResponse<AuthResponse>>(API_ENDPOINTS.register, data);
+  register: async (data: RegisterRequest): Promise<ApiResponse<PendingVerificationResponse>> => {
+    const response = await api.post<ApiResponse<PendingVerificationResponse>>(
+      API_ENDPOINTS.register,
+      { ...data, role: 'restaurant' }
+    );
+    return response.data;
+  },
+
+  verifyEmail: async (data: VerifyEmailRequest): Promise<ApiResponse<AuthResponse>> => {
+    const response = await api.post<ApiResponse<AuthResponse>>(API_ENDPOINTS.verifyEmail, data);
     return response.data;
   },
 
   verifyOtp: async (data: VerifyOtpRequest): Promise<ApiResponse<void>> => {
-    const response = await api.post<ApiResponse<void>>(API_ENDPOINTS.verifyOtp, data);
+    const response = await api.post<ApiResponse<void>>('/auth/verify-otp', data);
     return response.data;
   },
 
-  resendOtp: async (data: { email?: string; phone?: string; type: string }): Promise<ApiResponse<void>> => {
-    const response = await api.post<ApiResponse<void>>(API_ENDPOINTS.resendOtp, data);
+  resendOtp: async (email: string): Promise<ApiResponse<void>> => {
+    const response = await api.post<ApiResponse<void>>(API_ENDPOINTS.resendOtp, { email });
+    return response.data;
+  },
+
+  signInWithGoogle: async (idToken: string): Promise<ApiResponse<AuthResponse>> => {
+    const response = await api.post<ApiResponse<AuthResponse>>(
+      API_ENDPOINTS.googleSignIn,
+      { idToken, role: 'restaurant' }
+    );
     return response.data;
   },
 
