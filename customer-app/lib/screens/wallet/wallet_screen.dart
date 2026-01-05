@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../services/wallet_service.dart';
+import '../../config/routes.dart';
 
 class WalletScreen extends ConsumerStatefulWidget {
   const WalletScreen({Key? key}) : super(key: key);
@@ -11,10 +13,10 @@ class WalletScreen extends ConsumerStatefulWidget {
 
 class _WalletScreenState extends ConsumerState<WalletScreen> {
   bool _isLoading = false;
-
-  // Placeholder data - will be replaced with actual API calls
-  final double _balance = 0.0;
-  final List<WalletTransaction> _transactions = [];
+  WalletBalance? _balance;
+  List<WalletTransaction> _transactions = [];
+  int _currentPage = 1;
+  bool _hasMore = true;
 
   @override
   void initState() {
@@ -26,15 +28,23 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // TODO: Implement actual API call to fetch wallet balance and transactions
-      // final walletService = ref.read(walletServiceProvider);
-      // final balance = await walletService.getBalance();
-      // final transactions = await walletService.getTransactions();
+      final walletService = ref.read(walletServiceProvider);
 
-      await Future.delayed(const Duration(seconds: 1)); // Simulate API call
+      // Load balance and transactions in parallel
+      final results = await Future.wait([
+        walletService.getBalance(),
+        walletService.getTransactions(page: 1, limit: 20),
+      ]);
 
       if (mounted) {
-        setState(() => _isLoading = false);
+        setState(() {
+          _balance = results[0] as WalletBalance;
+          final transactionsResponse = results[1] as WalletTransactionsResponse;
+          _transactions = transactionsResponse.transactions;
+          _hasMore = transactionsResponse.page < transactionsResponse.pages;
+          _currentPage = 1;
+          _isLoading = false;
+        });
       }
     } catch (e) {
       if (mounted) {
@@ -50,49 +60,132 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
   }
 
   void _showTopUpDialog() {
+    final List<int> amounts = [50, 100, 200, 500];
+    int? selectedAmount;
+    String paymentMethod = 'card';
+    final TextEditingController phoneController = TextEditingController();
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('شحن المحفظة'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('اختر المبلغ المراد شحنه'),
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [50, 100, 200, 500].map((amount) {
-                return ElevatedButton(
-                  onPressed: () {
-                    context.pop();
-                    _processTopUp(amount.toDouble());
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('شحن المحفظة'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('اختر المبلغ المراد شحنه'),
+                const SizedBox(height: 16),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: amounts.map((amount) {
+                    final isSelected = selectedAmount == amount;
+                    return ElevatedButton(
+                      onPressed: () {
+                        setDialogState(() => selectedAmount = amount);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isSelected ? Colors.green : null,
+                        foregroundColor: isSelected ? Colors.white : null,
+                      ),
+                      child: Text('$amount ج.م'),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 24),
+                const Text('طريقة الدفع'),
+                const SizedBox(height: 8),
+                RadioListTile<String>(
+                  title: const Text('بطاقة ائتمان'),
+                  value: 'card',
+                  groupValue: paymentMethod,
+                  onChanged: (value) {
+                    setDialogState(() => paymentMethod = value!);
                   },
-                  child: Text('$amount ج.م'),
-                );
-              }).toList(),
+                ),
+                RadioListTile<String>(
+                  title: const Text('محفظة إلكترونية'),
+                  value: 'mobile_wallet',
+                  groupValue: paymentMethod,
+                  onChanged: (value) {
+                    setDialogState(() => paymentMethod = value!);
+                  },
+                ),
+                if (paymentMethod == 'mobile_wallet') ...[
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: phoneController,
+                    keyboardType: TextInputType.phone,
+                    decoration: const InputDecoration(
+                      labelText: 'رقم الهاتف',
+                      hintText: '01xxxxxxxxx',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('إلغاء'),
+            ),
+            ElevatedButton(
+              onPressed: selectedAmount != null
+                  ? () {
+                      Navigator.of(dialogContext).pop();
+                      _processTopUp(
+                        selectedAmount!.toDouble(),
+                        paymentMethod,
+                        phoneController.text.trim(),
+                      );
+                    }
+                  : null,
+              child: const Text('متابعة'),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => context.pop(),
-            child: const Text('إلغاء'),
-          ),
-        ],
       ),
     );
   }
 
-  Future<void> _processTopUp(double amount) async {
-    // TODO: Implement top-up functionality
-    // This would typically redirect to payment gateway
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('شحن المحفظة بمبلغ $amount ج.م'),
-        backgroundColor: Colors.blue,
-      ),
-    );
+  Future<void> _processTopUp(
+    double amount,
+    String paymentMethod,
+    String phoneNumber,
+  ) async {
+    try {
+      final walletService = ref.read(walletServiceProvider);
+
+      final response = await walletService.initiateTopUp(
+        amount: amount,
+        paymentMethod: paymentMethod,
+        phoneNumber: phoneNumber.isNotEmpty ? phoneNumber : null,
+      );
+
+      if (mounted) {
+        // Navigate to payment webview
+        context.push(
+          AppRoutes.payment,
+          extra: {
+            'paymentUrl': response.paymentUrl,
+            'orderId': response.transactionId,
+          },
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('فشل بدء عملية الشحن: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -102,7 +195,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
         title: const Text('المحفظة'),
         centerTitle: true,
       ),
-      body: _isLoading
+      body: _isLoading && _balance == null
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
               onRefresh: _loadWalletData,
@@ -126,12 +219,27 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            '${_balance.toStringAsFixed(2)} ج.م',
+                            '${(_balance?.balance ?? 0.0).toStringAsFixed(2)} ج.م',
                             style: const TextStyle(
                               fontSize: 36,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                             ),
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              _buildStatItem(
+                                'إجمالي الشحن',
+                                '${(_balance?.totalTopups ?? 0.0).toStringAsFixed(0)} ج.م',
+                              ),
+                              Container(width: 1, height: 30, color: Colors.white30),
+                              _buildStatItem(
+                                'إجمالي الإنفاق',
+                                '${(_balance?.totalSpent ?? 0.0).toStringAsFixed(0)} ج.م',
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 16),
                           SizedBox(
@@ -221,31 +329,25 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                           margin: const EdgeInsets.only(bottom: 8),
                           child: ListTile(
                             leading: CircleAvatar(
-                              backgroundColor: transaction.type == TransactionType.credit
+                              backgroundColor: transaction.isCredit
                                   ? Colors.green.withOpacity(0.1)
                                   : Colors.red.withOpacity(0.1),
                               child: Icon(
-                                transaction.type == TransactionType.credit
-                                    ? Icons.add
-                                    : Icons.remove,
-                                color: transaction.type == TransactionType.credit
-                                    ? Colors.green
-                                    : Colors.red,
+                                transaction.isCredit ? Icons.add : Icons.remove,
+                                color: transaction.isCredit ? Colors.green : Colors.red,
                               ),
                             ),
-                            title: Text(transaction.description),
+                            title: Text(transaction.typeLabel),
                             subtitle: Text(
-                              _formatDate(transaction.date),
+                              _formatDate(transaction.createdAt),
                               style: const TextStyle(fontSize: 12),
                             ),
                             trailing: Text(
-                              '${transaction.type == TransactionType.credit ? '+' : '-'}${transaction.amount.toStringAsFixed(2)} ج.م',
+                              '${transaction.isCredit ? '+' : '-'}${transaction.amount.toStringAsFixed(2)} ج.م',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: transaction.type == TransactionType.credit
-                                    ? Colors.green
-                                    : Colors.red,
+                                color: transaction.isCredit ? Colors.green : Colors.red,
                               ),
                             ),
                           ),
@@ -253,6 +355,29 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                 ],
               ),
             ),
+    );
+  }
+
+  Widget _buildStatItem(String label, String value) {
+    return Column(
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 12,
+            color: Colors.white70,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+      ],
     );
   }
 
@@ -305,23 +430,4 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
       return '${date.day}/${date.month}/${date.year}';
     }
   }
-}
-
-// Transaction model
-enum TransactionType { credit, debit }
-
-class WalletTransaction {
-  final String id;
-  final TransactionType type;
-  final double amount;
-  final String description;
-  final DateTime date;
-
-  WalletTransaction({
-    required this.id,
-    required this.type,
-    required this.amount,
-    required this.description,
-    required this.date,
-  });
 }

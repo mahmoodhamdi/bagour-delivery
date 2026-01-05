@@ -25,9 +25,10 @@ class ReviewService {
       final response = await _apiService.post(
         '/orders/$orderId/rate',
         data: {
-          'restaurantRating': restaurantRating.toInt(),
-          'foodRating': foodRating.toInt(),
-          if (driverRating != null) 'driverRating': driverRating.toInt(),
+          // Backend expects 'restaurant', 'food', 'driver' (not restaurantRating)
+          'restaurant': restaurantRating.toInt(),
+          'food': foodRating.toInt(),
+          if (driverRating != null) 'driver': driverRating.toInt(),
           if (comment != null && comment.isNotEmpty) 'comment': comment,
           if (images != null && images.isNotEmpty) 'images': images,
         },
