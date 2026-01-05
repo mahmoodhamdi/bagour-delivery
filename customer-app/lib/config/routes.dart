@@ -24,6 +24,7 @@ import '../screens/legal/privacy_policy_screen.dart';
 import '../screens/legal/terms_screen.dart';
 import '../screens/address/map_picker_screen.dart';
 import '../screens/menu/menu_item_details_screen.dart';
+import '../screens/help/help_screen.dart';
 import '../models/restaurant.dart';
 
 class AppRoutes {
@@ -54,6 +55,7 @@ class AppRoutes {
   static const String notifications = '/notifications';
   static const String settings = '/settings';
   static const String wallet = '/wallet';
+  static const String help = '/help';
   static const String privacyPolicy = '/privacy-policy';
   static const String terms = '/terms';
   static const String payment = '/payment';
@@ -207,6 +209,10 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.wallet,
       builder: (context, state) => const WalletScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.help,
+      builder: (context, state) => const HelpScreen(),
     ),
     GoRoute(
       path: AppRoutes.privacyPolicy,
