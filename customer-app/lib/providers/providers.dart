@@ -6,3 +6,4 @@ export 'address_provider.dart';
 export 'order_provider.dart';
 export 'payment_provider.dart';
 export 'notification_provider.dart';
+export 'chat_provider.dart';

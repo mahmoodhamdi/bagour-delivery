@@ -184,17 +184,24 @@ class WalletTransactionsResponse {
   });
 
   factory WalletTransactionsResponse.fromJson(Map<String, dynamic> json) {
-    final List<dynamic> transactionsData = json['transactions'] as List<dynamic>;
-    final pagination = json['pagination'] as Map<String, dynamic>;
+    // Backend sendPaginated puts transactions in 'data' field, not 'transactions'
+    final List<dynamic> transactionsData =
+        (json['data'] ?? json['transactions'] ?? []) as List<dynamic>;
+    final pagination = json['pagination'] as Map<String, dynamic>? ?? {
+      'total': 0,
+      'page': 1,
+      'limit': 20,
+      'pages': 1,
+    };
 
     return WalletTransactionsResponse(
       transactions: transactionsData
           .map((t) => WalletTransaction.fromJson(t as Map<String, dynamic>))
           .toList(),
-      total: pagination['total'] as int,
-      page: pagination['page'] as int,
-      limit: pagination['limit'] as int,
-      pages: pagination['pages'] as int,
+      total: pagination['total'] as int? ?? 0,
+      page: pagination['page'] as int? ?? 1,
+      limit: pagination['limit'] as int? ?? 20,
+      pages: pagination['pages'] as int? ?? 1,
     );
   }
 }
@@ -214,8 +221,9 @@ class WalletTopUpResponse {
   factory WalletTopUpResponse.fromJson(Map<String, dynamic> json) {
     return WalletTopUpResponse(
       transactionId: json['transactionId'] as String,
-      paymentUrl: json['paymentUrl'] as String,
-      amount: (json['amount'] as num).toDouble(),
+      // Backend returns 'redirectUrl', map it to paymentUrl
+      paymentUrl: (json['redirectUrl'] ?? json['paymentUrl']) as String,
+      amount: (json['amount'] as num?)?.toDouble() ?? 0.0,
     );
   }
 }

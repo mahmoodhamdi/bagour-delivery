@@ -377,39 +377,19 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           }
         }
       } else if (paymentMethod == PaymentMethod.wallet) {
-        // Initiate wallet payment
-        final user = ref.read(currentUserProvider);
-        if (user == null) return;
+        // App wallet payment - already handled on order creation
+        // Backend deducts from wallet automatically when paymentMethod is 'wallet'
+        await ref.read(cartProvider.notifier).clearCart();
 
-        final success = await ref
-            .read(paymentProvider.notifier)
-            .initiateWalletPayment(orderId, user.phone);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('تم الدفع من المحفظة وتأكيد طلبك بنجاح!'),
+              backgroundColor: AppColors.success,
+            ),
+          );
 
-        if (success) {
-          final paymentUrl = ref.read(paymentProvider).paymentUrl;
-          if (paymentUrl != null && mounted) {
-            // Clear cart before going to payment
-            await ref.read(cartProvider.notifier).clearCart();
-
-            // Navigate to payment webview
-            context.push(
-              AppRoutes.payment,
-              extra: {
-                'paymentUrl': paymentUrl,
-                'orderId': orderId,
-              },
-            );
-          }
-        } else {
-          final error = ref.read(paymentProvider).error;
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(error ?? 'فشل في بدء عملية الدفع'),
-                backgroundColor: AppColors.error,
-              ),
-            );
-          }
+          context.go('/order/$orderId');
         }
       } else {
         // Cash on delivery - clear cart and navigate to order tracking

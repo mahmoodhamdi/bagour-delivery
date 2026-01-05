@@ -8,11 +8,13 @@ import '../../providers/payment_provider.dart';
 class PaymentWebViewScreen extends ConsumerStatefulWidget {
   final String paymentUrl;
   final String orderId;
+  final bool isWalletTopup;
 
   const PaymentWebViewScreen({
     super.key,
     required this.paymentUrl,
     required this.orderId,
+    this.isWalletTopup = false,
   });
 
   @override
@@ -23,6 +25,7 @@ class PaymentWebViewScreen extends ConsumerStatefulWidget {
 class _PaymentWebViewScreenState extends ConsumerState<PaymentWebViewScreen> {
   late final WebViewController _controller;
   bool _isLoading = true;
+  bool _hasProcessedPayment = false;
 
   @override
   void initState() {
@@ -40,18 +43,15 @@ class _PaymentWebViewScreenState extends ConsumerState<PaymentWebViewScreen> {
           },
           onPageFinished: (String url) {
             setState(() => _isLoading = false);
+            _checkPaymentStatus(url);
           },
           onNavigationRequest: (NavigationRequest request) {
             final url = request.url;
+            debugPrint('Navigating to: $url');
 
-            // Check for success/failure URLs
-            if (url.contains('payment/success') || url.contains('success=true')) {
-              _handlePaymentSuccess();
-              return NavigationDecision.prevent;
-            }
-
-            if (url.contains('payment/failed') || url.contains('success=false')) {
-              _handlePaymentFailure();
+            // Check for Paymob response URL patterns
+            if (_isPaymentResultUrl(url)) {
+              _processPaymentResult(url);
               return NavigationDecision.prevent;
             }
 
@@ -65,32 +65,106 @@ class _PaymentWebViewScreenState extends ConsumerState<PaymentWebViewScreen> {
       ..loadRequest(Uri.parse(widget.paymentUrl));
   }
 
+  /// Check if the URL is a payment result URL
+  bool _isPaymentResultUrl(String url) {
+    return url.contains('payment/success') ||
+        url.contains('payment/failed') ||
+        url.contains('payment/response') ||
+        url.contains('/txn_response') ||
+        (url.contains('success=') && url.contains('pending='));
+  }
+
+  /// Check payment status from page URL
+  void _checkPaymentStatus(String url) {
+    if (_hasProcessedPayment) return;
+
+    // Parse Paymob response parameters from URL
+    final uri = Uri.parse(url);
+    final queryParams = uri.queryParameters;
+
+    // Check for Paymob standard response parameters
+    if (queryParams.containsKey('success') && queryParams.containsKey('pending')) {
+      _processPaymentResult(url);
+    }
+  }
+
+  /// Process payment result from URL
+  void _processPaymentResult(String url) {
+    if (_hasProcessedPayment) return;
+
+    final uri = Uri.parse(url);
+    final queryParams = uri.queryParameters;
+
+    // Paymob returns success=true/false and pending=true/false
+    final success = queryParams['success'] == 'true';
+    final pending = queryParams['pending'] == 'true';
+
+    // Payment is successful only if success=true AND pending=false
+    final paymentSuccessful = success && !pending;
+
+    _hasProcessedPayment = true;
+
+    if (paymentSuccessful) {
+      _handlePaymentSuccess();
+    } else {
+      _handlePaymentFailure();
+    }
+  }
+
   void _handlePaymentSuccess() {
     ref.read(paymentProvider.notifier).onPaymentCompleted(true);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('تم الدفع بنجاح!'),
-        backgroundColor: AppColors.success,
-      ),
-    );
+    if (widget.isWalletTopup) {
+      // Wallet topup success
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('تم شحن المحفظة بنجاح!'),
+          backgroundColor: AppColors.success,
+        ),
+      );
 
-    // Navigate to order tracking
-    context.go('/order/${widget.orderId}');
+      // Go back to wallet screen
+      context.pop();
+    } else {
+      // Order payment success
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('تم الدفع بنجاح!'),
+          backgroundColor: AppColors.success,
+        ),
+      );
+
+      // Navigate to order tracking
+      context.go('/order/${widget.orderId}');
+    }
   }
 
   void _handlePaymentFailure() {
     ref.read(paymentProvider.notifier).onPaymentCompleted(false);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('فشل الدفع. يرجى المحاولة مرة أخرى.'),
-        backgroundColor: AppColors.error,
-      ),
-    );
+    if (widget.isWalletTopup) {
+      // Wallet topup failure
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('فشل شحن المحفظة. يرجى المحاولة مرة أخرى.'),
+          backgroundColor: AppColors.error,
+        ),
+      );
 
-    // Go back to checkout
-    context.pop();
+      // Go back to wallet screen
+      context.pop();
+    } else {
+      // Order payment failure
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('فشل الدفع. يرجى المحاولة مرة أخرى.'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+
+      // Go back to checkout
+      context.pop();
+    }
   }
 
   Future<bool> _onWillPop() async {
