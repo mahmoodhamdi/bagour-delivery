@@ -272,33 +272,34 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         final walletService = ref.read(walletServiceProvider);
         try {
           final balance = await walletService.getBalance();
+          if (!mounted) return;
+
           if (balance.balance < cart.total) {
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    'رصيد محفظتك غير كافٍ. الرصيد الحالي: ${balance.balance.toStringAsFixed(2)} ج.م',
-                  ),
-                  backgroundColor: AppColors.error,
-                  action: SnackBarAction(
-                    label: 'شحن المحفظة',
-                    textColor: Colors.white,
-                    onPressed: () => context.push(AppRoutes.wallet),
-                  ),
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'رصيد محفظتك غير كافٍ. الرصيد الحالي: ${balance.balance.toStringAsFixed(2)} ج.م',
                 ),
-              );
-            }
+                backgroundColor: AppColors.error,
+                action: SnackBarAction(
+                  label: 'شحن المحفظة',
+                  textColor: Colors.white,
+                  onPressed: () {
+                    if (context.mounted) context.push(AppRoutes.wallet);
+                  },
+                ),
+              ),
+            );
             return;
           }
         } catch (e) {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('فشل التحقق من رصيد المحفظة'),
-                backgroundColor: AppColors.error,
-              ),
-            );
-          }
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('فشل التحقق من رصيد المحفظة'),
+              backgroundColor: AppColors.error,
+            ),
+          );
           return;
         }
       }
