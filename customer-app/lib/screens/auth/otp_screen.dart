@@ -77,12 +77,11 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
 
     setState(() => _isLoading = true);
 
-    await ref.read(authProvider.notifier).verifyOtp(
-          VerifyOtpRequest(
-            phone: widget.type.contains('phone') ? widget.identifier : null,
-            email: widget.type.contains('email') ? widget.identifier : null,
+    // Use email verification for the new auth flow
+    await ref.read(authProvider.notifier).verifyEmail(
+          VerifyEmailRequest(
+            email: widget.identifier,
             otp: _otp,
-            type: widget.type,
           ),
         );
 
@@ -102,11 +101,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     setState(() => _isResending = true);
 
     final success = await ref.read(authProvider.notifier).resendOtp(
-          ResendOtpRequest(
-            phone: widget.type.contains('phone') ? widget.identifier : null,
-            email: widget.type.contains('email') ? widget.identifier : null,
-            type: widget.type,
-          ),
+          widget.identifier,
         );
 
     if (!mounted) return;
@@ -157,11 +152,9 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isPhone = widget.type.contains('phone');
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text('التحقق'),
+        title: const Text('التحقق من البريد الإلكتروني'),
       ),
       body: SafeArea(
         child: Padding(
@@ -180,8 +173,8 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                     color: AppColors.primary.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(
-                    isPhone ? Icons.phone_android : Icons.email_outlined,
+                  child: const Icon(
+                    Icons.email_outlined,
                     size: 40,
                     color: AppColors.primary,
                   ),

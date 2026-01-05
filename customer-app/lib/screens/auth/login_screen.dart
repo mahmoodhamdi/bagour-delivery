@@ -36,8 +36,33 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           LoginRequest(
             email: _emailController.text.trim(),
             password: _passwordController.text,
+            role: 'customer',
           ),
         );
+
+    if (!mounted) return;
+    setState(() => _isLoading = false);
+
+    final authState = ref.read(authProvider);
+    authState.mapOrNull(
+      authenticated: (_) => context.go(AppRoutes.home),
+      requiresVerification: (state) {
+        context.push(
+          AppRoutes.otp,
+          extra: {
+            'email': state.email,
+            'type': 'email_verification',
+          },
+        );
+      },
+      error: (error) => _showError(error.message),
+    );
+  }
+
+  Future<void> _signInWithGoogle() async {
+    setState(() => _isLoading = true);
+
+    await ref.read(authProvider.notifier).signInWithGoogle();
 
     if (!mounted) return;
     setState(() => _isLoading = false);
@@ -202,9 +227,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                 // Google Sign In
                 OutlinedButton.icon(
-                  onPressed: () {
-                    // TODO: Implement Google Sign In
-                  },
+                  onPressed: _isLoading ? null : _signInWithGoogle,
                   icon: Image.network(
                     'https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg',
                     width: 24,

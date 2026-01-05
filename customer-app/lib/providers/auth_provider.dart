@@ -27,6 +27,10 @@ class AuthState with _$AuthState {
     CustomerProfile? profile,
   }) = _Authenticated;
   const factory AuthState.unauthenticated() = _Unauthenticated;
+  const factory AuthState.requiresVerification({
+    required String email,
+    String? message,
+  }) = _RequiresVerification;
   const factory AuthState.error(String message) = _Error;
 }
 
@@ -57,10 +61,25 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  // Register with Email + Password (sends OTP)
   Future<void> register(CustomerRegisterRequest request) async {
     state = const AuthState.loading();
     try {
-      final response = await _authService.registerCustomer(request);
+      final response = await _authService.register(request);
+      state = AuthState.requiresVerification(
+        email: response.email,
+        message: response.message,
+      );
+    } catch (e) {
+      state = AuthState.error(e.toString().replaceAll('Exception: ', ''));
+    }
+  }
+
+  // Verify Email with OTP
+  Future<void> verifyEmail(VerifyEmailRequest request) async {
+    state = const AuthState.loading();
+    try {
+      final response = await _authService.verifyEmail(request);
       state = AuthState.authenticated(
         user: response.user,
         profile: response.profile,
@@ -70,10 +89,34 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  // Login with Email + Password
   Future<void> login(LoginRequest request) async {
     state = const AuthState.loading();
     try {
       final response = await _authService.login(request);
+
+      // Check if response is PendingVerificationResponse
+      if (response is PendingVerificationResponse) {
+        state = AuthState.requiresVerification(
+          email: response.email,
+          message: response.message,
+        );
+      } else if (response is AuthResponse) {
+        state = AuthState.authenticated(
+          user: response.user,
+          profile: response.profile,
+        );
+      }
+    } catch (e) {
+      state = AuthState.error(e.toString().replaceAll('Exception: ', ''));
+    }
+  }
+
+  // Sign In with Google
+  Future<void> signInWithGoogle() async {
+    state = const AuthState.loading();
+    try {
+      final response = await _authService.signInWithGoogle();
       state = AuthState.authenticated(
         user: response.user,
         profile: response.profile,
@@ -83,21 +126,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  Future<void> verifyOtp(VerifyOtpRequest request) async {
-    state = const AuthState.loading();
+  // Resend OTP
+  Future<bool> resendOtp(String email) async {
     try {
-      await _authService.verifyOtp(request);
-      // Refresh user data after verification
-      final user = await _authService.getMe();
-      state = AuthState.authenticated(user: user);
-    } catch (e) {
-      state = AuthState.error(e.toString().replaceAll('Exception: ', ''));
-    }
-  }
-
-  Future<bool> resendOtp(ResendOtpRequest request) async {
-    try {
-      await _authService.resendOtp(request);
+      await _authService.resendOtp(ResendOtpRequest(email: email));
       return true;
     } catch (e) {
       state = AuthState.error(e.toString().replaceAll('Exception: ', ''));
@@ -105,6 +137,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  // Forgot Password
   Future<bool> forgotPassword(ForgotPasswordRequest request) async {
     try {
       await _authService.forgotPassword(request);
@@ -115,6 +148,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  // Reset Password
   Future<bool> resetPassword(ResetPasswordRequest request) async {
     try {
       await _authService.resetPassword(request);
@@ -125,6 +159,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  // Change Password
   Future<bool> changePassword(ChangePasswordRequest request) async {
     try {
       await _authService.changePassword(request);
@@ -135,6 +170,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  // Refresh User
   Future<void> refreshUser() async {
     try {
       final user = await _authService.getMe();
@@ -144,6 +180,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  // Update FCM Token
   Future<void> updateFcmToken(String fcmToken) async {
     try {
       await _authService.updateFcmToken(
@@ -154,12 +191,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  // Logout
   Future<void> logout({String? fcmToken}) async {
     state = const AuthState.loading();
     await _authService.logout(fcmToken: fcmToken);
     state = const AuthState.unauthenticated();
   }
 
+  // Clear Error
   void clearError() {
     state.mapOrNull(
       error: (_) => state = const AuthState.unauthenticated(),
