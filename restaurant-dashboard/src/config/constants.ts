@@ -105,6 +105,11 @@ export const API_ENDPOINTS = {
   acceptOrder: '/restaurants/orders/:id/accept',
   rejectOrder: '/restaurants/orders/:id/reject',
 
+  // Reviews
+  reviews: '/restaurants/owner/reviews',
+  reviewStats: '/restaurants/owner/reviews/stats',
+  replyToReview: '/restaurants/owner/reviews/:id/reply',
+
   // Analytics
   analytics: '/restaurants/analytics',
   earnings: '/restaurants/earnings',
