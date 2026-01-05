@@ -22,3 +22,6 @@ export { Transaction, ITransaction, TransactionStatus } from './Transaction';
 // Settings & Zones
 export { Zone, IZone } from './Zone';
 export { Setting, ISetting, SettingType, defaultSettings } from './Setting';
+
+// Chat
+export { Chat, IChat, IChatMessage } from './Chat';
