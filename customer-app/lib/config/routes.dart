@@ -20,6 +20,8 @@ import '../screens/profile/edit_profile_screen.dart';
 import '../screens/settings/settings_screen.dart';
 import '../screens/rating/rate_order_screen.dart';
 import '../screens/wallet/wallet_screen.dart';
+import '../screens/legal/privacy_policy_screen.dart';
+import '../screens/legal/terms_screen.dart';
 
 class AppRoutes {
   static const String splash = '/';
@@ -47,6 +49,8 @@ class AppRoutes {
   static const String notifications = '/notifications';
   static const String settings = '/settings';
   static const String wallet = '/wallet';
+  static const String privacyPolicy = '/privacy-policy';
+  static const String terms = '/terms';
   static const String payment = '/payment';
   static const String paymentSuccess = '/payment/success';
   static const String paymentFailed = '/payment/failed';
@@ -176,6 +180,14 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.wallet,
       builder: (context, state) => const WalletScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.privacyPolicy,
+      builder: (context, state) => const PrivacyPolicyScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.terms,
+      builder: (context, state) => const TermsScreen(),
     ),
     GoRoute(
       path: AppRoutes.payment,
