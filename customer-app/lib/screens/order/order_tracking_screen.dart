@@ -6,7 +6,10 @@ import '../../config/theme.dart';
 import '../../config/routes.dart';
 import '../../config/constants.dart';
 import '../../models/order.dart';
+import '../../models/restaurant.dart';
+import '../../models/cart.dart';
 import '../../providers/order_provider.dart';
+import '../../providers/cart_provider.dart';
 import 'widgets/order_status_timeline.dart';
 import 'widgets/order_info_card.dart';
 import 'widgets/driver_info_card.dart';
@@ -316,6 +319,39 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
                 ref.read(orderProvider(widget.orderId).notifier).fetchOrder(widget.orderId);
               },
             ),
+            if (order.canCancel)
+              ListTile(
+                leading: const Icon(Icons.cancel_outlined, color: AppColors.error),
+                title: const Text('إلغاء الطلب', style: TextStyle(color: AppColors.error)),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showCancelDialog(context, order);
+                },
+              ),
+            if (order.status == OrderStatus.delivered)
+              ListTile(
+                leading: const Icon(Icons.replay, color: AppColors.primary),
+                title: const Text('إعادة الطلب'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _reorder(context, order);
+                },
+              ),
+            if (order.status == OrderStatus.delivered && order.restaurant.id.isNotEmpty)
+              ListTile(
+                leading: const Icon(Icons.star_outline, color: AppColors.rating),
+                title: const Text('تقييم الطلب'),
+                onTap: () {
+                  Navigator.pop(context);
+                  context.push(
+                    AppRoutes.rateOrder.replaceFirst(':id', order.id),
+                    extra: {
+                      'restaurantName': order.restaurant.name,
+                      'driverName': order.driver?.name,
+                    },
+                  );
+                },
+              ),
             if (order.restaurant.phone != null)
               ListTile(
                 leading: const Icon(Icons.phone),
@@ -400,6 +436,51 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _reorder(BuildContext context, Order order) async {
+    final cart = ref.read(cartProvider);
+    final cartNotifier = ref.read(cartProvider.notifier);
+
+    // Check if cart has items from different restaurant
+    if (cart.isFromDifferentRestaurant(order.restaurant.id)) {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('استبدال السلة؟'),
+          content: const Text(
+            'لديك عناصر من مطعم آخر في السلة. هل تريد استبدالها بهذا الطلب؟',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('إلغاء'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('استبدال'),
+            ),
+          ],
+        ),
+      );
+
+      if (confirmed != true) return;
+
+      // Clear cart first
+      await cartNotifier.clearCart();
+    }
+
+    // Navigate to restaurant page
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('يمكنك الآن إضافة نفس العناصر من صفحة المطعم'),
+          backgroundColor: AppColors.success,
+        ),
+      );
+
+      context.push(AppRoutes.restaurant.replaceFirst(':id', order.restaurant.id));
+    }
   }
 
   void _showRatingDialog(BuildContext context, Order order) {
