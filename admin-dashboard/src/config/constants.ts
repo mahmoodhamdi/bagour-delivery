@@ -83,8 +83,8 @@ export const ROUTES = {
 };
 
 export const API_ENDPOINTS = {
-  // Auth
-  login: '/auth/admin/login',
+  // Auth - Unified endpoint with role parameter
+  login: '/auth/login',
   refreshToken: '/auth/refresh-token',
   logout: '/auth/logout',
 
