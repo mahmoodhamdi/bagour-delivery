@@ -26,6 +26,7 @@ import reviewRoutes, {
   adminReviewRouter,
 } from './review.routes';
 import driverProfileRoutes from './driver.routes';
+import chatRoutes from './chat.routes';
 
 const router = Router();
 
@@ -106,6 +107,9 @@ router.use(`${API_VERSION}/admin/reviews`, adminReviewRouter);
 
 // Driver profile routes
 router.use(`${API_VERSION}/driver`, driverProfileRoutes);
+
+// Chat routes
+router.use(`${API_VERSION}/chats`, chatRoutes);
 
 // Health check
 router.get('/health', (_req, res) => {

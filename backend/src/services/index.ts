@@ -11,3 +11,4 @@ export * from './wallet.service';
 export * from './transaction.service';
 export * from './admin.service';
 export * from './notification.service';
+export * from './chat.service';

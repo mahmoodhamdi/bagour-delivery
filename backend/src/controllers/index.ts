@@ -22,3 +22,12 @@ export * from './wallet.controller';
 export * from './transaction.controller';
 export * from './admin.controller';
 export * from './notification.controller';
+export {
+  getOrCreateChat,
+  sendMessage,
+  getMessages,
+  markAsRead as markChatAsRead,
+  getUserChats,
+  getChatByOrder,
+  getUnreadCount as getChatUnreadCount,
+} from './chat.controller';
