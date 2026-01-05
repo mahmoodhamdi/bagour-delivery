@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../config/theme.dart';
+import '../../config/routes.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -104,17 +106,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             leading: const Icon(Icons.description_outlined),
             title: const Text('الشروط والأحكام'),
             trailing: const Icon(Icons.chevron_right),
-            onTap: () {
-              // TODO: Show terms
-            },
+            onTap: () => context.push(AppRoutes.terms),
           ),
           ListTile(
             leading: const Icon(Icons.privacy_tip_outlined),
             title: const Text('سياسة الخصوصية'),
             trailing: const Icon(Icons.chevron_right),
-            onTap: () {
-              // TODO: Show privacy policy
-            },
+            onTap: () => context.push(AppRoutes.privacyPolicy),
           ),
           ListTile(
             leading: const Icon(Icons.star_outline),
