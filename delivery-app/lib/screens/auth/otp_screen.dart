@@ -77,12 +77,11 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
 
     setState(() => _isLoading = true);
 
-    await ref.read(authProvider.notifier).verifyOtp(
-          VerifyOtpRequest(
-            phone: widget.type.contains('phone') ? widget.identifier : null,
-            email: widget.type.contains('email') ? widget.identifier : null,
+    // Use email verification
+    await ref.read(authProvider.notifier).verifyEmail(
+          VerifyEmailRequest(
+            email: widget.identifier,
             otp: _otp,
-            type: widget.type,
           ),
         );
 
@@ -102,11 +101,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     setState(() => _isResending = true);
 
     final success = await ref.read(authProvider.notifier).resendOtp(
-          ResendOtpRequest(
-            phone: widget.type.contains('phone') ? widget.identifier : null,
-            email: widget.type.contains('email') ? widget.identifier : null,
-            type: widget.type,
-          ),
+          widget.identifier,
         );
 
     if (!mounted) return;
