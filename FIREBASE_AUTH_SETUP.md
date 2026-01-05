@@ -14,49 +14,79 @@
 npm install resend firebase-admin bcryptjs @types/bcryptjs
 ```
 
-## 📋 REMAINING TASKS
+## ✅ COMPLETED BACKEND TASKS
 
-### 1. Complete Email Service (backend/src/services/email.service.ts)
+### 1. ✅ Email Service (backend/src/services/email.service.ts)
+- Created complete email service using Resend
+- Beautiful HTML email templates for:
+  - Email verification OTP
+  - Password reset OTP
+  - Welcome emails
+  - Order confirmations
 
-Create the email service using the template below. This service handles:
-- OTP verification emails
-- Welcome emails
-- Order confirmations
+### 2. ✅ User Model Updated (backend/src/models/User.ts)
+- Added `authProvider` field ('email' or 'google')
+- Added `googleId` for Google Sign-In
+- Added OTP fields: `emailOTP`, `emailOTPExpires`, `resetOTP`, `resetOTPExpires`
+- Made `phone` and `password` optional
+- Added indexes for `googleId` and `authProvider`
+- Updated toJSON to exclude OTP fields
 
-### 2. Update User Model
+### 3. ✅ Auth Service Complete (backend/src/services/auth.service.ts)
+Implemented all auth flows:
+- ✅ Email + Password Registration with OTP verification
+- ✅ Email verification with OTP
+- ✅ Resend email OTP
+- ✅ Email Login (checks email verification)
+- ✅ Google Sign-In with Firebase Admin SDK
+- ✅ Forgot Password (sends reset OTP)
+- ✅ Reset Password with OTP
+- ✅ Change Password (for logged-in users)
+- ✅ Refresh Tokens
 
-Add these fields to `User` model:
-```typescript
-// Auth provider
-authProvider: { type: String, enum: ['email', 'google'], default: 'email' },
-googleId: String,
+### 4. ✅ Auth Controller Updated (backend/src/controllers/auth.controller.ts)
+- Created unified `register` endpoint
+- Created `verifyEmail` endpoint
+- Created `resendOTP` endpoint
+- Created unified `login` endpoint
+- Created `googleSignIn` endpoint
+- Updated password reset endpoints
+- All other endpoints maintained
 
-// OTP fields
-emailOTP: String,
-emailOTPExpires: Date,
-resetOTP: String,
-resetOTPExpires: Date,
-```
+### 5. ✅ Auth Routes Updated (backend/src/routes/auth.routes.ts)
+New simplified routes:
+- `POST /auth/register` - Unified registration (sends OTP)
+- `POST /auth/verify-email` - Verify email with OTP
+- `POST /auth/resend-otp` - Resend email OTP
+- `POST /auth/login` - Unified login
+- `POST /auth/google` - Google Sign-In
+- `POST /auth/forgot-password` - Send reset OTP
+- `POST /auth/reset-password` - Reset password with OTP
+- All other routes maintained
 
-### 3. Create Auth Service
+### 6. ✅ Auth Validators Updated (backend/src/validators/auth.validator.ts)
+- Created unified `registerSchema` with role-specific data
+- Created `verifyEmailSchema`
+- Updated `resendOtpSchema` (email only)
+- Updated `loginSchema` (with optional role)
+- Updated `googleSignInSchema` (with required role)
+- All other validators maintained
 
-Implement complete auth flows:
-- Email + Password Registration with OTP
-- Email Login
-- Google Sign-In
-- Forgot Password
-- Reset Password
-- Refresh Tokens
+## 📋 REMAINING BACKEND TASKS
 
-### 4. Remove Phone/SMS Auth
+### 1. Update Test Files
+Test files need to be updated to use new schemas:
+- `src/__tests__/integration/auth.test.ts`
+- `src/__tests__/validators/auth.validator.test.ts`
 
-Delete these files:
+Old schemas removed: `customerRegisterSchema`, `restaurantRegisterSchema`, `driverRegisterSchema`, `phoneLoginSchema`, `verifyOtpSchema`
+
+### 2. Remove Phone/SMS Auth (Optional)
+If you want to clean up old phone auth code:
 ```bash
-rm -f src/services/sms.service.ts
-rm -f src/services/twilio.service.ts
+# Search for any remaining phone auth references
+grep -r "sendSmsOtp\|sendPhoneOtp\|phoneOTP" backend/src/
 ```
-
-Update routes to remove phone auth endpoints.
 
 ### 5. Flutter Setup
 

@@ -4,173 +4,50 @@ import { successResponse } from '../utils/response';
 import { AppError } from '../utils/errors';
 
 /**
- * Register a new customer
- * POST /api/v1/auth/customer/register
+ * Register with Email + Password (sends OTP)
+ * POST /api/v1/auth/register
  */
-export const registerCustomer = async (
+export const register = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { name, email, phone, password, referralCode } = req.body;
+    const { name, email, password, role, phone, restaurantData, driverData } = req.body;
 
-    const { user, tokens } = await authService.registerCustomer({
+    const result = await authService.registerWithEmail({
       name,
       email,
-      phone,
       password,
-      referralCode,
+      role,
+      phone,
+      restaurantData,
+      driverData,
     });
 
-    // Send OTP for phone verification
-    const otp = authService.storeOtp(phone, 'phone_verification');
-    await authService.sendSmsOtp(phone, otp);
-
-    successResponse(res, 201, 'تم إنشاء الحساب بنجاح', {
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        role: user.role,
-        isPhoneVerified: user.isPhoneVerified,
-        isEmailVerified: user.isEmailVerified,
-      },
-      ...tokens,
-    });
+    successResponse(res, 201, 'تم إرسال رمز التحقق إلى بريدك الإلكتروني', result);
   } catch (error) {
     next(error);
   }
 };
 
 /**
- * Register a new restaurant
- * POST /api/v1/auth/restaurant/register
+ * Verify Email with OTP
+ * POST /api/v1/auth/verify-email
  */
-export const registerRestaurant = async (
+export const verifyEmail = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    const {
-      ownerName,
-      email,
-      phone,
-      password,
-      name,
-      nameEn,
-      description,
-      cuisineTypes,
-      address,
-    } = req.body;
+    const { email, otp } = req.body;
 
-    const { user, tokens } = await authService.registerRestaurant({
-      ownerName,
-      email,
-      phone,
-      password,
-      name,
-      nameEn,
-      description,
-      cuisineTypes,
-      address,
-    });
-
-    // Send OTP for email verification
-    const otp = authService.storeOtp(email, 'email_verification');
-    await authService.sendEmailOtp(email, otp);
-
-    successResponse(res, 201, 'تم إنشاء حساب المطعم بنجاح. في انتظار الموافقة.', {
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        role: user.role,
-      },
-      ...tokens,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-/**
- * Register a new driver
- * POST /api/v1/auth/driver/register
- */
-export const registerDriver = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
-  try {
-    const {
-      name,
-      email,
-      phone,
-      password,
-      nationalId,
-      vehicleType,
-      vehicleModel,
-      vehicleColor,
-      vehiclePlateNumber,
-      licenseNumber,
-      licenseExpiryDate,
-    } = req.body;
-
-    const { user, tokens } = await authService.registerDriver({
-      name,
-      email,
-      phone,
-      password,
-      nationalId,
-      vehicleType,
-      vehicleModel,
-      vehicleColor,
-      vehiclePlateNumber,
-      licenseNumber,
-      licenseExpiryDate,
-    });
-
-    // Send OTP for phone verification
-    const otp = authService.storeOtp(phone, 'phone_verification');
-    await authService.sendSmsOtp(phone, otp);
-
-    successResponse(res, 201, 'تم إنشاء حساب السائق بنجاح. في انتظار الموافقة.', {
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        role: user.role,
-      },
-      ...tokens,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-/**
- * Login for customers
- * POST /api/v1/auth/customer/login
- */
-export const customerLogin = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
-  try {
-    const { email, password } = req.body;
-
-    const { user, tokens } = await authService.login(email, password, ['customer']);
+    const { user, tokens } = await authService.verifyEmail(email, otp);
 
     const { profile } = await authService.getUserWithProfile(user._id.toString());
 
-    successResponse(res, 200, 'تم تسجيل الدخول بنجاح', {
+    successResponse(res, 200, 'تم التحقق من البريد الإلكتروني بنجاح', {
       user: {
         id: user._id,
         name: user.name,
@@ -178,7 +55,7 @@ export const customerLogin = async (
         phone: user.phone,
         role: user.role,
         avatar: user.avatar,
-        isPhoneVerified: user.isPhoneVerified,
+        authProvider: user.authProvider,
         isEmailVerified: user.isEmailVerified,
       },
       profile,
@@ -190,180 +67,147 @@ export const customerLogin = async (
 };
 
 /**
- * Login for restaurants
- * POST /api/v1/auth/restaurant/login
- */
-export const restaurantLogin = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
-  try {
-    const { email, password } = req.body;
-
-    const { user, tokens } = await authService.login(email, password, ['restaurant']);
-
-    const { profile } = await authService.getUserWithProfile(user._id.toString());
-
-    // Check restaurant status
-    const restaurant = profile as { status: string } | null;
-    if (restaurant?.status === 'pending') {
-      throw new AppError('حسابك قيد المراجعة', 403);
-    }
-    if (restaurant?.status === 'rejected') {
-      throw new AppError('تم رفض طلب التسجيل', 403);
-    }
-    if (restaurant?.status === 'suspended') {
-      throw new AppError('تم إيقاف حسابك', 403);
-    }
-
-    successResponse(res, 200, 'تم تسجيل الدخول بنجاح', {
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        role: user.role,
-      },
-      restaurant: profile,
-      ...tokens,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-/**
- * Login for drivers
- * POST /api/v1/auth/driver/login
- */
-export const driverLogin = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
-  try {
-    const { email, password } = req.body;
-
-    const { user, tokens } = await authService.login(email, password, ['driver']);
-
-    const { profile } = await authService.getUserWithProfile(user._id.toString());
-
-    // Check driver status
-    const driver = profile as { status: string } | null;
-    if (driver?.status === 'pending') {
-      throw new AppError('حسابك قيد المراجعة', 403);
-    }
-    if (driver?.status === 'rejected') {
-      throw new AppError('تم رفض طلب التسجيل', 403);
-    }
-    if (driver?.status === 'suspended') {
-      throw new AppError('تم إيقاف حسابك', 403);
-    }
-
-    successResponse(res, 200, 'تم تسجيل الدخول بنجاح', {
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        role: user.role,
-      },
-      driver: profile,
-      ...tokens,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-/**
- * Login for admins
- * POST /api/v1/auth/admin/login
- */
-export const adminLogin = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
-  try {
-    const { email, password } = req.body;
-
-    const { user, tokens } = await authService.login(email, password, ['admin']);
-
-    successResponse(res, 200, 'تم تسجيل الدخول بنجاح', {
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
-      ...tokens,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-/**
- * Verify OTP
- * POST /api/v1/auth/verify-otp
- */
-export const verifyOtp = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
-  try {
-    const { phone, email, otp, type } = req.body;
-
-    const identifier = phone || email;
-    authService.verifyOtp(identifier, otp, type);
-
-    // Update user verification status
-    if (type === 'phone_verification' && phone) {
-      const { User } = await import('../models');
-      await User.findOneAndUpdate({ phone }, { isPhoneVerified: true });
-    } else if (type === 'email_verification' && email) {
-      const { User } = await import('../models');
-      await User.findOneAndUpdate({ email }, { isEmailVerified: true });
-    }
-
-    successResponse(res, 200, 'تم التحقق بنجاح');
-  } catch (error) {
-    next(error);
-  }
-};
-
-/**
- * Resend OTP
+ * Resend Email OTP
  * POST /api/v1/auth/resend-otp
  */
-export const resendOtp = async (
+export const resendOTP = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { phone, email, type } = req.body;
+    const { email } = req.body;
 
-    const identifier = phone || email;
-    const otp = authService.storeOtp(identifier, type);
+    const result = await authService.resendEmailOTP(email);
 
-    if (phone) {
-      await authService.sendSmsOtp(phone, otp);
-    } else if (email) {
-      await authService.sendEmailOtp(email, otp);
-    }
-
-    successResponse(res, 200, 'تم إرسال رمز التحقق');
+    successResponse(res, 200, result.message);
   } catch (error) {
     next(error);
   }
 };
 
 /**
- * Forgot password - request reset
+ * Login with Email + Password
+ * POST /api/v1/auth/login
+ */
+export const login = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { email, password, role } = req.body;
+
+    const result = await authService.loginWithEmail(
+      email,
+      password,
+      role ? [role] : undefined
+    );
+
+    // Check if requires verification
+    if ('requiresVerification' in result && result.requiresVerification) {
+      successResponse(res, 200, 'يرجى تأكيد بريدك الإلكتروني. تم إرسال رمز التحقق', {
+        requiresVerification: true,
+        email: result.email,
+      });
+      return;
+    }
+
+    // Type guard: At this point, result must be { user, tokens }
+    if (!('user' in result) || !('tokens' in result)) {
+      throw new AppError('خطأ في تسجيل الدخول', 500);
+    }
+
+    const { user, tokens } = result;
+    const { profile } = await authService.getUserWithProfile(user._id.toString());
+
+    // Check role-specific status
+    if (user.role === 'restaurant') {
+      const restaurant = profile as { status?: string } | null;
+      if (restaurant?.status === 'pending') {
+        throw new AppError('حسابك قيد المراجعة', 403);
+      }
+      if (restaurant?.status === 'rejected') {
+        throw new AppError('تم رفض طلب التسجيل', 403);
+      }
+      if (restaurant?.status === 'suspended') {
+        throw new AppError('تم إيقاف حسابك', 403);
+      }
+    } else if (user.role === 'driver') {
+      const driver = profile as { status?: string } | null;
+      if (driver?.status === 'pending') {
+        throw new AppError('حسابك قيد المراجعة', 403);
+      }
+      if (driver?.status === 'rejected') {
+        throw new AppError('تم رفض طلب التسجيل', 403);
+      }
+      if (driver?.status === 'suspended') {
+        throw new AppError('تم إيقاف حسابك', 403);
+      }
+    }
+
+    successResponse(res, 200, 'تم تسجيل الدخول بنجاح', {
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        avatar: user.avatar,
+        authProvider: user.authProvider,
+        isEmailVerified: user.isEmailVerified,
+      },
+      profile,
+      ...tokens,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Google Sign-In
+ * POST /api/v1/auth/google
+ */
+export const googleSignIn = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { idToken, role } = req.body;
+
+    const { user, tokens, isNewUser } = await authService.signInWithGoogle(idToken, role);
+
+    const { profile } = await authService.getUserWithProfile(user._id.toString());
+
+    successResponse(
+      res,
+      isNewUser ? 201 : 200,
+      isNewUser ? 'تم إنشاء الحساب بنجاح' : 'تم تسجيل الدخول بنجاح',
+      {
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          role: user.role,
+          avatar: user.avatar,
+          authProvider: user.authProvider,
+          isEmailVerified: user.isEmailVerified,
+        },
+        profile,
+        isNewUser,
+        ...tokens,
+      }
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Forgot Password - Send Reset OTP
  * POST /api/v1/auth/forgot-password
  */
 export const forgotPassword = async (
@@ -374,26 +218,16 @@ export const forgotPassword = async (
   try {
     const { email } = req.body;
 
-    const { User } = await import('../models');
-    const user = await User.findOne({ email });
+    const result = await authService.forgotPassword(email);
 
-    if (!user) {
-      // Don't reveal if email exists
-      successResponse(res, 200, 'إذا كان البريد الإلكتروني مسجلاً، سيتم إرسال رمز التحقق');
-      return;
-    }
-
-    const otp = authService.storeOtp(email, 'password_reset');
-    await authService.sendEmailOtp(email, otp);
-
-    successResponse(res, 200, 'تم إرسال رمز التحقق إلى بريدك الإلكتروني');
+    successResponse(res, 200, result.message);
   } catch (error) {
     next(error);
   }
 };
 
 /**
- * Reset password with OTP
+ * Reset Password with OTP
  * POST /api/v1/auth/reset-password
  */
 export const resetPassword = async (
@@ -404,16 +238,16 @@ export const resetPassword = async (
   try {
     const { email, otp, newPassword } = req.body;
 
-    await authService.resetPassword(email, otp, newPassword);
+    const result = await authService.resetPassword(email, otp, newPassword);
 
-    successResponse(res, 200, 'تم تغيير كلمة المرور بنجاح');
+    successResponse(res, 200, result.message);
   } catch (error) {
     next(error);
   }
 };
 
 /**
- * Change password (authenticated)
+ * Change Password (authenticated users)
  * POST /api/v1/auth/change-password
  */
 export const changePassword = async (
@@ -438,7 +272,7 @@ export const changePassword = async (
 };
 
 /**
- * Refresh tokens
+ * Refresh Tokens
  * POST /api/v1/auth/refresh-token
  */
 export const refreshToken = async (
@@ -458,7 +292,7 @@ export const refreshToken = async (
 };
 
 /**
- * Update FCM token
+ * Update FCM Token
  * POST /api/v1/auth/fcm-token
  */
 export const updateFcmToken = async (
@@ -506,7 +340,7 @@ export const logout = async (
 };
 
 /**
- * Get current user profile
+ * Get Current User Profile
  * GET /api/v1/auth/me
  */
 export const getMe = async (
@@ -531,7 +365,7 @@ export const getMe = async (
         phone: user.phone,
         role: user.role,
         avatar: user.avatar,
-        isPhoneVerified: user.isPhoneVerified,
+        authProvider: user.authProvider,
         isEmailVerified: user.isEmailVerified,
       },
       profile,
