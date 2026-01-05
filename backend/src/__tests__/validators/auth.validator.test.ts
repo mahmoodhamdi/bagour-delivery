@@ -1,30 +1,29 @@
 import {
-  customerRegisterSchema,
+  registerSchema,
   loginSchema,
-  phoneLoginSchema,
-  verifyOtpSchema,
+  verifyEmailSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
   changePasswordSchema,
-  driverRegisterSchema,
 } from '../../validators/auth.validator';
 
 describe('Auth Validators', () => {
-  describe('customerRegisterSchema', () => {
+  describe('registerSchema (customer)', () => {
     const validData = {
       name: 'Ahmed Mohamed',
       email: 'ahmed@example.com',
       phone: '01012345678',
       password: 'password123',
+      role: 'customer',
     };
 
     it('should validate correct customer data', () => {
-      const { error } = customerRegisterSchema.validate(validData);
+      const { error } = registerSchema.validate(validData);
       expect(error).toBeUndefined();
     });
 
     it('should reject missing name', () => {
-      const { error } = customerRegisterSchema.validate({
+      const { error } = registerSchema.validate({
         ...validData,
         name: undefined,
       });
@@ -33,7 +32,7 @@ describe('Auth Validators', () => {
     });
 
     it('should reject short name', () => {
-      const { error } = customerRegisterSchema.validate({
+      const { error } = registerSchema.validate({
         ...validData,
         name: 'A',
       });
@@ -42,7 +41,7 @@ describe('Auth Validators', () => {
     });
 
     it('should reject invalid email', () => {
-      const { error } = customerRegisterSchema.validate({
+      const { error } = registerSchema.validate({
         ...validData,
         email: 'not-an-email',
       });
@@ -51,7 +50,7 @@ describe('Auth Validators', () => {
     });
 
     it('should reject invalid phone number', () => {
-      const { error } = customerRegisterSchema.validate({
+      const { error } = registerSchema.validate({
         ...validData,
         phone: '123456789',
       });
@@ -63,7 +62,7 @@ describe('Auth Validators', () => {
       const validPhones = ['01012345678', '01112345678', '01212345678', '01512345678'];
 
       validPhones.forEach((phone) => {
-        const { error } = customerRegisterSchema.validate({ ...validData, phone });
+        const { error } = registerSchema.validate({ ...validData, phone });
         expect(error).toBeUndefined();
       });
     });
@@ -72,13 +71,13 @@ describe('Auth Validators', () => {
       const invalidPhones = ['01312345678', '01612345678', '02012345678'];
 
       invalidPhones.forEach((phone) => {
-        const { error } = customerRegisterSchema.validate({ ...validData, phone });
+        const { error } = registerSchema.validate({ ...validData, phone });
         expect(error).toBeDefined();
       });
     });
 
     it('should reject short password', () => {
-      const { error } = customerRegisterSchema.validate({
+      const { error } = registerSchema.validate({
         ...validData,
         password: '1234567',
       });
@@ -87,7 +86,7 @@ describe('Auth Validators', () => {
     });
 
     it('should allow optional referralCode', () => {
-      const { error } = customerRegisterSchema.validate({
+      const { error } = registerSchema.validate({
         ...validData,
         referralCode: 'REF123',
       });
@@ -127,63 +126,34 @@ describe('Auth Validators', () => {
     });
   });
 
-  describe('phoneLoginSchema', () => {
-    it('should validate valid phone number', () => {
-      const { error } = phoneLoginSchema.validate({
-        phone: '01012345678',
-      });
-      expect(error).toBeUndefined();
-    });
-
-    it('should reject invalid phone number', () => {
-      const { error } = phoneLoginSchema.validate({
-        phone: '1234567890',
-      });
-      expect(error).toBeDefined();
-    });
-  });
-
-  describe('verifyOtpSchema', () => {
-    it('should validate with phone and OTP', () => {
-      const { error } = verifyOtpSchema.validate({
-        phone: '01012345678',
-        otp: '123456',
-        type: 'phone_verification',
-      });
-      expect(error).toBeUndefined();
-    });
-
+  describe('verifyEmailSchema', () => {
     it('should validate with email and OTP', () => {
-      const { error } = verifyOtpSchema.validate({
+      const { error } = verifyEmailSchema.validate({
         email: 'test@example.com',
         otp: '123456',
-        type: 'email_verification',
       });
       expect(error).toBeUndefined();
     });
 
-    it('should reject without phone or email', () => {
-      const { error } = verifyOtpSchema.validate({
+    it('should reject missing email', () => {
+      const { error } = verifyEmailSchema.validate({
         otp: '123456',
-        type: 'phone_verification',
       });
       expect(error).toBeDefined();
     });
 
     it('should reject invalid OTP format', () => {
-      const { error } = verifyOtpSchema.validate({
-        phone: '01012345678',
+      const { error } = verifyEmailSchema.validate({
+        email: 'test@example.com',
         otp: '12345', // 5 digits instead of 6
-        type: 'phone_verification',
       });
       expect(error).toBeDefined();
     });
 
     it('should reject non-numeric OTP', () => {
-      const { error } = verifyOtpSchema.validate({
-        phone: '01012345678',
+      const { error } = verifyEmailSchema.validate({
+        email: 'test@example.com',
         otp: 'abcdef',
-        type: 'phone_verification',
       });
       expect(error).toBeDefined();
     });
@@ -266,12 +236,13 @@ describe('Auth Validators', () => {
     });
   });
 
-  describe('driverRegisterSchema', () => {
+  describe('registerSchema (driver)', () => {
     const validDriver = {
       name: 'Mohamed Ali',
       email: 'driver@example.com',
       phone: '01012345678',
       password: 'password123',
+      role: 'driver',
       nationalId: '29801011234567',
       vehicleType: 'motorcycle',
       vehiclePlateNumber: 'ABC123',
@@ -280,12 +251,12 @@ describe('Auth Validators', () => {
     };
 
     it('should validate correct driver data', () => {
-      const { error } = driverRegisterSchema.validate(validDriver);
+      const { error } = registerSchema.validate(validDriver);
       expect(error).toBeUndefined();
     });
 
     it('should reject invalid national ID (not 14 digits)', () => {
-      const { error } = driverRegisterSchema.validate({
+      const { error } = registerSchema.validate({
         ...validDriver,
         nationalId: '1234567890',
       });
@@ -294,7 +265,7 @@ describe('Auth Validators', () => {
     });
 
     it('should reject invalid vehicle type', () => {
-      const { error } = driverRegisterSchema.validate({
+      const { error } = registerSchema.validate({
         ...validDriver,
         vehicleType: 'plane',
       });
@@ -305,13 +276,13 @@ describe('Auth Validators', () => {
       const vehicleTypes = ['motorcycle', 'bicycle', 'car'];
 
       vehicleTypes.forEach((vehicleType) => {
-        const { error } = driverRegisterSchema.validate({ ...validDriver, vehicleType });
+        const { error } = registerSchema.validate({ ...validDriver, vehicleType });
         expect(error).toBeUndefined();
       });
     });
 
     it('should reject expired license', () => {
-      const { error } = driverRegisterSchema.validate({
+      const { error } = registerSchema.validate({
         ...validDriver,
         licenseExpiryDate: new Date('2020-01-01'),
       });
