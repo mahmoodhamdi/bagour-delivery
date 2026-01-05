@@ -145,6 +145,33 @@ class OrderService {
 
     await order.save();
 
+    // Handle wallet payment
+    if (input.paymentMethod === 'wallet') {
+      try {
+        // Import wallet service dynamically
+        const { walletService } = await import('./wallet.service');
+
+        // Deduct from wallet
+        await walletService.deductFromWallet(
+          input.customerId,
+          order._id.toString(),
+          calculation.total
+        );
+
+        // Mark order as paid
+        order.paymentStatus = 'paid';
+        order.paidAt = new Date();
+        await order.save();
+      } catch (walletError) {
+        // If wallet payment fails, cancel the order
+        order.status = 'cancelled';
+        order.cancelledAt = new Date();
+        order.cancelReason = 'فشل الدفع من المحفظة';
+        await order.save();
+        throw walletError;
+      }
+    }
+
     // Update coupon usage if applied
     if (calculation.couponId) {
       await Coupon.findByIdAndUpdate(calculation.couponId, {

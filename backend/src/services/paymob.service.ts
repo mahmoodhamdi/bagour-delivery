@@ -341,8 +341,26 @@ class PaymobService {
         cardType: transactionData.source_data.sub_type,
       };
 
-      // Update order payment status
-      if (transaction.orderId) {
+      // Handle based on transaction type
+      if (transaction.type === 'wallet_topup') {
+        // Import wallet service dynamically to avoid circular dependency
+        const { walletService } = await import('./wallet.service');
+
+        // Confirm wallet top-up
+        await walletService.confirmTopup(
+          transaction._id.toString(),
+          transactionData.id.toString()
+        );
+
+        // Emit wallet topup success event
+        if (transaction.toUserId) {
+          emitToUser(transaction.toUserId.toString(), 'wallet:topup:success', {
+            amount: transaction.amount,
+            newBalance: transaction.amount, // Will be updated by wallet service
+          });
+        }
+      } else if (transaction.orderId) {
+        // Update order payment status
         const order = await Order.findByIdAndUpdate(
           transaction.orderId,
           {
@@ -377,8 +395,17 @@ class PaymobService {
         paymobTransactionId: transactionData.id,
       };
 
-      // Update order payment status
-      if (transaction.orderId) {
+      // Handle based on transaction type
+      if (transaction.type === 'wallet_topup') {
+        // Emit wallet topup failed event
+        if (transaction.toUserId) {
+          emitToUser(transaction.toUserId.toString(), 'wallet:topup:failed', {
+            amount: transaction.amount,
+            error: transactionData.data?.message || 'فشل شحن المحفظة',
+          });
+        }
+      } else if (transaction.orderId) {
+        // Update order payment status
         const order = await Order.findByIdAndUpdate(
           transaction.orderId,
           {
@@ -566,6 +593,60 @@ class PaymobService {
     return {
       redirectUrl: response.data.redirect_url || '',
     };
+  }
+
+  /**
+   * Create payment for wallet top-up (public helper)
+   */
+  async createWalletTopupPayment(
+    transactionId: string,
+    amount: number,
+    billingData: BillingData,
+    paymentMethod: 'card' | 'mobile_wallet',
+    phoneNumber?: string
+  ): Promise<{ redirectUrl: string; paymobOrderId: string }> {
+    const amountCents = Math.round(amount * 100);
+
+    // Get auth token
+    const authToken = await this.getAuthToken();
+
+    // Create Paymob order
+    const paymobOrder = await this.createPaymobOrder(authToken, amountCents, transactionId);
+
+    // Get payment key
+    const paymentKey = await this.getPaymentKey(
+      authToken,
+      paymobOrder.id,
+      amountCents,
+      billingData
+    );
+
+    if (paymentMethod === 'card') {
+      // Generate iframe URL for card payment
+      const iframeUrl = `https://accept.paymob.com/api/acceptance/iframes/${this.iframeId}?payment_token=${paymentKey}`;
+      return {
+        redirectUrl: iframeUrl,
+        paymobOrderId: paymobOrder.id.toString(),
+      };
+    } else {
+      // Mobile wallet payment
+      if (!phoneNumber) {
+        throw new BadRequestError('رقم الهاتف مطلوب للمحفظة الإلكترونية');
+      }
+
+      const response = await this.client.post('/acceptance/payments/pay', {
+        source: {
+          identifier: phoneNumber,
+          subtype: 'WALLET',
+        },
+        payment_token: paymentKey,
+      });
+
+      return {
+        redirectUrl: response.data.redirect_url || response.data.iframe_redirection_url || '',
+        paymobOrderId: paymobOrder.id.toString(),
+      };
+    }
   }
 }
 

@@ -9,6 +9,7 @@ import orderRoutes, {
   adminRouter as adminOrderRoutes,
 } from './order.routes';
 import customerRoutes from './customer.routes';
+import walletRoutes from './wallet.routes';
 import couponRoutes, { couponAdminRouter } from './coupon.routes';
 import paymentRoutes, { paymentAdminRouter } from './payment.routes';
 import {
@@ -48,6 +49,9 @@ router.use(`${API_VERSION}/orders`, orderRoutes);
 
 // Customer routes
 router.use(`${API_VERSION}/customer`, customerRoutes);
+
+// Wallet routes (customer)
+router.use(`${API_VERSION}/customer/wallet`, walletRoutes);
 
 // Restaurant order routes
 router.use(`${API_VERSION}/restaurant`, restaurantOrderRoutes);
