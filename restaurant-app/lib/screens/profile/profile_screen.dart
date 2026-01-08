@@ -5,7 +5,6 @@ import 'package:image_picker/image_picker.dart';
 import '../../config/theme.dart';
 import '../../config/routes.dart';
 import '../../services/restaurant_service.dart';
-import '../../providers/auth_provider.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -335,7 +334,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               _InfoRow(
                 icon: Icons.store,
                 label: 'اسم المطعم',
-                value: _profile!.nameAr ?? _profile!.name,
+                value: _profile!.nameAr.isNotEmpty ? _profile!.nameAr : _profile!.name,
               ),
               if (_profile!.description != null &&
                   _profile!.description!.isNotEmpty)
