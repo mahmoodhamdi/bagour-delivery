@@ -201,7 +201,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       body: isLoading && notifications.isEmpty
           ? const LoadingWidget()
           : error != null && notifications.isEmpty
-              ? CustomErrorWidget(
+              ? AppErrorWidget(
                   message: error,
                   onRetry: () {
                     ref.read(notificationProvider.notifier).fetchNotifications(refresh: true);
@@ -336,7 +336,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     return EmptyStateWidget(
       icon: Icons.notifications_off_outlined,
       title: 'لا توجد إشعارات',
-      message: 'سنقوم بإعلامك عند وصول طلبات جديدة أو تحديثات مهمة',
+      description: 'سنقوم بإعلامك عند وصول طلبات جديدة أو تحديثات مهمة',
       actionLabel: 'تحديث',
       onAction: () {
         ref.read(notificationProvider.notifier).fetchNotifications(refresh: true);

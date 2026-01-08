@@ -37,6 +37,12 @@ dependencies:
   # Navigation
   go_router: ^13.2.0
 
+  # Maps & Location (FREE - OpenStreetMap)
+  flutter_map: ^6.1.0
+  latlong2: ^0.9.1
+  geolocator: ^11.0.0
+  http: ^1.2.0
+
   # Firebase
   firebase_core: ^2.27.0
   firebase_auth: ^4.17.8

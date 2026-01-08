@@ -526,7 +526,7 @@ class _EarningsScreenState extends ConsumerState<EarningsScreen>
                             message:
                                 '${DateFormat('dd/MM').format(earning.date)}\n${_currencyFormat.format(earning.amount)}\n${earning.orders} طلب',
                             child: Container(
-                              height: (heightRatio * 150).clamp(4.0, 150.0),
+                              height: (heightRatio * 150).clamp(4.0, 150.0).toDouble(),
                               decoration: BoxDecoration(
                                 color: AppColors.primary,
                                 borderRadius: const BorderRadius.vertical(

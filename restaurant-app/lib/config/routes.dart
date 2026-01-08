@@ -17,6 +17,10 @@ import '../screens/menu/add_menu_item_screen.dart';
 import '../screens/menu/categories_screen.dart';
 import '../screens/reviews/reviews_screen.dart';
 import '../screens/earnings/earnings_screen.dart';
+import '../screens/profile/profile_screen.dart';
+import '../screens/profile/edit_profile_screen.dart';
+import '../screens/settings/settings_screen.dart';
+import '../screens/notifications/notifications_screen.dart';
 
 /// Route path constants
 class AppRoutes {
@@ -253,17 +257,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       // ==================== PROFILE & SETTINGS ====================
       GoRoute(
         path: AppRoutes.profile,
-        builder: (context, state) {
-          // TODO: Create ProfileScreen
-          return const _ProfileScreen();
-        },
+        builder: (context, state) => const ProfileScreen(),
       ),
       GoRoute(
         path: AppRoutes.editProfile,
-        builder: (context, state) {
-          // TODO: Create EditProfileScreen
-          return const _PlaceholderScreen(title: 'تعديل الملف الشخصي');
-        },
+        builder: (context, state) => const EditProfileScreen(),
       ),
       GoRoute(
         path: AppRoutes.restaurantInfo,
@@ -281,17 +279,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutes.settings,
-        builder: (context, state) {
-          // TODO: Create SettingsScreen
-          return const _SettingsScreen();
-        },
+        builder: (context, state) => const SettingsScreen(),
       ),
       GoRoute(
         path: AppRoutes.notifications,
-        builder: (context, state) {
-          // TODO: Create NotificationsScreen
-          return const _NotificationsScreen();
-        },
+        builder: (context, state) => const NotificationsScreen(),
       ),
       GoRoute(
         path: AppRoutes.help,
@@ -606,200 +598,6 @@ class _EditMenuItemScreen extends StatelessWidget {
               onPressed: () => context.pop(),
               icon: const Icon(Icons.arrow_back),
               label: const Text('العودة'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Profile screen placeholder
-class _ProfileScreen extends StatelessWidget {
-  const _ProfileScreen();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('الملف الشخصي'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () => context.push(AppRoutes.editProfile),
-          ),
-        ],
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          const Center(
-            child: CircleAvatar(
-              radius: 50,
-              child: Icon(Icons.restaurant, size: 50),
-            ),
-          ),
-          const SizedBox(height: 16),
-          const Center(
-            child: Text(
-              'اسم المطعم',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          const SizedBox(height: 32),
-          _buildProfileItem(
-            context,
-            icon: Icons.restaurant_menu,
-            title: 'معلومات المطعم',
-            onTap: () => context.push(AppRoutes.restaurantInfo),
-          ),
-          _buildProfileItem(
-            context,
-            icon: Icons.access_time,
-            title: 'ساعات العمل',
-            onTap: () => context.push(AppRoutes.restaurantHours),
-          ),
-          _buildProfileItem(
-            context,
-            icon: Icons.star,
-            title: 'التقييمات',
-            onTap: () => context.push(AppRoutes.reviews),
-          ),
-          _buildProfileItem(
-            context,
-            icon: Icons.settings,
-            title: 'الإعدادات',
-            onTap: () => context.push(AppRoutes.settings),
-          ),
-          _buildProfileItem(
-            context,
-            icon: Icons.help_outline,
-            title: 'المساعدة',
-            onTap: () => context.push(AppRoutes.help),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProfileItem(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-  }) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        leading: Icon(icon),
-        title: Text(title),
-        trailing: const Icon(Icons.chevron_right),
-        onTap: onTap,
-      ),
-    );
-  }
-}
-
-/// Settings screen placeholder
-class _SettingsScreen extends StatelessWidget {
-  const _SettingsScreen();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('الإعدادات'),
-      ),
-      body: ListView(
-        children: [
-          ListTile(
-            leading: const Icon(Icons.notifications_outlined),
-            title: const Text('الإشعارات'),
-            trailing: Switch(
-              value: true,
-              onChanged: (value) {},
-            ),
-          ),
-          ListTile(
-            leading: const Icon(Icons.volume_up_outlined),
-            title: const Text('صوت الطلبات الجديدة'),
-            trailing: Switch(
-              value: true,
-              onChanged: (value) {},
-            ),
-          ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.language),
-            title: const Text('اللغة'),
-            subtitle: const Text('العربية'),
-            onTap: () {},
-          ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.lock_outline),
-            title: const Text('تغيير كلمة المرور'),
-            onTap: () {},
-          ),
-          ListTile(
-            leading: const Icon(Icons.privacy_tip_outlined),
-            title: const Text('سياسة الخصوصية'),
-            onTap: () {},
-          ),
-          ListTile(
-            leading: const Icon(Icons.description_outlined),
-            title: const Text('الشروط والأحكام'),
-            onTap: () {},
-          ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.logout, color: Colors.red),
-            title: const Text(
-              'تسجيل الخروج',
-              style: TextStyle(color: Colors.red),
-            ),
-            onTap: () => context.go(AppRoutes.login),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Notifications screen placeholder
-class _NotificationsScreen extends StatelessWidget {
-  const _NotificationsScreen();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('الإشعارات'),
-        actions: [
-          TextButton(
-            onPressed: () {},
-            child: const Text('مسح الكل'),
-          ),
-        ],
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.notifications_none,
-              size: 80,
-              color: Colors.grey[400],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'لا توجد إشعارات',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: Colors.grey[600],
-                  ),
             ),
           ],
         ),

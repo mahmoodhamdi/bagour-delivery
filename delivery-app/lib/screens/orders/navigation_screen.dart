@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../config/theme.dart';
@@ -9,6 +11,7 @@ import '../../config/constants.dart';
 import '../../models/order.dart';
 import '../../providers/order_provider.dart';
 import '../../services/location_service.dart';
+import '../../services/map_service.dart';
 import '../../widgets/common/loading_indicator.dart';
 
 class NavigationScreen extends ConsumerStatefulWidget {
@@ -21,12 +24,16 @@ class NavigationScreen extends ConsumerStatefulWidget {
 }
 
 class _NavigationScreenState extends ConsumerState<NavigationScreen> {
+  final MapController _mapController = MapController();
+  final MapService _mapService = MapService();
   Timer? _locationUpdateTimer;
-  double? _currentLat;
-  double? _currentLng;
+  LatLng? _currentLocation;
+  LatLng? _destination;
+  List<LatLng>? _routePoints;
   double? _distanceRemaining;
   String? _eta;
   bool _isNavigating = false;
+  bool _isLoadingRoute = false;
 
   @override
   void initState() {
@@ -37,6 +44,51 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
 
   Future<void> _loadOrder() async {
     await ref.read(currentOrderProvider.notifier).fetchCurrentOrder();
+    _updateDestination();
+  }
+
+  void _updateDestination() {
+    final order = ref.read(currentOrderProvider).order;
+    if (order != null) {
+      setState(() {
+        if (order.status == OrderStatus.ready) {
+          _destination = LatLng(order.restaurant.latitude, order.restaurant.longitude);
+        } else {
+          _destination = LatLng(order.deliveryAddress.latitude, order.deliveryAddress.longitude);
+        }
+      });
+      _loadRoute();
+    }
+  }
+
+  Future<void> _loadRoute() async {
+    if (_currentLocation == null || _destination == null) return;
+
+    setState(() => _isLoadingRoute = true);
+
+    try {
+      final route = await _mapService.getRoute(_currentLocation!, _destination!);
+      if (route != null && mounted) {
+        setState(() {
+          _routePoints = route.polylinePoints;
+          _distanceRemaining = route.distanceMeters / 1000; // Convert to km
+          _eta = route.durationText;
+          _isLoadingRoute = false;
+        });
+
+        // Fit map to show entire route
+        if (_routePoints != null && _routePoints!.isNotEmpty) {
+          final bounds = LatLngBounds.fromPoints(_routePoints!);
+          _mapController.fitCamera(
+            CameraFit.bounds(bounds: bounds, padding: const EdgeInsets.all(50)),
+          );
+        }
+      } else {
+        setState(() => _isLoadingRoute = false);
+      }
+    } catch (e) {
+      setState(() => _isLoadingRoute = false);
+    }
   }
 
   void _startLocationUpdates() {
@@ -49,135 +101,29 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
 
   Future<void> _updateLocation() async {
     try {
-      final locationService = LocationService();
+      final locationService = LocationService(ref.read(apiServiceProvider));
       final position = await locationService.getCurrentLocation();
 
-      if (!mounted) return;
+      if (!mounted || position == null) return;
 
-      setState(() {
-        _currentLat = position.latitude;
-        _currentLng = position.longitude;
-      });
+      final newLocation = LatLng(position.latitude, position.longitude);
 
-      // Calculate distance to destination
-      final order = ref.read(currentOrderProvider).order;
-      if (order != null) {
-        double destLat, destLng;
+      setState(() => _currentLocation = newLocation);
 
-        if (order.status == OrderStatus.ready) {
-          destLat = order.restaurant.latitude;
-          destLng = order.restaurant.longitude;
-        } else {
-          destLat = order.deliveryAddress.latitude;
-          destLng = order.deliveryAddress.longitude;
-        }
-
-        final distance = _calculateDistance(
-          _currentLat!,
-          _currentLng!,
-          destLat,
-          destLng,
-        );
-
-        setState(() {
-          _distanceRemaining = distance;
-          _eta = _calculateETA(distance);
+      // Recalculate route and ETA
+      if (_destination != null) {
+        final distance = _mapService.getDistance(_currentLocation!, _destination!);
+        distance.then((result) {
+          if (result != null && mounted) {
+            setState(() {
+              _distanceRemaining = result.distanceMeters / 1000;
+              _eta = result.durationText;
+            });
+          }
         });
       }
     } catch (e) {
       // Handle location error silently
-    }
-  }
-
-  double _calculateDistance(
-    double lat1,
-    double lon1,
-    double lat2,
-    double lon2,
-  ) {
-    // Simplified distance calculation (Haversine formula approximation)
-    const double earthRadius = 6371; // km
-    final dLat = _toRadians(lat2 - lat1);
-    final dLon = _toRadians(lon2 - lon1);
-
-    final a = _sin(dLat / 2) * _sin(dLat / 2) +
-        _cos(_toRadians(lat1)) *
-            _cos(_toRadians(lat2)) *
-            _sin(dLon / 2) *
-            _sin(dLon / 2);
-
-    final c = 2 * _atan2(_sqrt(a), _sqrt(1 - a));
-    return earthRadius * c;
-  }
-
-  double _toRadians(double degree) => degree * 3.14159265359 / 180;
-  double _sin(double x) => _taylorSin(x);
-  double _cos(double x) => _taylorCos(x);
-  double _sqrt(double x) => x > 0 ? _newtonSqrt(x) : 0;
-  double _atan2(double y, double x) {
-    if (x > 0) return _taylorAtan(y / x);
-    if (x < 0 && y >= 0) return _taylorAtan(y / x) + 3.14159265359;
-    if (x < 0 && y < 0) return _taylorAtan(y / x) - 3.14159265359;
-    if (x == 0 && y > 0) return 3.14159265359 / 2;
-    if (x == 0 && y < 0) return -3.14159265359 / 2;
-    return 0;
-  }
-
-  double _taylorSin(double x) {
-    double result = x;
-    double term = x;
-    for (int i = 1; i <= 10; i++) {
-      term *= -x * x / ((2 * i) * (2 * i + 1));
-      result += term;
-    }
-    return result;
-  }
-
-  double _taylorCos(double x) {
-    double result = 1;
-    double term = 1;
-    for (int i = 1; i <= 10; i++) {
-      term *= -x * x / ((2 * i - 1) * (2 * i));
-      result += term;
-    }
-    return result;
-  }
-
-  double _taylorAtan(double x) {
-    if (x.abs() > 1) {
-      return (x > 0 ? 1 : -1) * (3.14159265359 / 2 - _taylorAtan(1 / x));
-    }
-    double result = x;
-    double term = x;
-    for (int i = 1; i <= 20; i++) {
-      term *= -x * x;
-      result += term / (2 * i + 1);
-    }
-    return result;
-  }
-
-  double _newtonSqrt(double x) {
-    double guess = x / 2;
-    for (int i = 0; i < 10; i++) {
-      guess = (guess + x / guess) / 2;
-    }
-    return guess;
-  }
-
-  String _calculateETA(double distanceKm) {
-    // Assume average speed of 25 km/h for delivery
-    const averageSpeed = 25.0;
-    final timeHours = distanceKm / averageSpeed;
-    final timeMinutes = (timeHours * 60).round();
-
-    if (timeMinutes < 1) {
-      return 'أقل من دقيقة';
-    } else if (timeMinutes == 1) {
-      return 'دقيقة واحدة';
-    } else if (timeMinutes <= 10) {
-      return '$timeMinutes دقائق';
-    } else {
-      return '$timeMinutes دقيقة';
     }
   }
 
@@ -190,12 +136,18 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
   Future<void> _launchExternalNavigation(double lat, double lng) async {
     setState(() => _isNavigating = true);
 
+    // Try OpenStreetMap-based navigation first (OsmAnd or similar)
+    final osmUrl = Uri.parse('geo:$lat,$lng?q=$lat,$lng');
     final googleMapsUrl = Uri.parse(
       'https://www.google.com/maps/dir/?api=1&destination=$lat,$lng&travelmode=driving',
     );
 
     try {
-      if (await canLaunchUrl(googleMapsUrl)) {
+      // Try to open with geo URI (works with OsmAnd and other OSM apps)
+      if (await canLaunchUrl(osmUrl)) {
+        await launchUrl(osmUrl, mode: LaunchMode.externalApplication);
+      } else if (await canLaunchUrl(googleMapsUrl)) {
+        // Fallback to Google Maps web
         await launchUrl(googleMapsUrl, mode: LaunchMode.externalApplication);
       }
     } catch (e) {
@@ -252,39 +204,101 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
 
     return Stack(
       children: [
-        // Map Placeholder (in real app, use Google Maps or similar)
-        Container(
-          width: double.infinity,
-          height: double.infinity,
-          color: AppColors.grey200,
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.map,
-                  size: 80,
-                  color: AppColors.grey400,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'الخريطة',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        color: AppColors.textSecondary,
+        // OpenStreetMap (FREE)
+        FlutterMap(
+          mapController: _mapController,
+          options: MapOptions(
+            initialCenter: _currentLocation ?? _destination ?? MapService.bagourCenter,
+            initialZoom: 15,
+          ),
+          children: [
+            // Map tiles
+            TileLayer(
+              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+              userAgentPackageName: 'com.bagour.delivery',
+              maxZoom: 19,
+            ),
+
+            // Route polyline
+            if (_routePoints != null && _routePoints!.isNotEmpty)
+              PolylineLayer(
+                polylines: [
+                  Polyline(
+                    points: _routePoints!,
+                    color: AppColors.primary,
+                    strokeWidth: 5,
+                  ),
+                ],
+              ),
+
+            // Markers
+            MarkerLayer(
+              markers: [
+                // Current location marker
+                if (_currentLocation != null)
+                  Marker(
+                    point: _currentLocation!,
+                    width: 50,
+                    height: 50,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.blue.withOpacity(0.2),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.blue, width: 3),
                       ),
-                ),
-                const SizedBox(height: 8),
-                ElevatedButton.icon(
-                  onPressed: _isNavigating
-                      ? null
-                      : () => _launchExternalNavigation(destLat, destLng),
-                  icon: const Icon(Icons.navigation),
-                  label: const Text('فتح في خرائط جوجل'),
-                ),
+                      child: const Icon(Icons.delivery_dining, color: Colors.blue, size: 28),
+                    ),
+                  ),
+
+                // Destination marker
+                if (_destination != null)
+                  Marker(
+                    point: _destination!,
+                    width: 50,
+                    height: 50,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: isPickup ? AppColors.primary : AppColors.secondary,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        isPickup ? Icons.restaurant : Icons.location_on,
+                        color: Colors.white,
+                        size: 28,
+                      ),
+                    ),
+                  ),
               ],
             ),
-          ),
+          ],
         ),
+
+        // Loading indicator for route
+        if (_isLoadingRoute)
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 100,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10)],
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)),
+                    SizedBox(width: 8),
+                    Text('جاري تحميل المسار...'),
+                  ],
+                ),
+              ),
+            ),
+          ),
 
         // Top Bar
         Positioned(
@@ -302,7 +316,7 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
               color: AppColors.white,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
+                  color: Colors.black.withOpacity(0.1),
                   blurRadius: 10,
                 ),
               ],
@@ -337,7 +351,7 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
                   icon: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: AppColors.success.withValues(alpha: 0.1),
+                      color: AppColors.success.withOpacity(0.1),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(Icons.phone, color: AppColors.success),
@@ -381,6 +395,38 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
             ),
           ),
 
+        // My Location Button
+        Positioned(
+          right: 16,
+          bottom: 280,
+          child: FloatingActionButton(
+            mini: true,
+            heroTag: 'myLocation',
+            backgroundColor: Colors.white,
+            onPressed: () {
+              if (_currentLocation != null) {
+                _mapController.move(_currentLocation!, 16);
+              }
+            },
+            child: const Icon(Icons.my_location, color: Colors.blue),
+          ),
+        ),
+
+        // Reload Route Button
+        Positioned(
+          right: 16,
+          bottom: 230,
+          child: FloatingActionButton(
+            mini: true,
+            heroTag: 'refreshRoute',
+            backgroundColor: Colors.white,
+            onPressed: _loadRoute,
+            child: _isLoadingRoute
+                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                : const Icon(Icons.refresh, color: Colors.blue),
+          ),
+        ),
+
         // Bottom Card
         Positioned(
           bottom: 0,
@@ -400,7 +446,7 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
+                  color: Colors.black.withOpacity(0.1),
                   blurRadius: 10,
                   offset: const Offset(0, -5),
                 ),
@@ -417,8 +463,8 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: isPickup
-                            ? AppColors.primary.withValues(alpha: 0.1)
-                            : AppColors.secondary.withValues(alpha: 0.1),
+                            ? AppColors.primary.withOpacity(0.1)
+                            : AppColors.secondary.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
@@ -483,7 +529,7 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
                                 ),
                               )
                             : const Icon(Icons.navigation),
-                        label: const Text('ابدأ الملاحة'),
+                        label: const Text('فتح الملاحة'),
                       ),
                     ),
                   ],

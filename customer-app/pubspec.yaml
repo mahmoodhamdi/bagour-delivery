@@ -37,10 +37,13 @@ dependencies:
   # Navigation
   go_router: ^13.2.0
 
-  # Maps & Location
-  google_maps_flutter: ^2.5.3
+  # Maps & Location (FREE - OpenStreetMap)
+  flutter_map: ^6.1.0
+  latlong2: ^0.9.1
   geolocator: ^11.0.0
-  geocoding: ^2.2.0
+  http: ^1.2.0
+  # google_maps_flutter: ^2.5.3  # Commented out - using free OSM instead
+  # geocoding: ^2.2.0  # Commented out - using Nominatim instead
 
   # Firebase
   firebase_core: ^2.27.0

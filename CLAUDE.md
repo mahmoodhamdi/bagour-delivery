@@ -43,9 +43,9 @@ npm run build  # Production build
 npm run lint   # ESLint
 ```
 
-### Flutter Apps (Customer & Delivery)
+### Flutter Apps (Customer, Delivery & Restaurant)
 ```bash
-cd customer-app  # or delivery-app
+cd customer-app  # or delivery-app or restaurant-app
 flutter pub get
 flutter run                           # Run on device/emulator
 flutter test                          # Run all tests
@@ -69,6 +69,7 @@ docker-compose logs -f backend        # View logs
 - **backend/** - Express REST API with MongoDB (Mongoose)
 - **customer-app/** - Flutter mobile app for ordering
 - **delivery-app/** - Flutter mobile app for drivers (includes background location)
+- **restaurant-app/** - Flutter mobile app for restaurant owners (includes fl_chart for analytics, audioplayers for order alerts)
 - **restaurant-dashboard/** - Next.js 14 web panel with App Router
 - **admin-dashboard/** - Next.js 14 web panel for platform admins
 - **shared/** - TypeScript types shared across backend and dashboards
@@ -268,7 +269,7 @@ Tests use Jest + Supertest. Test files in `src/__tests__/` with `.test.ts` exten
 
 ### Flutter Tests
 ```bash
-cd customer-app  # or delivery-app
+cd customer-app  # or delivery-app or restaurant-app
 flutter test                          # Run all tests
 flutter test test/widget_test.dart    # Single test file
 flutter test --coverage               # With coverage

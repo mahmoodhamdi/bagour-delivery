@@ -44,7 +44,11 @@ export const config = {
     hmacSecret: process.env.PAYMOB_HMAC_SECRET || '',
   },
 
-  // Google Cloud & Maps
+  // Maps & Geocoding (FREE - OpenStreetMap)
+  // Using Nominatim for geocoding and OSRM for routing - no API key needed!
+  nominatimBaseUrl: process.env.NOMINATIM_BASE_URL || 'https://nominatim.openstreetmap.org',
+  osrmBaseUrl: process.env.OSRM_BASE_URL || 'https://router.project-osrm.org',
+  // Google Maps API key (deprecated - keeping for reference/fallback)
   googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY || '',
   googleCloudApiKey: process.env.GOOGLE_CLOUD_API_KEY || '',
 
