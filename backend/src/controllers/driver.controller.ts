@@ -170,3 +170,32 @@ export const getAvailableZones = async (
     next(error);
   }
 };
+
+/**
+ * Reject an assigned order
+ * PUT /api/v1/driver/orders/:id/reject
+ */
+export const rejectOrder = async (
+  req: IAuthRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id: orderId } = req.params;
+    const { reason } = req.body;
+    const driverId = req.driverId!;
+
+    const result = await driverService.rejectOrder(driverId, orderId, reason);
+
+    sendSuccess(res, {
+      orderId: result.order._id,
+      orderNumber: result.order.orderNumber,
+      status: result.order.status,
+      rejectedBy: driverId,
+      rejectionReason: reason,
+      rejectedAt: result.rejectedAt,
+    }, 'تم رفض الطلب بنجاح');
+  } catch (error) {
+    next(error);
+  }
+};

@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { authService } from '../services/auth.service';
 import { successResponse } from '../utils/response';
 import { AppError } from '../utils/errors';
+import { IAuthRequest } from '../types';
 
 /**
  * Register with Email + Password (sends OTP)
@@ -251,7 +252,7 @@ export const resetPassword = async (
  * POST /api/v1/auth/change-password
  */
 export const changePassword = async (
-  req: Request,
+  req: IAuthRequest,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
@@ -296,7 +297,7 @@ export const refreshToken = async (
  * POST /api/v1/auth/fcm-token
  */
 export const updateFcmToken = async (
-  req: Request,
+  req: IAuthRequest,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
@@ -321,7 +322,7 @@ export const updateFcmToken = async (
  * POST /api/v1/auth/logout
  */
 export const logout = async (
-  req: Request,
+  req: IAuthRequest,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
@@ -344,7 +345,7 @@ export const logout = async (
  * GET /api/v1/auth/me
  */
 export const getMe = async (
-  req: Request,
+  req: IAuthRequest,
   res: Response,
   next: NextFunction
 ): Promise<void> => {

@@ -5,10 +5,14 @@ import { connectDatabase } from './config/database';
 import { configureCloudinary } from './config/cloudinary';
 import { initializeFirebase } from './config/firebase';
 import { initializeSocket } from './config/socket';
+import { validateEnv } from './config/validateEnv';
 import { logger } from './utils/logger';
 
 const startServer = async (): Promise<void> => {
   try {
+    // Validate environment variables first
+    validateEnv();
+
     // Connect to database
     await connectDatabase();
 

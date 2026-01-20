@@ -18,6 +18,7 @@ export { Notification, INotification, NotificationType } from './Notification';
 
 // Financial
 export { Transaction, ITransaction, TransactionStatus } from './Transaction';
+export { Payout, IPayout, PayoutMethod, PayoutStatus, IAccountDetails } from './Payout';
 
 // Settings & Zones
 export { Zone, IZone } from './Zone';

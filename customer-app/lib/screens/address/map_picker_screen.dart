@@ -110,10 +110,12 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
     }
   }
 
-  void _onMapPositionChanged(MapCamera camera, bool hasGesture) {
-    setState(() {
-      _selectedLocation = camera.center;
-    });
+  void _onMapPositionChanged(MapPosition position, bool hasGesture) {
+    if (position.center != null) {
+      setState(() {
+        _selectedLocation = position.center;
+      });
+    }
   }
 
   void _onMapMoveEnd() {

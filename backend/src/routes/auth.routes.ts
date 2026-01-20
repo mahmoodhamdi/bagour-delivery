@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { validate } from '../middleware/validate';
+import { authLimiter, otpLimiter } from '../middleware/rateLimiter';
 import {
   registerSchema,
   verifyEmailSchema,
@@ -67,7 +68,7 @@ const router = Router();
  *       201:
  *         description: OTP sent successfully
  */
-router.post('/register', validate(registerSchema), register);
+router.post('/register', authLimiter, validate(registerSchema), register);
 
 /**
  * @swagger
@@ -116,7 +117,7 @@ router.post('/verify-email', validate(verifyEmailSchema), verifyEmail);
  *       200:
  *         description: OTP sent successfully
  */
-router.post('/resend-otp', validate(resendOtpSchema), resendOTP);
+router.post('/resend-otp', otpLimiter, validate(resendOtpSchema), resendOTP);
 
 /**
  * @swagger
@@ -145,7 +146,7 @@ router.post('/resend-otp', validate(resendOtpSchema), resendOTP);
  *       200:
  *         description: Login successful
  */
-router.post('/login', validate(loginSchema), login);
+router.post('/login', authLimiter, validate(loginSchema), login);
 
 /**
  * @swagger
@@ -174,7 +175,7 @@ router.post('/login', validate(loginSchema), login);
  *       201:
  *         description: Account created successfully
  */
-router.post('/google', validate(googleSignInSchema), googleSignIn);
+router.post('/google', authLimiter, validate(googleSignInSchema), googleSignIn);
 
 /**
  * @swagger
@@ -197,7 +198,7 @@ router.post('/google', validate(googleSignInSchema), googleSignIn);
  *       200:
  *         description: Reset OTP sent successfully
  */
-router.post('/forgot-password', validate(forgotPasswordSchema), forgotPassword);
+router.post('/forgot-password', otpLimiter, validate(forgotPasswordSchema), forgotPassword);
 
 /**
  * @swagger

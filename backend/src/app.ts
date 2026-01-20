@@ -5,8 +5,10 @@ import compression from 'compression';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import { config } from './config';
+import { getDatabaseHealth } from './config/database';
 import { errorHandler } from './middleware/errorHandler';
 import { notFound } from './middleware/notFound';
+import { sanitizeInput } from './middleware/sanitize';
 import routes from './routes';
 import { setupSwagger } from './config/swagger';
 
@@ -42,6 +44,9 @@ export const createApp = (): Express => {
   app.use(express.json({ limit: '10mb' }));
   app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+  // Input sanitization (NoSQL injection & XSS protection)
+  app.use(sanitizeInput);
+
   // Compression
   app.use(compression());
 
@@ -54,15 +59,40 @@ export const createApp = (): Express => {
 
   // Health check
   app.get('/health', (_req, res) => {
-    res.status(200).json({
-      success: true,
-      message: 'Server is healthy',
+    const dbHealth = getDatabaseHealth();
+    const isHealthy = dbHealth.status === 'connected';
+
+    res.status(isHealthy ? 200 : 503).json({
+      success: isHealthy,
+      message: isHealthy ? 'Server is healthy' : 'Server is degraded',
       data: {
         timestamp: new Date().toISOString(),
         uptime: process.uptime(),
         environment: config.nodeEnv,
+        version: process.env.npm_package_version || '1.0.0',
+        memory: {
+          used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
+          total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024),
+          unit: 'MB',
+        },
+        database: dbHealth,
       },
     });
+  });
+
+  // Liveness probe (for kubernetes/docker health checks)
+  app.get('/health/live', (_req, res) => {
+    res.status(200).json({ status: 'ok' });
+  });
+
+  // Readiness probe (checks if app can accept traffic)
+  app.get('/health/ready', (_req, res) => {
+    const dbHealth = getDatabaseHealth();
+    if (dbHealth.status === 'connected') {
+      res.status(200).json({ status: 'ready', database: 'connected' });
+    } else {
+      res.status(503).json({ status: 'not ready', database: dbHealth.status });
+    }
   });
 
   // API version info

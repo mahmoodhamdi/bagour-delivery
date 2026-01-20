@@ -5,8 +5,8 @@ class AppConstants {
   static const String appVersion = '1.0.0';
 
   // API Configuration
-  static const String baseUrl = 'http://localhost:5000/api/v1';
-  static const String socketUrl = 'http://localhost:5000';
+  static const String baseUrl = 'https://bagour-delivery.loca.lt/api/v1';
+  static const String socketUrl = 'https://bagour-delivery.loca.lt';
   static const Duration apiTimeout = Duration(seconds: 30);
 
   // Storage Keys
@@ -104,7 +104,7 @@ class ApiEndpoints {
   // Orders
   static const String availableOrders = '/drivers/orders/available';
   static const String acceptOrder = '/drivers/orders/accept';
-  static const String rejectOrder = '/drivers/orders/reject';
+  static const String rejectOrder = '/driver/orders'; // Use with /{orderId}/reject suffix
   static const String currentOrder = '/drivers/orders/current';
   static const String orderHistory = '/drivers/orders/history';
   static const String updateOrderStatus = '/drivers/orders/status';

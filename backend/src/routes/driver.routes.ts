@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { validate } from '../middleware/validate';
 import { authenticate, authorize } from '../middleware/auth';
+import { orderActionLimiter } from '../middleware/rateLimiter';
 import {
   updateProfileSchema,
   updateAvatarSchema,
@@ -8,6 +9,7 @@ import {
   toggleOnlineSchema,
   toggleAvailabilitySchema,
   updateDocumentsSchema,
+  rejectOrderSchema,
 } from '../validators/driver.validator';
 import {
   getProfile,
@@ -19,6 +21,7 @@ import {
   getStats,
   updateDocuments,
   getAvailableZones,
+  rejectOrder,
 } from '../controllers/driver.controller';
 
 const router = Router();
@@ -59,5 +62,10 @@ router.put('/documents', validate(updateDocumentsSchema), updateDocuments);
 
 // Get available zones
 router.get('/zones', getAvailableZones);
+
+// ==================== Order Actions ====================
+
+// Reject assigned order (rate limited)
+router.put('/orders/:id/reject', orderActionLimiter, validate(rejectOrderSchema), rejectOrder);
 
 export default router;

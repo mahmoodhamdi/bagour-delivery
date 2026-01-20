@@ -1,7 +1,11 @@
 import { Types, SortOrder } from 'mongoose';
+import mongoose from 'mongoose';
 import { Restaurant, IRestaurant } from '../models/Restaurant';
 import { MenuCategory } from '../models/MenuCategory';
 import { MenuItem } from '../models/MenuItem';
+import { Order } from '../models/Order';
+import { Review } from '../models/Review';
+import { Setting } from '../models/Setting';
 import { User } from '../models';
 import { AppError } from '../utils/errors';
 import { StatusCodes } from 'http-status-codes';
@@ -660,6 +664,249 @@ class RestaurantService {
         pages,
         hasNext: page < pages,
         hasPrev: page > 1,
+      },
+    };
+  }
+
+  /**
+   * Get restaurant analytics
+   */
+  async getAnalytics(
+    restaurantId: string,
+    period: string = 'week',
+    startDate?: Date,
+    endDate?: Date
+  ): Promise<{
+    summary: {
+      totalOrders: number;
+      completedOrders: number;
+      cancelledOrders: number;
+      totalRevenue: number;
+      netRevenue: number;
+      averageOrderValue: number;
+      averageRating: string;
+      totalReviews: number;
+    };
+    charts: {
+      ordersByDay: Array<{ date: string; orders: number; revenue: number }>;
+      ordersByHour: Array<{ hour: number; orders: number }>;
+      topItems: Array<{ itemId: string; name: string; quantity: number; revenue: number }>;
+      ordersByStatus: {
+        completed: number;
+        cancelled: number;
+        pending: number;
+      };
+    };
+    comparison: {
+      previousPeriod: {
+        orders: number;
+        revenue: number;
+      };
+      growth: {
+        ordersPercent: number;
+        revenuePercent: number;
+      };
+    };
+  }> {
+    const now = new Date();
+    let start: Date;
+    let end: Date = endDate || now;
+
+    // Calculate date range based on period
+    switch (period) {
+      case 'week':
+        start = startDate || new Date(new Date().setDate(now.getDate() - 7));
+        break;
+      case 'month':
+        start = startDate || new Date(new Date().setMonth(now.getMonth() - 1));
+        break;
+      case 'year':
+        start = startDate || new Date(new Date().setFullYear(now.getFullYear() - 1));
+        break;
+      default:
+        start = startDate || new Date(new Date().setDate(now.getDate() - 7));
+    }
+
+    const restaurantObjectId = new mongoose.Types.ObjectId(restaurantId);
+
+    // Aggregation pipeline for orders
+    const orderStats = await Order.aggregate([
+      {
+        $match: {
+          restaurantId: restaurantObjectId,
+          createdAt: { $gte: start, $lte: end },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalOrders: { $sum: 1 },
+          completedOrders: {
+            $sum: { $cond: [{ $eq: ['$status', 'delivered'] }, 1, 0] },
+          },
+          cancelledOrders: {
+            $sum: { $cond: [{ $eq: ['$status', 'cancelled'] }, 1, 0] },
+          },
+          totalRevenue: {
+            $sum: { $cond: [{ $eq: ['$status', 'delivered'] }, '$subtotal', 0] },
+          },
+          averageOrderValue: { $avg: '$subtotal' },
+        },
+      },
+    ]);
+
+    // Orders by day
+    const ordersByDay = await Order.aggregate([
+      {
+        $match: {
+          restaurantId: restaurantObjectId,
+          createdAt: { $gte: start, $lte: end },
+        },
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+          orders: { $sum: 1 },
+          revenue: { $sum: '$subtotal' },
+        },
+      },
+      { $sort: { _id: 1 } },
+      { $project: { date: '$_id', orders: 1, revenue: 1, _id: 0 } },
+    ]);
+
+    // Orders by hour
+    const ordersByHour = await Order.aggregate([
+      {
+        $match: {
+          restaurantId: restaurantObjectId,
+          createdAt: { $gte: start, $lte: end },
+        },
+      },
+      {
+        $group: {
+          _id: { $hour: '$createdAt' },
+          orders: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } },
+      { $project: { hour: '$_id', orders: 1, _id: 0 } },
+    ]);
+
+    // Top items
+    const topItems = await Order.aggregate([
+      {
+        $match: {
+          restaurantId: restaurantObjectId,
+          createdAt: { $gte: start, $lte: end },
+          status: 'delivered',
+        },
+      },
+      { $unwind: '$items' },
+      {
+        $group: {
+          _id: '$items.menuItemId',
+          name: { $first: '$items.nameAr' },
+          quantity: { $sum: '$items.quantity' },
+          revenue: { $sum: { $multiply: ['$items.basePrice', '$items.quantity'] } },
+        },
+      },
+      { $sort: { quantity: -1 } },
+      { $limit: 10 },
+      { $project: { itemId: '$_id', name: 1, quantity: 1, revenue: 1, _id: 0 } },
+    ]);
+
+    // Get ratings
+    const ratingStats = await Review.aggregate([
+      {
+        $match: {
+          restaurantId: restaurantObjectId,
+          createdAt: { $gte: start, $lte: end },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          averageRating: { $avg: '$restaurantRating' },
+          totalReviews: { $sum: 1 },
+        },
+      },
+    ]);
+
+    // Previous period comparison
+    const periodDuration = end.getTime() - start.getTime();
+    const previousStart = new Date(start.getTime() - periodDuration);
+    const previousEnd = start;
+
+    const previousStats = await Order.aggregate([
+      {
+        $match: {
+          restaurantId: restaurantObjectId,
+          createdAt: { $gte: previousStart, $lte: previousEnd },
+          status: 'delivered',
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          orders: { $sum: 1 },
+          revenue: { $sum: '$subtotal' },
+        },
+      },
+    ]);
+
+    // Calculate commission (from settings or default 15%)
+    const commissionSetting = await Setting.findOne({ key: 'default_commission' });
+    const commissionRate = (commissionSetting?.value as number) || 15;
+
+    const stats = orderStats[0] || {
+      totalOrders: 0,
+      completedOrders: 0,
+      cancelledOrders: 0,
+      totalRevenue: 0,
+      averageOrderValue: 0,
+    };
+    const netRevenue = stats.totalRevenue * (1 - commissionRate / 100);
+
+    const prevStats = previousStats[0] || { orders: 0, revenue: 0 };
+    const ordersGrowth =
+      prevStats.orders > 0
+        ? ((stats.completedOrders - prevStats.orders) / prevStats.orders) * 100
+        : 0;
+    const revenueGrowth =
+      prevStats.revenue > 0
+        ? ((stats.totalRevenue - prevStats.revenue) / prevStats.revenue) * 100
+        : 0;
+
+    return {
+      summary: {
+        totalOrders: stats.totalOrders,
+        completedOrders: stats.completedOrders,
+        cancelledOrders: stats.cancelledOrders,
+        totalRevenue: Math.round(stats.totalRevenue),
+        netRevenue: Math.round(netRevenue),
+        averageOrderValue: Math.round(stats.averageOrderValue || 0),
+        averageRating: ratingStats[0]?.averageRating?.toFixed(1) || '0.0',
+        totalReviews: ratingStats[0]?.totalReviews || 0,
+      },
+      charts: {
+        ordersByDay,
+        ordersByHour,
+        topItems,
+        ordersByStatus: {
+          completed: stats.completedOrders,
+          cancelled: stats.cancelledOrders,
+          pending: stats.totalOrders - stats.completedOrders - stats.cancelledOrders,
+        },
+      },
+      comparison: {
+        previousPeriod: {
+          orders: prevStats.orders,
+          revenue: Math.round(prevStats.revenue),
+        },
+        growth: {
+          ordersPercent: parseFloat(ordersGrowth.toFixed(1)),
+          revenuePercent: parseFloat(revenueGrowth.toFixed(1)),
+        },
       },
     };
   }

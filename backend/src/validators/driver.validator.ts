@@ -68,3 +68,21 @@ export const updateDocumentsSchema = Joi.object({
 }).min(1).messages({
   'object.min': 'يجب تحديث مستند واحد على الأقل',
 });
+
+export const rejectOrderSchema = Joi.object({
+  reason: Joi.string().min(10).max(500).required().messages({
+    'string.min': 'سبب الرفض يجب أن يكون 10 أحرف على الأقل',
+    'string.max': 'سبب الرفض يجب ألا يتجاوز 500 حرف',
+    'any.required': 'سبب الرفض مطلوب',
+  }),
+});
+
+export const updateOrderStatusSchema = Joi.object({
+  status: Joi.string()
+    .valid('picked_up', 'on_the_way', 'delivered')
+    .required()
+    .messages({
+      'any.only': 'حالة الطلب غير صالحة',
+      'any.required': 'حالة الطلب مطلوبة',
+    }),
+});

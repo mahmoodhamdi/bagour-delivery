@@ -1,3 +1,4 @@
+/// <reference path="../types/express.d.ts" />
 import { Request, Response, NextFunction } from 'express';
 import { authService } from '../services/auth.service';
 import { AppError } from '../utils/errors';
