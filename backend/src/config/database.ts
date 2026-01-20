@@ -2,6 +2,36 @@ import mongoose from 'mongoose';
 import { config } from './index';
 import { logger } from '../utils/logger';
 
+/**
+ * Database health status
+ */
+export interface DatabaseHealth {
+  status: 'connected' | 'disconnected' | 'connecting' | 'unknown';
+  host?: string;
+  name?: string;
+  readyState: number;
+}
+
+/**
+ * Get current database health status
+ */
+export const getDatabaseHealth = (): DatabaseHealth => {
+  const readyState = mongoose.connection.readyState;
+  const statusMap: Record<number, DatabaseHealth['status']> = {
+    0: 'disconnected',
+    1: 'connected',
+    2: 'connecting',
+    3: 'disconnected', // disconnecting
+  };
+
+  return {
+    status: statusMap[readyState] || 'unknown',
+    host: mongoose.connection.host,
+    name: mongoose.connection.name,
+    readyState,
+  };
+};
+
 export const connectDatabase = async (): Promise<void> => {
   try {
     const conn = await mongoose.connect(config.mongoUri);

@@ -241,7 +241,7 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
         SizedBox(
           width: double.infinity,
           child: TextButton.icon(
-            onPressed: () => context.push(AppRoutes.orderHistory),
+            onPressed: () => context.push(AppRoutes.orders),
             icon: const Icon(Icons.receipt_long_outlined),
             label: const Text('عرض جميع الطلبات'),
           ),

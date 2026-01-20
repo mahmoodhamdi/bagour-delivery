@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { validate } from '../middleware/validate';
 import { authenticate, authorize } from '../middleware/auth';
+import { payoutLimiter, analyticsLimiter } from '../middleware/rateLimiter';
 import {
   updateProfileSchema,
   updateLocationSchema,
@@ -25,12 +26,17 @@ import {
   updateDeliverySettings,
   togglePause,
   getDashboardStats,
+  getAnalytics,
+  getBalance,
+  getPayouts,
+  createPayout,
   searchRestaurants,
   getRestaurantBySlug,
   getRestaurantMenu,
   getFeaturedRestaurants,
   getNearbyRestaurants,
 } from '../controllers/restaurant.controller';
+import { createPayoutSchema } from '../validators/payout.validator';
 import {
   getCategories,
   createCategory,
@@ -121,6 +127,39 @@ router.get(
   authenticate,
   authorize('restaurant'),
   getDashboardStats
+);
+
+router.get(
+  '/analytics',
+  authenticate,
+  authorize('restaurant'),
+  analyticsLimiter,
+  getAnalytics
+);
+
+// ==================== Balance & Payouts ====================
+
+router.get(
+  '/balance',
+  authenticate,
+  authorize('restaurant'),
+  getBalance
+);
+
+router.get(
+  '/payouts',
+  authenticate,
+  authorize('restaurant'),
+  getPayouts
+);
+
+router.post(
+  '/payouts',
+  authenticate,
+  authorize('restaurant'),
+  payoutLimiter,
+  validate(createPayoutSchema),
+  createPayout
 );
 
 // ==================== Menu Categories ====================

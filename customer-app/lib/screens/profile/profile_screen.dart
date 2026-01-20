@@ -137,7 +137,7 @@ class ProfileScreen extends ConsumerWidget {
                 _MenuItem(
                   icon: Icons.receipt_long,
                   title: 'طلباتي السابقة',
-                  onTap: () => context.push(AppRoutes.orderHistory),
+                  onTap: () => context.push(AppRoutes.orders),
                 ),
               ],
             ),

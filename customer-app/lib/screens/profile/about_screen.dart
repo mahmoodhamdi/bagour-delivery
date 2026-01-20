@@ -426,7 +426,7 @@ class _AboutScreenState extends State<AboutScreen> {
                     onLongPress: () {
                       // Easter egg - show debug info
                       Clipboard.setData(ClipboardData(
-                        text: 'Version: $_version ($buildNumber)',
+                        text: 'Version: $_version ($_buildNumber)',
                       ));
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(

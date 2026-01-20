@@ -160,8 +160,10 @@ Key entities and their relationships:
 - **Driver** - Has userId ref, tracks location and vehicle info
 - **Order** - Links Customer, Restaurant, Driver. Contains order items (snapshots of menu items at time of order)
 - **Chat** - Per-order, per-participant-pair (customer↔restaurant, customer↔driver, restaurant↔driver)
+- **Payout** - Restaurant withdrawal requests. Tracks amount, method, status, account details
 
 Payment methods: `cash`, `card`, `wallet`. Payment statuses: `pending`, `paid`, `failed`, `refunded`.
+Payout statuses: `pending`, `processing`, `completed`, `rejected`.
 
 ## Key Patterns
 
@@ -213,6 +215,21 @@ router.put('/restaurants/:id', authenticate, verifyRestaurantOwner, updateRestau
 4. Add route in `src/routes/` with validation middleware
 5. Export from barrel files (`index.ts`) in each directory
 
+### Security Middleware
+Available in `@middleware/rateLimiter` and `@middleware/sanitize`:
+```typescript
+import { authLimiter, otpLimiter, payoutLimiter, orderActionLimiter, analyticsLimiter } from '@middleware/rateLimiter';
+import { sanitizeInput } from '@middleware/sanitize';
+
+// Apply rate limiting to sensitive routes
+router.post('/payouts', authenticate, payoutLimiter, validate(createPayoutSchema), createPayout);
+```
+
+### Environment Validation
+Environment variables are validated at startup using `@config/validateEnv`:
+- Required in production: MONGODB_URI, JWT_SECRET, JWT_REFRESH_SECRET, Cloudinary credentials
+- Startup fails if required vars are missing in production mode
+
 ## API Structure
 
 All backend routes are versioned under `/api/v1/`:
@@ -232,7 +249,39 @@ All backend routes are versioned under `/api/v1/`:
 - `/api/v1/admin` - Admin operations
 - `/api/v1/upload` - File uploads (Cloudinary)
 
-Rate limiting: Auth routes 10 req/15min, general routes 100 req/15min.
+Rate limiting:
+- Auth routes: 10 req/15min (login, register, password reset)
+- OTP routes: 3 req/10min (resend-otp, forgot-password)
+- Payout routes: 5 req/15min (financial security)
+- Analytics routes: 10 req/5min (heavy queries)
+- Order actions: 30 req/min (accept, reject, status updates)
+- General routes: 100 req/15min
+
+### Driver Order Rejection
+Drivers can reject assigned orders with a reason:
+```typescript
+PUT /api/v1/driver/orders/:orderId/reject
+Body: { reason: string } // 10-500 characters required
+```
+When rejected:
+- Order status resets to `ready` for reassignment
+- Driver becomes available again
+- Restaurant receives notification
+- Order broadcast to available drivers
+
+### Restaurant Analytics
+```typescript
+GET /api/v1/restaurants/analytics?period=week|month|year|custom&startDate=ISO&endDate=ISO
+```
+Returns: summary stats, charts (ordersByDay, ordersByHour, topItems, ordersByStatus), comparison with previous period.
+
+### Restaurant Payout System
+```typescript
+GET /api/v1/restaurants/balance  // Get available balance
+GET /api/v1/restaurants/payouts  // List payout history (paginated)
+POST /api/v1/restaurants/payouts // Create withdrawal request
+```
+Payout methods: `bank_transfer`, `vodafone_cash`, `instapay`. Minimum withdrawal: 100 EGP.
 
 ### Authentication Flow
 JWT-based with access + refresh tokens:
@@ -248,9 +297,25 @@ Backend requires `.env` with:
 - Cloudinary credentials (image uploads)
 - Firebase config (auth + push notifications)
 - Paymob keys (payment processing)
-- Google Maps API key
+- Resend API key (email service)
+
+Business settings configured via `.env`:
+- `DEFAULT_COMMISSION=15` - Platform commission percentage
+- `SERVICE_FEE=3` - Fixed service fee (EGP)
+- `DELIVERY_FEE_PER_KM=2` - Delivery fee per kilometer (EGP)
+- `MAX_DELIVERY_DISTANCE=10` - Maximum delivery radius (km)
 
 CORS configured for ports: 3000 (customer web), 3001 (restaurant), 3002 (admin).
+
+## Maps & Location
+
+**Flutter apps use OpenStreetMap (free):**
+- `flutter_map` with OpenStreetMap tiles for map display
+- Nominatim API for geocoding (address ↔ coordinates)
+- `geolocator` for device location
+- `latlong2` for coordinate types
+
+Google Maps is NOT used in Flutter apps (commented out in pubspec.yaml).
 
 ## Bilingual Support
 
@@ -274,3 +339,19 @@ flutter test                          # Run all tests
 flutter test test/widget_test.dart    # Single test file
 flutter test --coverage               # With coverage
 ```
+
+## Production Infrastructure
+
+### Health Check Endpoints
+- `GET /health` - Full health status (database, memory, uptime)
+- `GET /health/live` - Liveness probe (for Kubernetes)
+- `GET /health/ready` - Readiness probe (checks database connection)
+
+### Structured Logging
+In production (`NODE_ENV=production`), logs are output as JSON for log aggregation:
+```json
+{"timestamp":"2024-01-20T10:00:00.000Z","level":"INFO","message":"HTTP Request","meta":{"method":"GET","url":"/health"},"service":"bagour-delivery-api"}
+```
+
+### Graceful Shutdown
+Server handles SIGTERM/SIGINT signals and closes connections gracefully with a 10-second timeout.

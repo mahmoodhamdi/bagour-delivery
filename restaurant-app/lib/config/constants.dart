@@ -3,8 +3,8 @@ class AppConstants {
   static const String appNameAr = 'توصيل الباجور - المطعم';
 
   // API
-  static const String baseUrl = 'http://192.168.1.100:5000/api/v1';
-  static const String socketUrl = 'http://192.168.1.100:5000';
+  static const String baseUrl = 'https://bagour-delivery.loca.lt/api/v1';
+  static const String socketUrl = 'https://bagour-delivery.loca.lt';
   static const Duration connectionTimeout = Duration(seconds: 30);
   static const Duration receiveTimeout = Duration(seconds: 30);
 
@@ -93,9 +93,11 @@ class AppEndpoints {
   static const String orders = '/restaurant/orders';
   static const String orderStatus = '/restaurant/orders/{id}/status';
 
-  // Earnings
+  // Earnings & Analytics
   static const String earnings = '/restaurant/earnings';
-  static const String payouts = '/restaurant/payouts';
+  static const String analytics = '/restaurants/analytics';
+  static const String balance = '/restaurants/balance';
+  static const String payouts = '/restaurants/payouts';
 
   // Reviews
   static const String reviews = '/restaurant/reviews';

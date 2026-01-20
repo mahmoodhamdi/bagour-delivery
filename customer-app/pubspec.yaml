@@ -83,6 +83,9 @@ dependencies:
   # WebView
   webview_flutter: ^4.7.0
 
+  # Photo viewer
+  photo_view: ^0.15.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

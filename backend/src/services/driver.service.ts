@@ -2,9 +2,11 @@ import { Types } from 'mongoose';
 import { Driver, IDriver } from '../models/Driver';
 import { User } from '../models/User';
 import { Zone } from '../models/Zone';
+import { Order, IOrder } from '../models/Order';
 import { NotFoundError, BadRequestError, ForbiddenError } from '../utils/errors';
 import { ILocation } from '../types';
-import { getIO } from '../config/socket';
+import { getIO, emitToRestaurant } from '../config/socket';
+import { notificationService } from './notification.service';
 
 interface UpdateDriverProfileInput {
   vehicleColor?: string;
@@ -381,6 +383,105 @@ class DriverService {
       .lean();
 
     return drivers as IDriver[];
+  }
+
+  /**
+   * Reject an assigned order
+   */
+  async rejectOrder(
+    driverId: string,
+    orderId: string,
+    reason: string
+  ): Promise<{
+    order: IOrder;
+    rejectedAt: Date;
+  }> {
+    const order = await Order.findById(orderId)
+      .populate('restaurantId', 'name userId');
+
+    if (!order) {
+      throw new NotFoundError('الطلب غير موجود');
+    }
+
+    if (!order.driverId || order.driverId.toString() !== driverId) {
+      throw new ForbiddenError('هذا الطلب غير مخصص لك');
+    }
+
+    const nonRejectableStatuses = ['delivered', 'cancelled'];
+    if (nonRejectableStatuses.includes(order.status)) {
+      throw new BadRequestError('لا يمكن رفض هذا الطلب');
+    }
+
+    const rejectedAt = new Date();
+
+    // Update order - remove driver and set status back to 'ready' for reassignment
+    order.driverId = undefined;
+    order.status = 'ready';
+    order.driverAssignedAt = undefined;
+    order.statusHistory.push({
+      status: 'ready',
+      timestamp: rejectedAt,
+      note: `تم رفض الطلب من السائق: ${reason}`,
+      updatedBy: new Types.ObjectId(driverId),
+    });
+
+    await order.save();
+
+    // Update driver - clear current order and increment rejection count
+    const driver = await Driver.findById(driverId);
+    if (driver) {
+      driver.currentOrderId = undefined;
+      driver.isBusy = false;
+      driver.isAvailable = true;
+      await driver.save();
+    }
+
+    // Socket notifications
+    const io = getIO();
+
+    // Notify restaurant about driver rejection
+    emitToRestaurant(order.restaurantId._id.toString(), 'order:driver_rejected', {
+      orderId: order._id,
+      orderNumber: order.orderNumber,
+      reason,
+      driverId,
+      rejectedAt,
+    });
+
+    // Broadcast to online drivers that order is available again
+    if (io) {
+      io.to('drivers:online').emit('order:available', {
+        orderId: order._id,
+        orderNumber: order.orderNumber,
+        restaurantId: order.restaurantId._id,
+        restaurantName: (order.restaurantId as unknown as { name: string }).name,
+        deliveryAddress: order.deliveryAddress,
+        total: order.total,
+        status: 'ready',
+      });
+    }
+
+    // Push notification to restaurant owner
+    const restaurant = order.restaurantId as unknown as { userId: Types.ObjectId; name: string };
+    if (restaurant.userId) {
+      await notificationService.createAndSendNotification({
+        userId: restaurant.userId.toString(),
+        title: 'Driver Rejected Order',
+        titleAr: 'السائق رفض الطلب',
+        body: `Order #${order.orderNumber} was rejected. Reason: ${reason}`,
+        bodyAr: `تم رفض الطلب #${order.orderNumber}. السبب: ${reason}`,
+        type: 'order',
+        data: {
+          orderId: order._id.toString(),
+          action: 'driver_rejected',
+        },
+      });
+    }
+
+    return {
+      order,
+      rejectedAt,
+    };
   }
 }
 

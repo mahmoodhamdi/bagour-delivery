@@ -1,7 +1,7 @@
 class AppConstants {
   // API
-  static const String apiBaseUrl = 'http://localhost:5000/api/v1';
-  static const String socketUrl = 'http://localhost:5000';
+  static const String apiBaseUrl = 'https://attempt-verbal-manor-wallet.trycloudflare.com/api/v1';
+  static const String socketUrl = 'https://attempt-verbal-manor-wallet.trycloudflare.com';
 
   // App Info
   static const String appName = 'Bagour Delivery';

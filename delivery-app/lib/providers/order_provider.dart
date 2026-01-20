@@ -198,13 +198,13 @@ class CurrentOrderNotifier extends StateNotifier<CurrentOrderState> {
     }
   }
 
-  Future<bool> rejectOrder(String orderId, {String? reason}) async {
+  Future<bool> rejectOrder(String orderId, {required String reason}) async {
     state = state.copyWith(isUpdating: true, error: null);
 
     try {
-      final response = await _apiService.post(
-        '${ApiEndpoints.rejectOrder}/$orderId',
-        data: {'reason': reason ?? ''},
+      final response = await _apiService.put(
+        '${ApiEndpoints.rejectOrder}/$orderId/reject',
+        data: {'reason': reason},
       );
 
       if (response.statusCode == 200 && response.data['success'] == true) {

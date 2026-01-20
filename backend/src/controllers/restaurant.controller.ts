@@ -6,6 +6,8 @@ import { successResponse, paginatedResponse } from '../utils/response';
 import { AppError } from '../utils/errors';
 import { StatusCodes } from 'http-status-codes';
 import { AuthRequest } from '../types';
+import { restaurantService } from '../services/restaurant.service';
+import { payoutService } from '../services/payout.service';
 
 // ==================== Restaurant Profile ====================
 
@@ -546,6 +548,134 @@ export const getNearbyRestaurants = async (
       .limit(Number(limit));
 
     successResponse(res, 200, 'تم جلب المطاعم القريبة بنجاح', { restaurants });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Get restaurant analytics
+ * GET /api/v1/restaurants/analytics
+ */
+export const getAnalytics = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const userId = req.user?.userId;
+    const { period = 'week', startDate, endDate } = req.query;
+
+    const restaurant = await Restaurant.findOne({ userId });
+    if (!restaurant) {
+      throw new AppError('المطعم غير موجود', StatusCodes.NOT_FOUND);
+    }
+
+    const analytics = await restaurantService.getAnalytics(
+      restaurant._id.toString(),
+      period as string,
+      startDate ? new Date(startDate as string) : undefined,
+      endDate ? new Date(endDate as string) : undefined
+    );
+
+    successResponse(res, 200, 'تم جلب الإحصائيات بنجاح', analytics);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Get restaurant balance
+ * GET /api/v1/restaurants/balance
+ */
+export const getBalance = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const userId = req.user?.userId;
+
+    const restaurant = await Restaurant.findOne({ userId });
+    if (!restaurant) {
+      throw new AppError('المطعم غير موجود', StatusCodes.NOT_FOUND);
+    }
+
+    const balance = await payoutService.getBalance(restaurant._id.toString());
+
+    successResponse(res, 200, 'تم جلب الرصيد بنجاح', balance);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Get payout history
+ * GET /api/v1/restaurants/payouts
+ */
+export const getPayouts = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const userId = req.user?.userId;
+    const { page = 1, limit = 10 } = req.query;
+
+    const restaurant = await Restaurant.findOne({ userId });
+    if (!restaurant) {
+      throw new AppError('المطعم غير موجود', StatusCodes.NOT_FOUND);
+    }
+
+    const result = await payoutService.getPayouts(
+      restaurant._id.toString(),
+      Number(page),
+      Number(limit)
+    );
+
+    paginatedResponse(res, 200, 'تم جلب طلبات السحب بنجاح', result.payouts, result.pagination);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Create payout request
+ * POST /api/v1/restaurants/payouts
+ */
+export const createPayout = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const userId = req.user?.userId;
+    const { amount, method, accountDetails, notes } = req.body;
+
+    const restaurant = await Restaurant.findOne({ userId });
+    if (!restaurant) {
+      throw new AppError('المطعم غير موجود', StatusCodes.NOT_FOUND);
+    }
+
+    const payout = await payoutService.createPayout(restaurant._id.toString(), {
+      amount,
+      method,
+      accountDetails,
+      notes,
+    });
+
+    const estimatedArrival =
+      method === 'bank_transfer' ? '2-3 أيام عمل' : '24 ساعة';
+
+    successResponse(res, 201, 'تم إرسال طلب السحب بنجاح', {
+      payoutId: payout._id,
+      amount: payout.amount,
+      method: payout.method,
+      status: payout.status,
+      estimatedArrival,
+      createdAt: payout.createdAt,
+      reference: payout.reference,
+    });
   } catch (error) {
     next(error);
   }
