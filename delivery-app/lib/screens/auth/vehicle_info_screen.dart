@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import '../../config/theme.dart';
 import '../../config/routes.dart';
 import '../../config/constants.dart';
-import '../../services/api_service.dart';
 import '../../providers/order_provider.dart' show apiServiceProvider;
 
 class VehicleInfoScreen extends ConsumerStatefulWidget {

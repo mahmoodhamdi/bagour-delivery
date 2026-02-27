@@ -10,10 +10,10 @@ class MapPickerScreen extends StatefulWidget {
   final double? initialLng;
 
   const MapPickerScreen({
-    Key? key,
+    super.key,
     this.initialLat,
     this.initialLng,
-  }) : super(key: key);
+  });
 
   @override
   State<MapPickerScreen> createState() => _MapPickerScreenState();

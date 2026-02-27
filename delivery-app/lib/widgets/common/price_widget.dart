@@ -96,7 +96,7 @@ class PriceWidget extends StatelessWidget {
           priceWidget,
           const SizedBox(width: 8),
           Text(
-            _formatPrice(originalPrice!) + ' $currency',
+            '${_formatPrice(originalPrice!)} $currency',
             style: TextStyle(
               fontFamily: 'Cairo',
               fontSize: (fontSize ?? 16) * 0.75,

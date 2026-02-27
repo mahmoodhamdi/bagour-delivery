@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../config/theme.dart';
 import '../../services/review_service.dart';
-import '../../models/restaurant.dart';
 
 /// State for restaurant reviews
 class RestaurantReviewsState {

@@ -499,7 +499,7 @@ class DashboardTabContent extends ConsumerWidget {
                     onChanged: (_) {
                       _showToggleConfirmation(context, ref, state.isRestaurantOpen);
                     },
-                    activeColor: AppColors.restaurantOpen,
+                    activeThumbColor: AppColors.restaurantOpen,
                   ),
           ],
         ),

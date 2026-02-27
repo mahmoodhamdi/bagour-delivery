@@ -168,7 +168,7 @@ class _TodayEarningsScreenState extends ConsumerState<TodayEarningsScreen> {
                 _EarningsStat(
                   icon: Icons.trending_up,
                   value: summary.todayDeliveries > 0
-                      ? '${(summary.todayEarnings / summary.todayDeliveries).toStringAsFixed(0)}'
+                      ? (summary.todayEarnings / summary.todayDeliveries).toStringAsFixed(0)
                       : '0',
                   label: 'ج.م/توصيلة',
                 ),

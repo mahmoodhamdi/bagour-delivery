@@ -136,7 +136,7 @@ class _VehicleScreenState extends ConsumerState<VehicleScreen> {
 
               if (_isEditing)
                 DropdownButtonFormField<String>(
-                  value: _vehicleType,
+                  initialValue: _vehicleType,
                   decoration: const InputDecoration(
                     labelText: 'نوع المركبة',
                     prefixIcon: Icon(Icons.two_wheeler),

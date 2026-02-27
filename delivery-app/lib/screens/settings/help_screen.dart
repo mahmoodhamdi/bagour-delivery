@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme.dart';
 import '../../utils/url_launcher_helper.dart';
-import '../../services/api_service.dart';
 import '../../providers/order_provider.dart' show apiServiceProvider;
 
 class HelpScreen extends ConsumerStatefulWidget {

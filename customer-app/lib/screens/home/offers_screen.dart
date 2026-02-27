@@ -529,7 +529,7 @@ class _OfferCard extends StatelessWidget {
                           )
                         else
                           Text(
-                            '${offer.discountAmount?.toStringAsFixed(0) ?? '0'}',
+                            offer.discountAmount?.toStringAsFixed(0) ?? '0',
                             style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,

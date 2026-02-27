@@ -280,7 +280,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           Switch(
             value: isOpen,
             onChanged: _toggleRestaurantStatus,
-            activeColor: AppColors.success,
+            activeThumbColor: AppColors.success,
           ),
         ],
       ),
@@ -321,7 +321,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 Switch(
                   value: isOpen,
                   onChanged: (value) => _updateDayOpenStatus(dayKey, value),
-                  activeColor: AppColors.success,
+                  activeThumbColor: AppColors.success,
                 ),
                 IconButton(
                   icon: const Icon(Icons.edit, size: 20),

@@ -349,7 +349,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 content: Column(
                   children: [
                     DropdownButtonFormField<String>(
-                      value: _selectedVehicleType,
+                      initialValue: _selectedVehicleType,
                       decoration: const InputDecoration(
                         labelText: 'نوع المركبة',
                         prefixIcon: Icon(Icons.two_wheeler),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class TermsScreen extends StatelessWidget {
-  const TermsScreen({Key? key}) : super(key: key);
+  const TermsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

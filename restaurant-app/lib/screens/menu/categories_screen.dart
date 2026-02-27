@@ -789,7 +789,7 @@ class _CategoryCard extends StatelessWidget {
             Switch(
               value: category.isActive,
               onChanged: onToggleActive,
-              activeColor: AppColors.success,
+              activeThumbColor: AppColors.success,
             ),
             PopupMenuButton<String>(
               icon: const Icon(Icons.more_vert),

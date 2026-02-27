@@ -4,7 +4,7 @@ import '../../config/theme.dart';
 import '../../config/constants.dart';
 
 class HelpScreen extends StatelessWidget {
-  const HelpScreen({Key? key}) : super(key: key);
+  const HelpScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

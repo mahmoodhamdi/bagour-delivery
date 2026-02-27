@@ -527,7 +527,7 @@ class _CuisineScreenState extends ConsumerState<CuisineScreen> {
                         _isOpenOnly = value ? true : null;
                       });
                     },
-                    activeColor: AppColors.primary,
+                    activeThumbColor: AppColors.primary,
                     contentPadding: EdgeInsets.zero,
                   ),
                   const SizedBox(height: 24),

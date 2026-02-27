@@ -964,7 +964,7 @@ class _EditMenuItemScreenState extends ConsumerState<EditMenuItemScreen> {
 
                       // Category
                       DropdownButtonFormField<String>(
-                        value: _selectedCategoryId,
+                        initialValue: _selectedCategoryId,
                         decoration: const InputDecoration(
                           labelText: 'القسم *',
                           prefixIcon: Icon(Icons.category),
@@ -1379,7 +1379,7 @@ class _EditMenuItemScreenState extends ConsumerState<EditMenuItemScreen> {
             subtitle: const Text('اظهار الصنف في القائمة'),
             value: _isAvailable,
             onChanged: (v) => setState(() => _isAvailable = v),
-            activeColor: AppColors.success,
+            activeThumbColor: AppColors.success,
           ),
           const Divider(height: 1),
           SwitchListTile(
@@ -1387,7 +1387,7 @@ class _EditMenuItemScreenState extends ConsumerState<EditMenuItemScreen> {
             subtitle: const Text('اظهار شارة "شائع" على الصنف'),
             value: _isPopular,
             onChanged: (v) => setState(() => _isPopular = v),
-            activeColor: AppColors.tertiary,
+            activeThumbColor: AppColors.tertiary,
           ),
         ],
       ),

@@ -660,7 +660,7 @@ class _MenuItemCard extends StatelessWidget {
                         Switch(
                           value: item.isAvailable,
                           onChanged: onToggleAvailability,
-                          activeColor: AppColors.success,
+                          activeThumbColor: AppColors.success,
                         ),
                       ],
                     ),

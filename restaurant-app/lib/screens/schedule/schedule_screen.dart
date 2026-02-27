@@ -135,7 +135,7 @@ class _ScheduleScreenState extends ConsumerState<ScheduleScreen> {
                 const Spacer(),
                 Switch(
                   value: isOpen,
-                  activeColor: AppTheme.primaryColor,
+                  activeThumbColor: AppTheme.primaryColor,
                   onChanged: (value) {
                     setState(() {
                       _schedule[day]!['isOpen'] = value;
