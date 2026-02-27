@@ -205,7 +205,7 @@ class _EarningsHistoryScreenState extends ConsumerState<EarningsHistoryScreen>
               _StatChip(
                 icon: Icons.trending_up,
                 value: deliveries > 0
-                    ? '${(earnings / deliveries).toStringAsFixed(0)}'
+                    ? (earnings / deliveries).toStringAsFixed(0)
                     : '0',
                 label: 'ج.م/توصيلة',
               ),

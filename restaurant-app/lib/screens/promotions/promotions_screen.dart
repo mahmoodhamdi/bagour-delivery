@@ -128,7 +128,7 @@ class _PromotionsScreenState extends ConsumerState<PromotionsScreen> {
                 ),
                 Switch(
                   value: isActive,
-                  activeColor: AppTheme.primaryColor,
+                  activeThumbColor: AppTheme.primaryColor,
                   onChanged: (value) {
                     ref.read(promotionsProvider.notifier).togglePromotion(
                       promotion.id,

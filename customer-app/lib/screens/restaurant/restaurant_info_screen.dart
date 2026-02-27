@@ -253,7 +253,7 @@ class RestaurantInfoScreen extends ConsumerWidget {
                   title: 'رسوم التوصيل',
                   value: restaurant.deliveryFee == 0
                       ? 'مجاني'
-                      : '${restaurant.deliveryFee.toStringAsFixed(0)}',
+                      : restaurant.deliveryFee.toStringAsFixed(0),
                   subtitle: restaurant.deliveryFee == 0 ? '' : 'ج.م',
                 ),
               ),

@@ -433,7 +433,7 @@ class _PayoutScreenState extends ConsumerState<PayoutScreen> {
     final items = _selectedPaymentMethod == 'bank' ? _banks : _wallets;
 
     return DropdownButtonFormField<String>(
-      value: _selectedBank.isEmpty ? null : _selectedBank,
+      initialValue: _selectedBank.isEmpty ? null : _selectedBank,
       decoration: InputDecoration(
         labelText: _selectedPaymentMethod == 'bank' ? 'البنك' : 'المحفظة',
         prefixIcon: Icon(_selectedPaymentMethod == 'bank'

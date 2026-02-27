@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme.dart';
-import '../../providers/earnings_provider.dart';
-import '../../services/api_service.dart';
-import '../../config/constants.dart';
 import '../../providers/order_provider.dart' show apiServiceProvider;
 import '../../widgets/common/loading_indicator.dart';
 import '../../widgets/common/error_state.dart';

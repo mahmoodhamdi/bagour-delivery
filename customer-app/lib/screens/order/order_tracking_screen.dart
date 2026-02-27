@@ -6,8 +6,6 @@ import '../../config/theme.dart';
 import '../../config/routes.dart';
 import '../../config/constants.dart';
 import '../../models/order.dart';
-import '../../models/restaurant.dart';
-import '../../models/cart.dart';
 import '../../providers/order_provider.dart';
 import '../../providers/cart_provider.dart';
 import 'widgets/order_status_timeline.dart';

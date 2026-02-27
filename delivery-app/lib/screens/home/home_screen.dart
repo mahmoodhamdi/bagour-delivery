@@ -288,7 +288,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             Switch(
               value: _isOnline,
               onChanged: _isTogglingStatus ? null : (_) => _toggleOnlineStatus(),
-              activeColor: AppColors.online,
+              activeThumbColor: AppColors.online,
             ),
           ],
         ),

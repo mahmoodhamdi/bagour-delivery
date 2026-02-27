@@ -30,7 +30,7 @@ class _DocumentsUploadScreenState extends ConsumerState<DocumentsUploadScreen> {
 
   bool _isUploading = false;
   String? _currentUploadingDocument;
-  double _uploadProgress = 0.0;
+  final double _uploadProgress = 0.0;
 
   bool get _allDocumentsUploaded =>
       _nationalIdFrontUrl != null &&

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../config/theme.dart';
 
 class SupportScreen extends ConsumerWidget {
   const SupportScreen({super.key});

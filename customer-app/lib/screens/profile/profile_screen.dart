@@ -379,7 +379,6 @@ class _MenuItem extends StatelessWidget {
   const _MenuItem({
     required this.icon,
     required this.title,
-    this.subtitle,
     required this.onTap,
   });
 

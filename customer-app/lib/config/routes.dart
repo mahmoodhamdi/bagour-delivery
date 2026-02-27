@@ -19,7 +19,6 @@ import '../screens/address/addresses_screen.dart';
 import '../screens/address/add_edit_address_screen.dart';
 import '../screens/checkout/checkout_screen.dart';
 import '../screens/order/order_tracking_screen.dart';
-import '../screens/order/order_history_screen.dart';
 import '../screens/order/orders_screen.dart';
 import '../screens/order/order_details_screen.dart';
 import '../screens/order/order_success_screen.dart';

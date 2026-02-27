@@ -311,7 +311,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   });
                   _search();
                 },
-                activeColor: AppColors.primary,
+                activeThumbColor: AppColors.primary,
               ),
             ],
           ),

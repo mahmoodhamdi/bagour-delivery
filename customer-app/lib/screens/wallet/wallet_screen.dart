@@ -5,7 +5,7 @@ import '../../services/wallet_service.dart';
 import '../../config/routes.dart';
 
 class WalletScreen extends ConsumerStatefulWidget {
-  const WalletScreen({Key? key}) : super(key: key);
+  const WalletScreen({super.key});
 
   @override
   ConsumerState<WalletScreen> createState() => _WalletScreenState();

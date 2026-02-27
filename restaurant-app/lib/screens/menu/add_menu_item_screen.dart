@@ -153,13 +153,13 @@ class _AddMenuItemScreenState extends ConsumerState<AddMenuItemScreen> {
   final _servingSizeController = TextEditingController();
 
   // Options
-  List<MenuAddon> _addons = [];
-  List<MenuVariation> _variations = [];
+  final List<MenuAddon> _addons = [];
+  final List<MenuVariation> _variations = [];
 
   // Flags
   bool _isAvailable = true;
   bool _isPopular = false;
-  List<String> _tags = [];
+  final List<String> _tags = [];
 
   @override
   void initState() {
@@ -815,7 +815,7 @@ class _AddMenuItemScreenState extends ConsumerState<AddMenuItemScreen> {
 
                   // Category
                   DropdownButtonFormField<String>(
-                    value: _selectedCategoryId,
+                    initialValue: _selectedCategoryId,
                     decoration: const InputDecoration(
                       labelText: 'القسم *',
                       prefixIcon: Icon(Icons.category),
@@ -1219,7 +1219,7 @@ class _AddMenuItemScreenState extends ConsumerState<AddMenuItemScreen> {
             subtitle: const Text('اظهار الصنف في القائمة'),
             value: _isAvailable,
             onChanged: (v) => setState(() => _isAvailable = v),
-            activeColor: AppColors.success,
+            activeThumbColor: AppColors.success,
           ),
           const Divider(height: 1),
           SwitchListTile(
@@ -1227,7 +1227,7 @@ class _AddMenuItemScreenState extends ConsumerState<AddMenuItemScreen> {
             subtitle: const Text('اظهار شارة "شائع" على الصنف'),
             value: _isPopular,
             onChanged: (v) => setState(() => _isPopular = v),
-            activeColor: AppColors.tertiary,
+            activeThumbColor: AppColors.tertiary,
           ),
         ],
       ),

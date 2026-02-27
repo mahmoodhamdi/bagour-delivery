@@ -10,11 +10,11 @@ class RateOrderScreen extends ConsumerStatefulWidget {
   final String? driverName;
 
   const RateOrderScreen({
-    Key? key,
+    super.key,
     required this.orderId,
     required this.restaurantName,
     this.driverName,
-  }) : super(key: key);
+  });
 
   @override
   ConsumerState<RateOrderScreen> createState() => _RateOrderScreenState();
