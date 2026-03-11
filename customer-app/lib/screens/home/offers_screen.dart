@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import '../../config/theme.dart';
 import '../../models/restaurant.dart';
-import '../../services/restaurant_service.dart';
 import '../../services/api_service.dart';
-import '../../models/api_response.dart';
-import 'widgets/restaurant_card.dart';
 
 /// Offer model representing promotional deals
 class Offer {
