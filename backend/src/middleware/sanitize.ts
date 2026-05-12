@@ -52,10 +52,9 @@ export const sanitizeInput = (req: Request, _res: Response, next: NextFunction):
     req.body = sanitizeObject(req.body);
   }
 
-  if (req.query) {
-    req.query = sanitizeObject(req.query) as typeof req.query;
-  }
-
+  // Express 5 made req.query a getter-only property; assigning to it throws.
+  // Route handlers should validate query params via Joi schemas anyway, so
+  // skip the rewrite. (We still sanitize body + params where it's safe.)
   if (req.params) {
     req.params = sanitizeObject(req.params) as typeof req.params;
   }
