@@ -77,7 +77,13 @@ export default function DashboardLayout({
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      router.push(ROUTES.login);
+      // Fall back to the cookie the login flow sets before bouncing —
+      // zustand persist sometimes lags the page mount, and the cookie is
+      // the source of truth the API client uses anyway.
+      const hasCookie = typeof document !== 'undefined' && document.cookie.includes('access_token=');
+      if (!hasCookie) {
+        router.push(ROUTES.login);
+      }
     }
   }, [isAuthenticated, isLoading, router]);
 

@@ -63,6 +63,10 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       restaurant: null,
       isAuthenticated: false,
+      // isLoading stays true on first render so the dashboard layout's auth
+      // check waits for persist's rehydration before deciding whether to
+      // bounce to /login. onRehydrateStorage in the persist config below
+      // flips it to false once localStorage has finished loading.
       isLoading: true,
 
       setUser: (user) => set({ user }),
@@ -129,6 +133,15 @@ export const useAuthStore = create<AuthState>()(
         restaurant: state.restaurant,
         isAuthenticated: state.isAuthenticated,
       }),
+      // Without this the persist middleware loads user/restaurant/
+      // isAuthenticated from localStorage but never touches isLoading, so
+      // the dashboard layout sees `isLoading: true` forever and the
+      // useEffect that bounces unauthenticated users never fires for
+      // authenticated ones either. Flip isLoading off as soon as
+      // rehydration finishes — success or failure.
+      onRehydrateStorage: () => (state) => {
+        if (state) state.isLoading = false;
+      },
     }
   )
 );

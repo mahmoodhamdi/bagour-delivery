@@ -65,13 +65,14 @@ export const ROUTES = {
   register: '/register',
   forgotPassword: '/forgot-password',
 
-  // Dashboard routes
-  dashboard: '/dashboard',
-  orders: '/dashboard/orders',
-  menu: '/dashboard/menu',
-  analytics: '/dashboard/analytics',
-  settings: '/dashboard/settings',
-  profile: '/dashboard/profile',
+  // Dashboard routes — the (dashboard) folder is a Next.js route group, so
+  // the actual URLs don't have a /dashboard prefix.
+  dashboard: '/',
+  orders: '/orders',
+  menu: '/menu',
+  analytics: '/analytics',
+  settings: '/settings',
+  profile: '/profile',
 };
 
 export const API_ENDPOINTS = {

@@ -72,8 +72,23 @@ export default function LoginPage() {
           return;
         }
 
-        // Successful login
-        const { accessToken, refreshToken, user, restaurant } = response.data;
+        // Successful login — narrow the union via the discriminant property
+        // that only exists on AuthResponse, since `'requiresVerification' in
+        // data && data.requiresVerification` doesn't actually narrow when
+        // requiresVerification is `true | undefined`.
+        if (!('accessToken' in response.data)) {
+          toast.error('استجابة الخادم غير متوقعة');
+          return;
+        }
+        // The backend returns `profile`, not `restaurant`, after a successful
+        // restaurant login. Read whichever the server happened to populate.
+        const data = response.data as Record<string, unknown> & {
+          accessToken: string;
+          refreshToken: string;
+          user: Parameters<typeof setAuth>[0];
+        };
+        const { accessToken, refreshToken, user } = data;
+        const restaurant = (data.restaurant ?? data.profile) as Parameters<typeof setAuth>[1];
 
         // Save tokens
         Cookies.set(STORAGE_KEYS.accessToken, accessToken, { expires: 7 });
@@ -83,7 +98,10 @@ export default function LoginPage() {
         setAuth(user, restaurant);
 
         toast.success('تم تسجيل الدخول بنجاح');
-        router.push(ROUTES.dashboard);
+        // window.location is more reliable than router.push when middleware-
+        // adjacent state needs to settle (zustand persist write hasn't
+        // flushed before router.push reads it on the next render).
+        window.location.href = ROUTES.dashboard;
       } else {
         toast.error(response.message || 'فشل تسجيل الدخول');
       }

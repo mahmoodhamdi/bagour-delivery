@@ -80,10 +80,7 @@ function VerifyOtpForm() {
     setIsResending(true);
 
     try {
-      const response = await authApi.resendOtp({
-        email,
-        type,
-      });
+      const response = await authApi.resendOtp(email);
 
       if (response.success) {
         toast.success('تم إرسال رمز التحقق مرة أخرى');
