@@ -9,15 +9,30 @@ import { notificationService } from './notification.service';
 import { emailService } from './email.service';
 import { logger } from '../utils/logger';
 
-// Initialize Firebase Admin
+// Initialize Firebase Admin only when real credentials are present. The
+// placeholder .env.example values cause admin.credential.cert() to throw
+// "Invalid PEM formatted message" at module load, which prevented the API
+// from booting at all in a fresh-clone dev setup.
 if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert({
-      projectId: config.firebase.projectId,
-      privateKey: config.firebase.privateKey,
-      clientEmail: config.firebase.clientEmail,
-    }),
-  });
+  const fb = config.firebase;
+  const hasFirebaseCreds =
+    fb.projectId &&
+    fb.clientEmail &&
+    fb.privateKey &&
+    !fb.privateKey.includes('your-firebase-private-key') &&
+    fb.privateKey.includes('BEGIN PRIVATE KEY');
+
+  if (hasFirebaseCreds) {
+    admin.initializeApp({
+      credential: admin.credential.cert({
+        projectId: fb.projectId,
+        privateKey: fb.privateKey,
+        clientEmail: fb.clientEmail,
+      }),
+    });
+  } else {
+    logger.warn('[Firebase] Skipping Admin SDK init — placeholder credentials in env');
+  }
 }
 
 // Token types
