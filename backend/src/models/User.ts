@@ -165,6 +165,14 @@ userSchema.pre('save', async function () {
     return;
   }
 
+  // Idempotency: bcrypt hashes start with $2{a,b,y}$. The seed pre-hashed the
+  // password before constructing the document, which made this hook run a
+  // second hash over the already-hashed value — every seeded login then
+  // failed because bcrypt.compare('Admin@123', hash-of-hash) is always false.
+  if (/^\$2[aby]\$/.test(this.password)) {
+    return;
+  }
+
   const salt = await bcrypt.genSalt(12);
   this.password = await bcrypt.hash(this.password, salt);
 });

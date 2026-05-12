@@ -42,9 +42,9 @@ export default function OrderDetailsPage() {
     setError(null);
 
     try {
-      const response = await ordersApi.getOrder(orderId);
+      const response = await ordersApi.getOrderById(orderId);
       if (response.success && response.data) {
-        setOrder(response.data.order);
+        setOrder(response.data);
       }
     } catch (err) {
       setError(getErrorMessage(err));

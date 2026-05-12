@@ -90,9 +90,9 @@ export default function UserDetailsPage() {
     setError(null);
 
     try {
-      const response = await usersApi.getUser(userId);
+      const response = await usersApi.getUserById(userId);
       if (response.success && response.data) {
-        setUser(response.data.user);
+        setUser(response.data);
       }
     } catch (err) {
       setError(getErrorMessage(err));

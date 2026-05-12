@@ -109,10 +109,9 @@ function ResetPasswordForm() {
     setIsResending(true);
 
     try {
-      const response = await authApi.resendOtp({
-        email,
-        type: 'password_reset',
-      });
+      // resendOtp's API signature takes only the email; the OTP "type" is
+      // inferred server-side from the active reset/verify state machine.
+      const response = await authApi.resendOtp(email);
 
       if (response.success) {
         toast.success('تم إرسال رمز التحقق مرة أخرى');
