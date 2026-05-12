@@ -69,9 +69,9 @@ export default function DriverDetailsPage() {
     setError(null);
 
     try {
-      const response = await driversApi.getDriver(driverId);
+      const response = await driversApi.getDriverById(driverId);
       if (response.success && response.data) {
-        setDriver(response.data.driver);
+        setDriver(response.data);
       }
     } catch (err) {
       setError(getErrorMessage(err));

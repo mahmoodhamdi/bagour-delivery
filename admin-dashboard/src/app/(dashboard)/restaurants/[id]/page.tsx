@@ -61,9 +61,9 @@ export default function RestaurantDetailsPage() {
     setError(null);
 
     try {
-      const response = await restaurantsApi.getRestaurant(restaurantId);
+      const response = await restaurantsApi.getRestaurantById(restaurantId);
       if (response.success && response.data) {
-        setRestaurant(response.data.restaurant);
+        setRestaurant(response.data);
       }
     } catch (err) {
       setError(getErrorMessage(err));
