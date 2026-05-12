@@ -1,5 +1,9 @@
-import rateLimit from 'express-rate-limit';
+import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
 import { TooManyRequestsError } from '../utils/errors';
+
+// express-rate-limit 7+ forbids raw `req.ip` in custom keyGenerators because
+// IPv6 addresses can be spoofed across /64 subnets. Use the bundled
+// ipKeyGenerator helper which masks the lower 64 bits of an IPv6 address.
 
 /**
  * Rate limiter for sensitive financial operations (payouts)
@@ -15,7 +19,7 @@ export const payoutLimiter = rateLimit({
   },
   keyGenerator: (req) => {
     // Use user ID if available, otherwise fall back to IP
-    return req.user?.id || req.ip || 'unknown';
+    return req.user?.id || ipKeyGenerator(req.ip || '') || 'unknown';
   },
 });
 
@@ -32,7 +36,7 @@ export const orderActionLimiter = rateLimit({
     next(new TooManyRequestsError('تجاوزت الحد المسموح من العمليات على الطلبات. يرجى المحاولة بعد دقيقة'));
   },
   keyGenerator: (req) => {
-    return req.user?.id || req.ip || 'unknown';
+    return req.user?.id || ipKeyGenerator(req.ip || '') || 'unknown';
   },
 });
 
@@ -49,7 +53,7 @@ export const analyticsLimiter = rateLimit({
     next(new TooManyRequestsError('تجاوزت الحد المسموح من طلبات التحليلات. يرجى المحاولة بعد 5 دقائق'));
   },
   keyGenerator: (req) => {
-    return req.user?.id || req.ip || 'unknown';
+    return req.user?.id || ipKeyGenerator(req.ip || '') || 'unknown';
   },
 });
 
@@ -83,7 +87,7 @@ export const uploadLimiter = rateLimit({
     next(new TooManyRequestsError('تجاوزت الحد المسموح من رفع الملفات. يرجى المحاولة بعد 10 دقائق'));
   },
   keyGenerator: (req) => {
-    return req.user?.id || req.ip || 'unknown';
+    return req.user?.id || ipKeyGenerator(req.ip || '') || 'unknown';
   },
 });
 
