@@ -45,7 +45,70 @@
   },
   "Profile": {
     "title": "Profile",
-    "subtitle": "Manage your account, addresses, and payment methods."
+    "subtitle": "Manage your account, addresses, and payment methods.",
+    "editProfile": "Edit profile",
+    "editProfileSubtitle": "Update your name and mobile number.",
+    "changePassword": "Change password",
+    "changePasswordDesc": "Pick a new password. You'll be asked to sign in again afterwards.",
+    "addresses": "Addresses",
+    "addressesDesc": "Add and edit the addresses we'll deliver to.",
+    "address": "Address",
+    "newAddress": "New address",
+    "newAddressDesc": "Tell us where to send your orders.",
+    "editAddress": "Edit address",
+    "editAddressDesc": "Update the details for this address.",
+    "addressNotFound": "Address not found. Returning to the list.",
+    "noAddresses": "No addresses yet",
+    "noAddressesDesc": "Add an address before you place your first order.",
+    "defaultAddressBadge": "Default",
+    "confirmDeleteAddress": "Are you sure you want to delete this address?",
+    "emailVerified": "Email verified",
+    "loyaltyPoints": "Loyalty points",
+    "yes": "Yes",
+    "no": "No",
+    "actions": {
+      "saveChanges": "Save changes",
+      "changePassword": "Update password",
+      "addAddress": "Add address",
+      "addFirstAddress": "Add your first address",
+      "saveAddress": "Save address",
+      "editAddress": "Edit",
+      "deleteAddress": "Delete",
+      "setAsDefault": "Set as default",
+      "addressMenu": "Address options",
+      "cancel": "Cancel"
+    },
+    "fields": {
+      "currentPassword": "Current password",
+      "addressLabel": "Label (Home / Work / …)",
+      "street": "Street",
+      "area": "Area",
+      "city": "City",
+      "buildingNumber": "Building number",
+      "floor": "Floor",
+      "apartment": "Apartment",
+      "landmark": "Landmark (shop / mosque / …)",
+      "isDefault": "Make this the default address"
+    },
+    "placeholders": {
+      "addressLabel": "e.g. Home",
+      "landmark": "Optional — helps the driver find you faster"
+    },
+    "errors": {
+      "streetRequired": "Street is required",
+      "areaRequired": "Area is required",
+      "cityRequired": "City is required",
+      "newPasswordMustDiffer": "New password must differ from your current one.",
+      "currentPasswordWrong": "Your current password is incorrect."
+    },
+    "toasts": {
+      "saved": "Saved.",
+      "passwordChanged": "Password changed.",
+      "addressAdded": "Address added.",
+      "addressUpdated": "Address updated.",
+      "addressDeleted": "Address deleted.",
+      "addressDefaultUpdated": "Default address updated."
+    }
   },
   "Placeholder": {
     "comingSoon": "Coming soon",
