@@ -49,6 +49,50 @@
     "subtitle": "The link may be broken, or the page may have been removed.",
     "backHome": "Back to home"
   },
+  "Orders": {
+    "availableTitle": "Available orders nearby",
+    "availableCount": "{count, plural, =0 {No orders} one {1 order} other {# orders}}",
+    "offlineHint": "Go online to see incoming orders.",
+    "noAvailable": "No orders near you right now. We'll surface new ones as they come in.",
+    "noActive": "You don't have any active orders.",
+    "activeSubtitle": "Orders you've accepted and not yet delivered.",
+    "loadError": "Couldn't load orders. Try again.",
+    "itemsCount": "{count, plural, =0 {No items} one {1 item} other {# items}}",
+    "takeOrder": "Take order",
+    "modalTitle": "New order",
+    "modalSubtitle": "Order #{orderNumber} is waiting for a driver.",
+    "modal": {
+      "earnings": "Your earnings",
+      "area": "Delivery area",
+      "items": "Items",
+      "payment": "Payment",
+      "expiresIn": "Expires in {seconds}s"
+    },
+    "payment": {
+      "cash": "Cash",
+      "card": "Card",
+      "wallet": "Wallet"
+    },
+    "status": {
+      "pending": "Awaiting restaurant",
+      "confirmed": "Confirmed",
+      "preparing": "Preparing",
+      "ready": "Ready for pickup",
+      "picked_up": "Picked up",
+      "on_the_way": "On the way",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled"
+    },
+    "actions": {
+      "accept": "Accept",
+      "pass": "Pass",
+      "close": "Close"
+    },
+    "toasts": {
+      "accepted": "Accepted order #{orderNumber}.",
+      "acceptFailed": "Couldn't accept the order — another driver may have taken it."
+    }
+  },
   "Online": {
     "statusOnline": "Online",
     "statusOffline": "Offline",

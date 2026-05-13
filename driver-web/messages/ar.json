@@ -49,6 +49,50 @@
     "subtitle": "اللينك ممكن يكون قديم أو الصفحة اتشالت.",
     "backHome": "ارجع للرئيسية"
   },
+  "Orders": {
+    "availableTitle": "طلبات متاحة قريبة منك",
+    "availableCount": "{count, plural, =0 {ولا طلب} one {طلب واحد} two {طلبين} few {# طلبات} many {# طلب} other {# طلب}}",
+    "offlineHint": "ابدأ شغلك عشان نوريك الطلبات الجاية ليك.",
+    "noAvailable": "مفيش طلبات قريبة منك حالياً. هنوريك أول ما تنزل طلبات جديدة.",
+    "noActive": "ما عندكش طلبات جارية دلوقتي.",
+    "activeSubtitle": "الطلبات اللي قبلتها ولسه تحت التوصيل.",
+    "loadError": "ما قدرناش نجيب الطلبات. حاول تاني.",
+    "itemsCount": "{count, plural, =0 {ولا صنف} one {صنف واحد} two {صنفين} few {# أصناف} many {# صنف} other {# صنف}}",
+    "takeOrder": "خد الطلب",
+    "modalTitle": "طلب جديد",
+    "modalSubtitle": "طلب رقم #{orderNumber} مستني سائق.",
+    "modal": {
+      "earnings": "هتكسب",
+      "area": "منطقة التوصيل",
+      "items": "الأصناف",
+      "payment": "طريقة الدفع",
+      "expiresIn": "متبقي {seconds} ثانية"
+    },
+    "payment": {
+      "cash": "كاش",
+      "card": "بطاقة",
+      "wallet": "محفظة"
+    },
+    "status": {
+      "pending": "تأكيد المطعم",
+      "confirmed": "اتأكد",
+      "preparing": "بيتم تحضيره",
+      "ready": "جاهز للاستلام",
+      "picked_up": "تم الاستلام",
+      "on_the_way": "في الطريق",
+      "delivered": "تم التوصيل",
+      "cancelled": "ملغي"
+    },
+    "actions": {
+      "accept": "اقبل",
+      "pass": "تخطي",
+      "close": "إغلاق"
+    },
+    "toasts": {
+      "accepted": "خدت طلب #{orderNumber}.",
+      "acceptFailed": "ما قدرناش نأكد الطلب. ممكن سائق تاني سبقك."
+    }
+  },
   "Online": {
     "statusOnline": "متصل",
     "statusOffline": "غير متصل",

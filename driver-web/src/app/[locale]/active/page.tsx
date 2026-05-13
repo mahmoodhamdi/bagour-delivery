@@ -1,7 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 
-import { PlaceholderPage } from "@/components/placeholder-page";
+import { MyOrdersList } from "@/components/orders/my-orders-list";
 import { ProtectedRoute } from "@/components/protected-route";
 
 export async function generateMetadata({
@@ -26,11 +26,17 @@ export default async function ActiveOrdersPage({
 
   return (
     <ProtectedRoute>
-      <PlaceholderPage
-        title={t("Nav.active")}
-        subtitle={t("Placeholder.comingSoon")}
-        body={t("Placeholder.comingSoonBody")}
-      />
+      <main
+        id="main"
+        className="container mx-auto max-w-3xl px-4 py-8 md:py-12"
+        data-testid="active-page"
+      >
+        <header className="mb-6 space-y-1">
+          <h1 className="text-3xl font-bold tracking-tight">{t("Nav.active")}</h1>
+          <p className="text-muted-foreground">{t("Orders.activeSubtitle")}</p>
+        </header>
+        <MyOrdersList />
+      </main>
     </ProtectedRoute>
   );
 }

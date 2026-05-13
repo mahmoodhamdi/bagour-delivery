@@ -7,12 +7,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "@/i18n/navigation";
 import { useDriverProfile } from "@/lib/hooks/use-driver";
 
+import { AvailableOrdersFeed } from "../orders/available-orders-feed";
 import { OnlineToggle } from "./online-toggle";
 
 /**
- * Home dashboard for signed-in drivers: status + online toggle. Renders
- * "complete onboarding" guidance for drivers who haven't filled in their
- * profile yet.
+ * Home dashboard for signed-in drivers: status + online toggle + available
+ * orders feed (when online + approved).
  */
 export function DriverHome() {
   const t = useTranslations();
@@ -61,14 +61,13 @@ export function DriverHome() {
           data-testid="needs-onboarding"
         >
           <p className="text-sm font-medium">{t("Online.completeProfilePrompt")}</p>
-          <Link
-            href="/onboarding"
-            className="mt-2 inline-flex text-sm font-semibold underline"
-          >
+          <Link href="/onboarding" className="mt-2 inline-flex text-sm font-semibold underline">
             {t("Online.completeProfileCta")}
           </Link>
         </div>
       ) : null}
+
+      <AvailableOrdersFeed />
     </div>
   );
 }
