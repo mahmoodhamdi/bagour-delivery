@@ -35,6 +35,32 @@
     "orders": "Orders",
     "profile": "Profile"
   },
+  "Menu": {
+    "featured": "Featured",
+    "unavailable": "Unavailable",
+    "openItem": "Open {name}",
+    "addToCart": "Add to cart · {total}",
+    "addons": "Add-ons",
+    "specialInstructions": "Notes for the kitchen",
+    "specialInstructionsPlaceholder": "e.g. no onions, a little spicy…",
+    "required": "Required",
+    "noItems": "Menu is empty right now. Check back soon.",
+    "emptyCategory": "No items in this section yet.",
+    "decreaseQuantity": "Decrease quantity",
+    "increaseQuantity": "Increase quantity",
+    "closeModal": "Close",
+    "confirmSwitchRestaurant": "Your cart is from another restaurant. Replace it with this one?",
+    "errors": {
+      "missingRequired": "Pick a {name} first."
+    },
+    "toasts": {
+      "addedToCart": "{name} added to your cart."
+    }
+  },
+  "Cart": {
+    "cartLabel": "Cart",
+    "itemsCount": "{count, plural, =0 {No items} one {1 item} other {# items}}"
+  },
   "Restaurants": {
     "title": "Restaurants",
     "subtitle": "Every place that delivers to your zone.",
