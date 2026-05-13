@@ -59,7 +59,48 @@
   },
   "Cart": {
     "cartLabel": "السلة",
-    "itemsCount": "{count, plural, one {صنف واحد} two {صنفين} few {# أصناف} many {# صنف} other {# صنف}}"
+    "itemsCount": "{count, plural, one {صنف واحد} two {صنفين} few {# أصناف} many {# صنف} other {# صنف}}",
+    "fromRestaurant": "من {name}",
+    "empty": "السلة فاضية",
+    "emptyDesc": "اختار مطعم وابدأ تطلب.",
+    "browseRestaurants": "تصفح المطاعم",
+    "goToCheckout": "إتمام الطلب",
+    "remove": "حذف",
+    "removeItem": "احذف العنصر",
+    "subtotal": "إجمالي المنتجات",
+    "deliveryFee": "رسوم التوصيل",
+    "serviceFee": "رسوم الخدمة",
+    "tax": "الضريبة",
+    "discount": "الخصم",
+    "total": "الإجمالي"
+  },
+  "Checkout": {
+    "title": "إتمام الطلب",
+    "subtitle": "راجع الطلب واختار طريقة الدفع.",
+    "deliverTo": "نوصلك على",
+    "noAddresses": "محتاج تضيف عنوان أولاً.",
+    "addAddress": "ضيف عنوان جديد",
+    "payment": "طريقة الدفع",
+    "payCash": "كاش عند الاستلام",
+    "payCard": "بطاقة ائتمان (Paymob)",
+    "coupon": "كوبون",
+    "couponPlaceholder": "أدخل كود الكوبون",
+    "applyCoupon": "تطبيق",
+    "couponActive": "خصم {amount}",
+    "notes": "ملاحظات للمطعم",
+    "notesPlaceholder": "أي تعليمات إضافية تحب توصل للمطعم",
+    "orderSummary": "ملخص الطلب",
+    "placeOrder": "تأكيد الطلب · {total}",
+    "disclaimer": "بالنقر على تأكيد الطلب أنت موافق على شروط الخدمة.",
+    "errors": {
+      "addressRequired": "اختار عنوان التوصيل.",
+      "cartEmpty": "السلة فاضية. ضيف منتجات وارجع تاني.",
+      "couponInvalid": "الكوبون مش صالح."
+    },
+    "toasts": {
+      "couponApplied": "تم تطبيق الكوبون!",
+      "orderPlaced": "تم تأكيد طلبك رقم {orderNumber}."
+    }
   },
   "Restaurants": {
     "title": "المطاعم",
