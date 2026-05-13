@@ -1,5 +1,3 @@
-import type { AxiosInstance } from "axios";
-
 import { authEndpoints, type AuthEndpoints } from "./auth";
 import { couponEndpoints, type CouponEndpoints } from "./coupons";
 import { customerEndpoints, type CustomerEndpoints } from "./customers";
@@ -9,6 +7,8 @@ import { orderEndpoints, type OrderEndpoints } from "./orders";
 import { restaurantEndpoints, type RestaurantEndpoints } from "./restaurants";
 import { reviewEndpoints, type ReviewEndpoints } from "./reviews";
 import { uploadEndpoints, type UploadEndpoints } from "./uploads";
+
+import type { AxiosInstance } from "axios";
 
 export interface BagourApi {
   http: AxiosInstance;

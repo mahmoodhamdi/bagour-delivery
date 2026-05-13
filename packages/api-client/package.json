@@ -36,6 +36,7 @@
     "zod": "^4.3.4"
   },
   "devDependencies": {
+    "@bagour/config-eslint": "workspace:*",
     "@bagour/config-tsconfig": "workspace:*",
     "msw": "^2.7.0",
     "typescript": "^5.9.3",

@@ -1,5 +1,3 @@
-import type { AxiosInstance } from "axios";
-
 import type {
   ApiResponse,
   AuthTokens,
@@ -10,6 +8,7 @@ import type {
   RegisterPayload,
   ResetPasswordPayload,
 } from "@bagour/types";
+import type { AxiosInstance } from "axios";
 
 export interface LoginResponse {
   user: BaseUser;

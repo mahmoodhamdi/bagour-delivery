@@ -1,5 +1,3 @@
-import type { AxiosInstance } from "axios";
-
 import type {
   ApiResponse,
   Order,
@@ -8,10 +6,14 @@ import type {
   PaginatedResponse,
   PaymentMethod,
 } from "@bagour/types";
+import type { AxiosInstance } from "axios";
 
 export interface CreateOrderPayload {
   restaurantId: string;
-  items: Pick<OrderItem, "menuItemId" | "quantity" | "addons" | "options" | "specialInstructions">[];
+  items: Pick<
+    OrderItem,
+    "menuItemId" | "quantity" | "addons" | "options" | "specialInstructions"
+  >[];
   addressId?: string;
   deliveryAddress?: Order["deliveryAddress"];
   deliveryLocation?: Order["deliveryLocation"];
@@ -53,9 +55,7 @@ export const orderEndpoints = (http: AxiosInstance) => ({
   },
 
   async byId(id: string): Promise<Order> {
-    const { data } = await http.get<ApiResponse<Order>>(
-      `/api/v1/orders/${encodeURIComponent(id)}`,
-    );
+    const { data } = await http.get<ApiResponse<Order>>(`/api/v1/orders/${encodeURIComponent(id)}`);
     return data.data;
   },
 

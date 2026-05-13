@@ -1,5 +1,3 @@
-import type { AxiosInstance } from "axios";
-
 import type {
   ApiResponse,
   MenuCategory,
@@ -7,6 +5,7 @@ import type {
   PaginatedResponse,
   Restaurant,
 } from "@bagour/types";
+import type { AxiosInstance } from "axios";
 
 export interface RestaurantSearchQuery {
   q?: string;
@@ -54,7 +53,9 @@ export const restaurantEndpoints = (http: AxiosInstance) => ({
   },
 
   async bySlug(slug: string): Promise<Restaurant> {
-    const { data } = await http.get<ApiResponse<Restaurant>>(`/api/v1/restaurants/${encodeURIComponent(slug)}`);
+    const { data } = await http.get<ApiResponse<Restaurant>>(
+      `/api/v1/restaurants/${encodeURIComponent(slug)}`,
+    );
     return data.data;
   },
 

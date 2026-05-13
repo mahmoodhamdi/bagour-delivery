@@ -1,12 +1,5 @@
+import type { ApiResponse, Driver, DriverDocuments, Order, PaginatedResponse } from "@bagour/types";
 import type { AxiosInstance } from "axios";
-
-import type {
-  ApiResponse,
-  Driver,
-  DriverDocuments,
-  Order,
-  PaginatedResponse,
-} from "@bagour/types";
 
 export interface UpdateLocationPayload {
   coordinates: [number, number]; // [lng, lat]
@@ -30,7 +23,9 @@ export const driverEndpoints = (http: AxiosInstance) => ({
     return data.data;
   },
 
-  async updateProfile(payload: Partial<Pick<Driver, "vehicleModel" | "vehicleColor" | "vehiclePlateNumber">>): Promise<Driver> {
+  async updateProfile(
+    payload: Partial<Pick<Driver, "vehicleModel" | "vehicleColor" | "vehiclePlateNumber">>,
+  ): Promise<Driver> {
     const { data } = await http.patch<ApiResponse<Driver>>("/api/v1/driver/profile", payload);
     return data.data;
   },
@@ -75,7 +70,9 @@ export const driverEndpoints = (http: AxiosInstance) => ({
     return data.data;
   },
 
-  async myOrders(query: { status?: string; page?: number; limit?: number } = {}): Promise<PaginatedResponse<Order>> {
+  async myOrders(
+    query: { status?: string; page?: number; limit?: number } = {},
+  ): Promise<PaginatedResponse<Order>> {
     const { data } = await http.get<PaginatedResponse<Order>>("/api/v1/driver/orders", {
       params: query,
     });

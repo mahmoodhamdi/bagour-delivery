@@ -1,6 +1,5 @@
-import type { AxiosInstance } from "axios";
-
 import type { ApiResponse } from "@bagour/types";
+import type { AxiosInstance } from "axios";
 
 export type UploadKind =
   | "avatar"
@@ -28,11 +27,9 @@ export const uploadEndpoints = (http: AxiosInstance) => ({
     const form = new FormData();
     form.append("file", file);
 
-    const { data } = await http.post<ApiResponse<UploadResponse>>(
-      `/api/v1/upload/${kind}`,
-      form,
-      { headers: { "Content-Type": "multipart/form-data" } },
-    );
+    const { data } = await http.post<ApiResponse<UploadResponse>>(`/api/v1/upload/${kind}`, form, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
     return data.data;
   },
 

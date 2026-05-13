@@ -2,10 +2,11 @@ import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
-import { createApiClient } from "./index";
-import type { AuthTokenStore } from "./client";
 import { ApiError } from "./errors";
+import { createApiClient } from "./index";
 import { createDefaultHandlers } from "./test/handlers";
+
+import type { AuthTokenStore } from "./client";
 
 const BASE_URL = "http://localhost:5000";
 
@@ -90,10 +91,7 @@ describe("createApiClient", () => {
         attempts += 1;
         const auth = request.headers.get("authorization");
         if (auth === "Bearer expired") {
-          return HttpResponse.json(
-            { success: false, message: "Unauthorized" },
-            { status: 401 },
-          );
+          return HttpResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
         }
         return HttpResponse.json({ success: true, data: { id: "u1", email: "x@y.z" } });
       }),

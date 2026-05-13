@@ -6,21 +6,13 @@
  *   const r = makeRestaurant({ name: "Test", rating: 5 });
  */
 
-import type {
-  AuthTokens,
-  BaseUser,
-  Customer,
-  Driver,
-  Order,
-  Restaurant,
-} from "@bagour/types";
+import type { AuthTokens, BaseUser, Customer, Driver, Order, Restaurant } from "@bagour/types";
 
 const NOW = "2026-05-13T12:00:00.000Z";
 
 let userCounter = 0;
 let restaurantCounter = 0;
 let orderCounter = 0;
-let driverCounter = 0;
 
 const nextId = (prefix: string, counter: { value: number }) => {
   counter.value += 1;
@@ -152,8 +144,15 @@ export function makeOrder(overrides: Partial<Order> = {}): Order {
     paymentMethod: overrides.paymentMethod ?? "cash",
     paymentStatus: overrides.paymentStatus ?? "pending",
     paymentReference: overrides.paymentReference,
-    deliveryAddress: overrides.deliveryAddress ?? { street: "Main", area: "Bagour", city: "Monufia" },
-    deliveryLocation: overrides.deliveryLocation ?? { type: "Point", coordinates: [30.9667, 30.45] },
+    deliveryAddress: overrides.deliveryAddress ?? {
+      street: "Main",
+      area: "Bagour",
+      city: "Monufia",
+    },
+    deliveryLocation: overrides.deliveryLocation ?? {
+      type: "Point",
+      coordinates: [30.9667, 30.45],
+    },
     deliveryInstructions: overrides.deliveryInstructions,
     estimatedDeliveryTime: overrides.estimatedDeliveryTime,
     actualDeliveryTime: overrides.actualDeliveryTime,
@@ -173,7 +172,6 @@ export function makeOrder(overrides: Partial<Order> = {}): Order {
 }
 
 export function makeDriver(overrides: Partial<Driver> = {}): Driver {
-  driverCounter += 1;
   const id = overrides.id ?? nextId("drv", driverCtr);
   return {
     id,
