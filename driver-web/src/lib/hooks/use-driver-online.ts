@@ -16,10 +16,3 @@ export function useToggleDriverOnline() {
     },
   });
 }
-
-export function useDriverStats() {
-  const api = useApi();
-  return useMutation({
-    mutationFn: () => api.drivers.stats(),
-  });
-}
