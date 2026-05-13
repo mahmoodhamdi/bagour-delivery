@@ -127,7 +127,33 @@
   },
   "Orders": {
     "title": "My orders",
-    "subtitle": "Track current orders and revisit past ones."
+    "subtitle": "Track current orders and revisit past ones.",
+    "tracking": "Tracking",
+    "orderNumber": "Order number",
+    "deliveryAddress": "Delivery address",
+    "itemsLabel": "items",
+    "empty": "No orders yet",
+    "emptyDesc": "Your first order will show up here.",
+    "browseRestaurants": "Browse restaurants",
+    "backToList": "← Back to orders",
+    "loadError": "Couldn't load your orders. Try again.",
+    "cancelPrompt": "Why are you cancelling? (optional)",
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "preparing": "Preparing",
+      "ready": "Ready",
+      "picked_up": "Picked up",
+      "on_the_way": "On the way",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled"
+    },
+    "actions": {
+      "cancelOrder": "Cancel order"
+    },
+    "toasts": {
+      "cancelled": "Order cancelled."
+    }
   },
   "Profile": {
     "title": "Profile",
