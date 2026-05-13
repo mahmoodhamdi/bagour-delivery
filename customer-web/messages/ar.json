@@ -1,0 +1,40 @@
+{
+  "Brand": {
+    "name": "باجور ديليفري",
+    "tagline": "أكل البلد يوصلك خلال ٣٠ دقيقة"
+  },
+  "Home": {
+    "heroTitle": "اطلب من مطاعم باجور وأنت في بيتك",
+    "heroSubtitle": "كل المطاعم المحلية في مكان واحد. توصيل سريع، أكل ساخن، وأسعار شفافة.",
+    "browseRestaurants": "تصفح المطاعم",
+    "trackOrder": "تتبع طلبك",
+    "becomeDriver": "اشتغل سائق معانا",
+    "highlights": {
+      "fast": "توصيل ٣٠ دقيقة",
+      "fastDesc": "وقت متوسط بين الطلب والاستلام",
+      "local": "مطاعم باجور بس",
+      "localDesc": "نختار المطاعم الموثوقة بإيدنا",
+      "transparent": "أسعار صريحة",
+      "transparentDesc": "بدون رسوم خفية وقت الحساب"
+    }
+  },
+  "Common": {
+    "loading": "جاري التحميل…",
+    "error": "في حاجة غلط",
+    "retry": "حاول تاني",
+    "language": "اللغة",
+    "switchToEnglish": "English",
+    "switchToArabic": "العربية",
+    "skipToContent": "تخطي للمحتوى الرئيسي"
+  },
+  "Pwa": {
+    "installPrompt": "ثبّت التطبيق علي الهاتف",
+    "installButton": "تثبيت",
+    "dismiss": "مش دلوقتي"
+  },
+  "NotFound": {
+    "title": "الصفحة دي مش موجودة",
+    "subtitle": "يمكن الرابط بايظ أو الصفحة اتشالت.",
+    "backHome": "ارجع للرئيسية"
+  }
+}
