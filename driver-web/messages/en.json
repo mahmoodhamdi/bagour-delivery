@@ -49,6 +49,35 @@
     "subtitle": "The link may be broken, or the page may have been removed.",
     "backHome": "Back to home"
   },
+  "Online": {
+    "statusOnline": "Online",
+    "statusOffline": "Offline",
+    "headlineOnline": "You're online",
+    "headlineOffline": "Start your shift",
+    "descOnline": "We send your location to the server so we can match nearby orders.",
+    "descOffline": "Tap start to enable location tracking and start receiving orders.",
+    "locationWaiting": "Waiting for a location fix…",
+    "locationTracking": "{lat}, {lng}",
+    "locationError": "Location error: {error}",
+    "wakeLockHeld": "Screen kept on",
+    "wakeLockOff": "Screen may sleep",
+    "lastUpdate": "Last update: {ago}",
+    "notApprovedYet": "Your account is still under review. You'll be able to accept orders once admin approves.",
+    "profileLoadError": "Couldn't load your driver profile right now.",
+    "goToOnboarding": "Complete your profile",
+    "completeProfilePrompt": "Your profile isn't complete yet. Fill in vehicle details and documents to start working.",
+    "completeProfileCta": "Complete profile →",
+    "actions": {
+      "goOnline": "Go online",
+      "goOffline": "Go offline"
+    },
+    "toasts": {
+      "online": "You're online.",
+      "offline": "You're offline.",
+      "wakeLockDenied": "Browser declined to keep the screen on. You may need to retry.",
+      "toggleFailed": "Couldn't switch status. Try again."
+    }
+  },
   "Onboarding": {
     "title": "Complete your driver profile",
     "subtitle": "Tell us about your vehicle and upload your documents so we can review your account.",
