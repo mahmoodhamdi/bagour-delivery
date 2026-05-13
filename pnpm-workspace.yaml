@@ -1,0 +1,8 @@
+packages:
+  - "packages/*"
+  - "customer-web"
+  - "driver-web"
+
+# Note: admin-dashboard, restaurant-dashboard, and backend are intentionally
+# excluded from the workspace for now. They keep their existing npm lockfiles
+# and run standalone. They can opt in to the workspace later if desired.

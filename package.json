@@ -1,0 +1,30 @@
+{
+  "name": "bagour-delivery-web",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Bagour Delivery — pnpm + Turborepo workspace for the customer-web and driver-web PWAs and their shared packages.",
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "test:unit": "turbo run test:unit",
+    "test:component": "turbo run test:component",
+    "test:integration": "turbo run test:integration",
+    "test:e2e": "turbo run test:e2e",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,mjs,cjs,json,md,css,yaml,yml}\" --ignore-path .prettierignore",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,mjs,cjs,json,md,css,yaml,yml}\" --ignore-path .prettierignore",
+    "clean": "turbo run clean && rm -rf node_modules .turbo"
+  },
+  "devDependencies": {
+    "prettier": "^3.7.4",
+    "turbo": "^2.5.0",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,18 @@
+/* Bagour Delivery — Cairo font loader.
+ *
+ * Apps that ship the Cairo font as next/font instead of self-hosted CSS
+ * can skip this import; the @theme `--font-sans` will resolve to whatever
+ * CSS variable next/font sets.
+ *
+ * For PWA installability without an external network hop, prefer loading
+ * Cairo through next/font (best perf, no FOUT).
+ */
+
+/* Fallback @font-face for non-Next contexts (Storybook, etc.). */
+@font-face {
+  font-family: "Cairo";
+  font-style: normal;
+  font-weight: 300 900;
+  font-display: swap;
+  src: local("Cairo");
+}

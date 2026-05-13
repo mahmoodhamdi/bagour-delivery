@@ -1,0 +1,17 @@
+{
+  "name": "@bagour/config-tailwind",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Shared Tailwind v4 preset for Bagour Delivery web apps. Brand tokens + design system.",
+  "type": "module",
+  "exports": {
+    "./theme.css": "./theme.css",
+    "./brand.css": "./brand.css",
+    "./fonts.css": "./fonts.css"
+  },
+  "files": [
+    "theme.css",
+    "brand.css",
+    "fonts.css"
+  ]
+}
