@@ -8,11 +8,14 @@ import { toast } from "sonner";
 import type { Order } from "@bagour/types";
 import { ApiError } from "@bagour/api-client";
 
+import { RouteMap } from "@/components/maps/route-map";
 import { ProtectedRoute } from "@/components/protected-route";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "@/i18n/navigation";
+import { useCurrentPosition } from "@/lib/hooks/use-current-position";
 import { useDriverOrder, useMarkDelivered, useMarkOnTheWay, useMarkPickedUp, useUploadDeliveryProof } from "@/lib/hooks/use-driver-order";
+import { useOsrmRoute } from "@/lib/hooks/use-osrm-route";
 import { formatCurrency, formatTimeAgo } from "@/lib/format";
 
 import { StatusTimeline } from "./status-timeline";
@@ -32,6 +35,14 @@ export function OrderDetailClient({ params }: OrderDetailClientProps) {
   const upload = useUploadDeliveryProof();
   const fileRef = useRef<HTMLInputElement>(null);
   const [proofUrl, setProofUrl] = useState<string | undefined>(undefined);
+  const myPos = useCurrentPosition();
+  const dest: [number, number] | null = order.data
+    ? order.data.deliveryLocation.coordinates
+    : null;
+  const from: [number, number] | null = myPos.position
+    ? [myPos.position.longitude, myPos.position.latitude]
+    : null;
+  const routeQuery = useOsrmRoute({ from, to: dest });
 
   if (order.isLoading) {
     return (
@@ -156,6 +167,23 @@ export function OrderDetailClient({ params }: OrderDetailClientProps) {
         </header>
 
         <StatusTimeline current={o.status} />
+
+        <div className="mt-6">
+          <RouteMap
+            from={from}
+            to={dest}
+            route={routeQuery.data?.geometry ?? null}
+            ariaLabel={t("Orders.detail.mapLabel")}
+          />
+          {routeQuery.data ? (
+            <p className="mt-2 text-xs text-muted-foreground">
+              {t("Orders.detail.routeStats", {
+                km: (routeQuery.data.distance / 1000).toFixed(1),
+                mins: Math.round(routeQuery.data.duration / 60),
+              })}
+            </p>
+          ) : null}
+        </div>
 
         <section className="mt-6 space-y-4">
           <div className="rounded-2xl border bg-card p-4">

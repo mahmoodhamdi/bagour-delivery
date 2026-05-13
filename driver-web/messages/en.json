@@ -147,6 +147,8 @@
       "deliveryProof": "Delivery proof",
       "proofHint": "Snap a photo of the order at the door — JPG/PNG/WEBP.",
       "proofReady": "Photo uploaded ✓",
+      "mapLabel": "Route map",
+      "routeStats": "{km} km · ~{mins} min",
       "waitingRestaurant": "Waiting on the restaurant to prepare the order."
     },
     "backToActive": "← Active orders",

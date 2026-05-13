@@ -147,6 +147,8 @@
       "deliveryProof": "إثبات التسليم",
       "proofHint": "صور المنتج عند العميل أو الباب — لازم نوع JPG/PNG/WEBP.",
       "proofReady": "تم رفع الصورة ✓",
+      "mapLabel": "خريطة الطريق",
+      "routeStats": "{km} كم · {mins} دقيقة بالتقريب",
       "waitingRestaurant": "بنستنى المطعم يجهّز الطلب."
     },
     "backToActive": "← الطلبات الحالية",
