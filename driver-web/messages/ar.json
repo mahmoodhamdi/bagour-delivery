@@ -49,6 +49,35 @@
     "subtitle": "اللينك ممكن يكون قديم أو الصفحة اتشالت.",
     "backHome": "ارجع للرئيسية"
   },
+  "Online": {
+    "statusOnline": "متصل",
+    "statusOffline": "غير متصل",
+    "headlineOnline": "أنت أونلاين دلوقتي",
+    "headlineOffline": "ابدأ شغلك",
+    "descOnline": "بنبعت موقعك للسيرفر علشان نوصل لك أقرب طلب.",
+    "descOffline": "اضغط زر البدء عشان نشغل تتبع الموقع ونبدأ نلاقي لك طلبات.",
+    "locationWaiting": "بنحاول نلاقي موقعك…",
+    "locationTracking": "{lat}, {lng}",
+    "locationError": "خطأ في الموقع: {error}",
+    "wakeLockHeld": "الشاشة شغّالة",
+    "wakeLockOff": "الشاشة هتقفل",
+    "lastUpdate": "آخر تحديث: {ago}",
+    "notApprovedYet": "حسابك لسه تحت المراجعة. هتبدأ تستلم طلبات بعد ما الإدارة توافق.",
+    "profileLoadError": "ما قدرناش نجيب بيانات حسابك دلوقتي.",
+    "goToOnboarding": "أكمل ملفك",
+    "completeProfilePrompt": "ملفك مش مكتمل لسه. أكمل بيانات الموتور والمستندات عشان تشتغل.",
+    "completeProfileCta": "أكمل الملف ←",
+    "actions": {
+      "goOnline": "ابدأ الشغل",
+      "goOffline": "إنهاء الشغل"
+    },
+    "toasts": {
+      "online": "أنت أونلاين دلوقتي.",
+      "offline": "تم إيقاف الشغل.",
+      "wakeLockDenied": "المتصفح ما سمحش بإبقاء الشاشة شغالة. ممكن تحتاج تعيد المحاولة.",
+      "toggleFailed": "ما قدرناش نغير الحالة. حاول تاني."
+    }
+  },
   "Onboarding": {
     "title": "أكمل ملفك كسائق",
     "subtitle": "اكتب بيانات موتورك ورفع المستندات عشان نراجع حسابك ونوافق عليه.",
