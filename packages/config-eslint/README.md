@@ -4,11 +4,11 @@ Shared ESLint flat configurations (ESLint 9+) for the Bagour Delivery web apps a
 
 ## Available configs
 
-| Export | Use for |
-|---|---|
-| `@bagour/config-eslint/base.mjs` | Pure TypeScript libraries (no React). |
+| Export                            | Use for                                        |
+| --------------------------------- | ---------------------------------------------- |
+| `@bagour/config-eslint/base.mjs`  | Pure TypeScript libraries (no React).          |
 | `@bagour/config-eslint/react.mjs` | React component libraries (e.g. `@bagour/ui`). |
-| `@bagour/config-eslint/next.mjs` | Next.js apps (`customer-web`, `driver-web`). |
+| `@bagour/config-eslint/next.mjs`  | Next.js apps (`customer-web`, `driver-web`).   |
 
 ## Usage in a Next.js app
 

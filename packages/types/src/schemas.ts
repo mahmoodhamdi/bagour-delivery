@@ -138,7 +138,10 @@ export const restaurantSchema = z.object({
   totalReviews: z.number().int().nonnegative(),
   totalOrders: z.number().int().nonnegative(),
   minimumOrder: z.number().nonnegative(),
-  deliveryTime: z.object({ min: z.number().int().nonnegative(), max: z.number().int().nonnegative() }),
+  deliveryTime: z.object({
+    min: z.number().int().nonnegative(),
+    max: z.number().int().nonnegative(),
+  }),
   deliveryFee: z.number().nonnegative(),
   commissionRate: z.number().min(0).max(1),
   features: z.object({
@@ -400,7 +403,10 @@ export const registerPayloadSchema = z.object({
 
 export const otpVerifyPayloadSchema = z.object({
   email: z.string().email(),
-  otp: z.string().length(6).regex(/^\d{6}$/),
+  otp: z
+    .string()
+    .length(6)
+    .regex(/^\d{6}$/),
 });
 
 export const forgotPasswordPayloadSchema = z.object({
@@ -409,7 +415,10 @@ export const forgotPasswordPayloadSchema = z.object({
 
 export const resetPasswordPayloadSchema = z.object({
   email: z.string().email(),
-  otp: z.string().length(6).regex(/^\d{6}$/),
+  otp: z
+    .string()
+    .length(6)
+    .regex(/^\d{6}$/),
   newPassword: z.string().min(8),
 });
 

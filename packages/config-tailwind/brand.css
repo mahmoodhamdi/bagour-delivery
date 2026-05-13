@@ -6,12 +6,12 @@
 
 :root {
   /* Brand */
-  --brand-primary: oklch(0.7 0.18 38);        /* warm Bagour orange */
+  --brand-primary: oklch(0.7 0.18 38); /* warm Bagour orange */
   --brand-primary-foreground: oklch(0.985 0 0);
-  --brand-accent: oklch(0.65 0.16 145);       /* fresh green for CTAs (online, available) */
+  --brand-accent: oklch(0.65 0.16 145); /* fresh green for CTAs (online, available) */
   --brand-accent-foreground: oklch(0.985 0 0);
-  --brand-warning: oklch(0.78 0.15 75);       /* honey amber for in-progress */
-  --brand-danger: oklch(0.6 0.24 27);         /* delivery red for offline/error */
+  --brand-warning: oklch(0.78 0.15 75); /* honey amber for in-progress */
+  --brand-danger: oklch(0.6 0.24 27); /* delivery red for offline/error */
 
   /* Surfaces */
   --radius: 0.75rem;

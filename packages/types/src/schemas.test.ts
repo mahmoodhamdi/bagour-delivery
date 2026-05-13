@@ -11,9 +11,10 @@ import {
 
 describe("loginPayloadSchema", () => {
   it("accepts a well-formed payload", () => {
-    expect(
-      loginPayloadSchema.parse({ email: "a@b.co", password: "secret123" }),
-    ).toEqual({ email: "a@b.co", password: "secret123" });
+    expect(loginPayloadSchema.parse({ email: "a@b.co", password: "secret123" })).toEqual({
+      email: "a@b.co",
+      password: "secret123",
+    });
   });
 
   it("rejects short passwords", () => {
@@ -53,9 +54,9 @@ describe("registerPayloadSchema", () => {
 
 describe("addressSchema", () => {
   it("accepts a minimal address", () => {
-    expect(addressSchema.parse({ street: "1 Main", area: "Bagour", city: "Monufia" })).toMatchObject(
-      { street: "1 Main", area: "Bagour", city: "Monufia" },
-    );
+    expect(
+      addressSchema.parse({ street: "1 Main", area: "Bagour", city: "Monufia" }),
+    ).toMatchObject({ street: "1 Main", area: "Bagour", city: "Monufia" });
   });
 
   it("rejects empty strings for required fields", () => {
@@ -128,7 +129,14 @@ describe("paginatedResponseSchema", () => {
     const r = schema.safeParse({
       success: true,
       data: [],
-      pagination: { page: 1, limit: 20, total: 0, totalPages: 0, hasNextPage: false, hasPrevPage: false },
+      pagination: {
+        page: 1,
+        limit: 20,
+        total: 0,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
+      },
     });
     expect(r.success).toBe(true);
   });

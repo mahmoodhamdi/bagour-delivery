@@ -7,13 +7,7 @@
     "build": {
       "dependsOn": ["^build"],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"],
-      "inputs": [
-        "src/**",
-        "public/**",
-        "next.config.*",
-        "tsconfig.json",
-        "package.json"
-      ]
+      "inputs": ["src/**", "public/**", "next.config.*", "tsconfig.json", "package.json"]
     },
     "dev": {
       "cache": false,
@@ -21,13 +15,7 @@
     },
     "lint": {
       "outputs": [],
-      "inputs": [
-        "src/**",
-        "*.config.*",
-        ".eslintrc*",
-        "eslint.config.*",
-        "package.json"
-      ]
+      "inputs": ["src/**", "*.config.*", ".eslintrc*", "eslint.config.*", "package.json"]
     },
     "typecheck": {
       "dependsOn": ["^build"],
@@ -37,55 +25,27 @@
     "test": {
       "dependsOn": ["^build"],
       "outputs": ["coverage/**"],
-      "inputs": [
-        "src/**",
-        "test/**",
-        "tests/**",
-        "__tests__/**",
-        "vitest.config.*",
-        "package.json"
-      ]
+      "inputs": ["src/**", "test/**", "tests/**", "__tests__/**", "vitest.config.*", "package.json"]
     },
     "test:unit": {
       "dependsOn": ["^build"],
       "outputs": ["coverage/**"],
-      "inputs": [
-        "src/**",
-        "test/**",
-        "tests/**",
-        "vitest.config.*",
-        "package.json"
-      ]
+      "inputs": ["src/**", "test/**", "tests/**", "vitest.config.*", "package.json"]
     },
     "test:component": {
       "dependsOn": ["^build"],
       "outputs": ["coverage/**"],
-      "inputs": [
-        "src/**",
-        "test/**",
-        "vitest.config.*",
-        "package.json"
-      ]
+      "inputs": ["src/**", "test/**", "vitest.config.*", "package.json"]
     },
     "test:integration": {
       "dependsOn": ["^build"],
       "outputs": ["coverage/**"],
-      "inputs": [
-        "src/**",
-        "test/**",
-        "vitest.config.*",
-        "package.json"
-      ]
+      "inputs": ["src/**", "test/**", "vitest.config.*", "package.json"]
     },
     "test:e2e": {
       "dependsOn": ["build"],
       "outputs": ["playwright-report/**", "test-results/**"],
-      "inputs": [
-        "src/**",
-        "e2e/**",
-        "playwright.config.*",
-        "package.json"
-      ]
+      "inputs": ["src/**", "e2e/**", "playwright.config.*", "package.json"]
     },
     "clean": {
       "cache": false
