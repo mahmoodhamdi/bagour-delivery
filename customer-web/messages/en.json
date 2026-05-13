@@ -1,0 +1,40 @@
+{
+  "Brand": {
+    "name": "Bagour Delivery",
+    "tagline": "Local food, hot at your door in 30 minutes"
+  },
+  "Home": {
+    "heroTitle": "Order from Bagour's best, delivered to you",
+    "heroSubtitle": "Every local restaurant in one app. Fast delivery, fresh food, transparent prices.",
+    "browseRestaurants": "Browse restaurants",
+    "trackOrder": "Track an order",
+    "becomeDriver": "Drive with us",
+    "highlights": {
+      "fast": "30-min delivery",
+      "fastDesc": "Average time from order to handoff",
+      "local": "Bagour-only kitchens",
+      "localDesc": "We hand-pick every restaurant",
+      "transparent": "Transparent pricing",
+      "transparentDesc": "No hidden fees at checkout"
+    }
+  },
+  "Common": {
+    "loading": "Loading…",
+    "error": "Something went wrong",
+    "retry": "Try again",
+    "language": "Language",
+    "switchToEnglish": "English",
+    "switchToArabic": "العربية",
+    "skipToContent": "Skip to main content"
+  },
+  "Pwa": {
+    "installPrompt": "Install Bagour on your phone",
+    "installButton": "Install",
+    "dismiss": "Not now"
+  },
+  "NotFound": {
+    "title": "Page not found",
+    "subtitle": "The link may be broken, or the page may have been removed.",
+    "backHome": "Back to home"
+  }
+}
