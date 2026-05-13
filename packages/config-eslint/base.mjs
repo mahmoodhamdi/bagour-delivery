@@ -1,7 +1,6 @@
 // @ts-check
 import js from "@eslint/js";
 import tseslint from "typescript-eslint";
-import importPlugin from "eslint-plugin-import";
 import security from "eslint-plugin-security";
 import prettier from "eslint-config-prettier";
 import globals from "globals";
@@ -9,6 +8,11 @@ import globals from "globals";
 /**
  * Base ESLint flat config for any TS/JS project in the Bagour Delivery
  * monorepo. App-specific configs (next.mjs, react.mjs) extend this.
+ *
+ * Intentionally does NOT include `eslint-plugin-import` — Next.js apps
+ * pull `import` through `eslint-config-next` and declaring it twice
+ * raises "Cannot redefine plugin". Non-Next packages should add
+ * `./imports.mjs` separately if they want import-order rules.
  */
 export default tseslint.config(
   {
@@ -42,7 +46,6 @@ export default tseslint.config(
       },
     },
     plugins: {
-      import: importPlugin,
       security,
     },
     rules: {
@@ -70,25 +73,6 @@ export default tseslint.config(
         { allowNumber: true, allowBoolean: true, allowNullish: true },
       ],
       "@typescript-eslint/no-unnecessary-condition": "off",
-
-      // Imports
-      "import/order": [
-        "error",
-        {
-          groups: [
-            "builtin",
-            "external",
-            "internal",
-            ["parent", "sibling", "index"],
-            "object",
-            "type",
-          ],
-          "newlines-between": "always",
-          alphabetize: { order: "asc", caseInsensitive: true },
-        },
-      ],
-      "import/no-duplicates": "error",
-      "import/no-self-import": "error",
 
       // Security
       "security/detect-object-injection": "off", // too noisy for typical code
