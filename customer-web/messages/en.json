@@ -59,7 +59,48 @@
   },
   "Cart": {
     "cartLabel": "Cart",
-    "itemsCount": "{count, plural, =0 {No items} one {1 item} other {# items}}"
+    "itemsCount": "{count, plural, =0 {No items} one {1 item} other {# items}}",
+    "fromRestaurant": "From {name}",
+    "empty": "Your cart is empty",
+    "emptyDesc": "Pick a restaurant and start adding items.",
+    "browseRestaurants": "Browse restaurants",
+    "goToCheckout": "Go to checkout",
+    "remove": "Remove",
+    "removeItem": "Remove item",
+    "subtotal": "Subtotal",
+    "deliveryFee": "Delivery fee",
+    "serviceFee": "Service fee",
+    "tax": "Tax",
+    "discount": "Discount",
+    "total": "Total"
+  },
+  "Checkout": {
+    "title": "Checkout",
+    "subtitle": "Review your order and choose a payment method.",
+    "deliverTo": "Deliver to",
+    "noAddresses": "Add an address first.",
+    "addAddress": "Add new address",
+    "payment": "Payment",
+    "payCash": "Cash on delivery",
+    "payCard": "Credit card (Paymob)",
+    "coupon": "Coupon",
+    "couponPlaceholder": "Enter coupon code",
+    "applyCoupon": "Apply",
+    "couponActive": "{amount} off",
+    "notes": "Notes for the kitchen",
+    "notesPlaceholder": "Anything else the restaurant should know",
+    "orderSummary": "Order summary",
+    "placeOrder": "Place order · {total}",
+    "disclaimer": "By placing your order you accept our terms of service.",
+    "errors": {
+      "addressRequired": "Pick a delivery address.",
+      "cartEmpty": "Your cart is empty. Add items and try again.",
+      "couponInvalid": "Coupon isn't valid."
+    },
+    "toasts": {
+      "couponApplied": "Coupon applied!",
+      "orderPlaced": "Order {orderNumber} placed."
+    }
   },
   "Restaurants": {
     "title": "Restaurants",
