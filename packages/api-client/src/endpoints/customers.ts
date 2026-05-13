@@ -1,6 +1,5 @@
-import type { AxiosInstance } from "axios";
-
 import type { Address, ApiResponse, Customer, Restaurant } from "@bagour/types";
+import type { AxiosInstance } from "axios";
 
 export type AddressPayload = Omit<Address, "id">;
 

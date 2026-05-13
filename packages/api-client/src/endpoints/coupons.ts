@@ -1,6 +1,5 @@
-import type { AxiosInstance } from "axios";
-
 import type { ApiResponse, Coupon } from "@bagour/types";
+import type { AxiosInstance } from "axios";
 
 export interface ValidateCouponPayload {
   code: string;

@@ -1,6 +1,5 @@
-import type { AxiosInstance } from "axios";
-
 import type { ApiResponse, PaginatedResponse, Review } from "@bagour/types";
+import type { AxiosInstance } from "axios";
 
 export interface CreateReviewPayload {
   orderId: string;
@@ -11,7 +10,11 @@ export interface CreateReviewPayload {
 }
 
 export const reviewEndpoints = (http: AxiosInstance) => ({
-  async forRestaurant(restaurantId: string, page = 1, limit = 20): Promise<PaginatedResponse<Review>> {
+  async forRestaurant(
+    restaurantId: string,
+    page = 1,
+    limit = 20,
+  ): Promise<PaginatedResponse<Review>> {
     const { data } = await http.get<PaginatedResponse<Review>>(
       `/api/v1/restaurants/${encodeURIComponent(restaurantId)}/reviews`,
       { params: { page, limit } },

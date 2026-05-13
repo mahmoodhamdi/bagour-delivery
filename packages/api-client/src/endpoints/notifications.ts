@@ -1,14 +1,15 @@
-import type { AxiosInstance } from "axios";
-
 import type {
   ApiResponse,
   Notification,
   PaginatedResponse,
   PushSubscriptionPayload,
 } from "@bagour/types";
+import type { AxiosInstance } from "axios";
 
 export const notificationEndpoints = (http: AxiosInstance) => ({
-  async list(query: { page?: number; limit?: number; unreadOnly?: boolean } = {}): Promise<PaginatedResponse<Notification>> {
+  async list(
+    query: { page?: number; limit?: number; unreadOnly?: boolean } = {},
+  ): Promise<PaginatedResponse<Notification>> {
     const { data } = await http.get<PaginatedResponse<Notification>>("/api/v1/notifications", {
       params: query,
     });
