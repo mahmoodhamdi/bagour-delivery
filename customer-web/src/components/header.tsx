@@ -6,6 +6,7 @@ import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
 import { AuthSlot } from "./auth/auth-slot";
+import { CartDrawer } from "./cart/cart-drawer";
 import { isActive, navLinks } from "./nav-links";
 import { LocaleSwitcher } from "./locale-switcher";
 import { SideDrawer } from "./side-drawer";
@@ -58,6 +59,7 @@ export function Header() {
 
         <div className="ms-auto flex items-center gap-2">
           <LocaleSwitcher />
+          <CartDrawer alwaysShowTrigger={false} />
           <AuthSlot />
         </div>
       </div>
