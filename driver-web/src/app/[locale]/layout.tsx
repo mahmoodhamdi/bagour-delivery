@@ -5,6 +5,8 @@ import { notFound } from "next/navigation";
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 
+import { BottomNav } from "@/components/bottom-nav";
+import { Header } from "@/components/header";
 import { Providers } from "@/components/providers";
 import { SkipLink } from "@/components/skip-link";
 import { routing } from "@/i18n/routing";
@@ -104,7 +106,9 @@ export default async function LocaleLayout({
         <NextIntlClientProvider messages={messages} locale={locale}>
           <Providers>
             <SkipLink />
-            <div className="flex-1">{children}</div>
+            <Header />
+            <div className="flex-1 pb-20 md:pb-0">{children}</div>
+            <BottomNav />
           </Providers>
         </NextIntlClientProvider>
       </body>

@@ -49,6 +49,48 @@
     "subtitle": "اللينك ممكن يكون قديم أو الصفحة اتشالت.",
     "backHome": "ارجع للرئيسية"
   },
+  "Onboarding": {
+    "title": "أكمل ملفك كسائق",
+    "subtitle": "اكتب بيانات موتورك ورفع المستندات عشان نراجع حسابك ونوافق عليه.",
+    "pendingNote": "حسابك تحت المراجعة. أرفع المستندات لتسريع الموافقة.",
+    "alreadyApproved": "حسابك معتمد! ممكن تبدأ تستلم طلبات دلوقتي.",
+    "vehicleSection": "بيانات الموتور",
+    "vehicleHint": "البيانات اللي نعرف بيها كابتن جاي.",
+    "documentsSection": "المستندات",
+    "documentsHint": "صور واضحة من كل وجه. مقاس ٥ ميجا كحد أقصى لكل ملف.",
+    "fields": {
+      "vehicleModel": "موديل الموتور",
+      "vehicleColor": "لون الموتور",
+      "vehiclePlateNumber": "رقم اللوحة"
+    },
+    "documents": {
+      "nationalIdFront": "البطاقة الشخصية — الوجه",
+      "nationalIdBack": "البطاقة الشخصية — الظهر",
+      "nationalIdDesc": "صورة واضحة من بطاقتك الشخصية.",
+      "driverLicenseFront": "رخصة السواقة — الوجه",
+      "driverLicenseBack": "رخصة السواقة — الظهر",
+      "driverLicenseDesc": "لازم تكون رخصة سارية."
+    },
+    "actions": {
+      "upload": "رفع",
+      "replace": "تغيير",
+      "remove": "إزالة",
+      "submit": "إرسال للمراجعة"
+    },
+    "errors": {
+      "fileTooLarge": "الملف أكبر من ٥ ميجا.",
+      "uploadFailed": "حصلت مشكلة وقت الرفع. حاول تاني.",
+      "vehicleModelRequired": "اكتب موديل الموتور",
+      "vehicleModelTooLong": "الموديل طويل جداً",
+      "vehicleColorRequired": "اكتب لون الموتور",
+      "vehicleColorTooLong": "اللون طويل جداً",
+      "vehiclePlateRequired": "اكتب رقم اللوحة",
+      "vehiclePlateTooLong": "الرقم طويل جداً"
+    },
+    "toasts": {
+      "submitted": "تم إرسال البيانات. هتبلغك لما الإدارة تراجع الحساب."
+    }
+  },
   "Auth": {
     "login": {
       "title": "أهلاً بعودتك يا كابتن",

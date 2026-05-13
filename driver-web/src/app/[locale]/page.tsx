@@ -1,8 +1,6 @@
 import { Clock, DollarSign, LifeBuoy } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
-import { LocaleSwitcher } from "@/components/locale-switcher";
-
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
@@ -10,10 +8,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
   return (
     <main id="main" className="flex flex-col">
-      <header className="flex items-center justify-between border-b px-4 py-3">
-        <span className="text-lg font-bold tracking-tight">{t("Brand.name")}</span>
-        <LocaleSwitcher />
-      </header>
       <section className="flex flex-1 flex-col items-center justify-center px-4 py-12 text-center md:py-20">
         <div className="max-w-2xl space-y-6">
           <p className="text-sm font-semibold uppercase tracking-widest text-primary">
