@@ -1,0 +1,180 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - "customer-app/**"
+      - "delivery-app/**"
+      - "marketing/**"
+      - "docs/**"
+      - "**/*.md"
+  push:
+    branches: [main]
+    paths-ignore:
+      - "customer-app/**"
+      - "delivery-app/**"
+      - "marketing/**"
+      - "docs/**"
+      - "**/*.md"
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # ─────────────────────────────────────────────────────────────────────────
+  # 1. Lint + format
+  # ─────────────────────────────────────────────────────────────────────────
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - name: Prettier check
+        run: pnpm format:check
+      - name: ESLint
+        run: pnpm lint
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # 2. Typecheck across the workspace
+  # ─────────────────────────────────────────────────────────────────────────
+  typecheck:
+    name: Typecheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - name: Run tsc --noEmit
+        run: pnpm typecheck
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # 3. Tests (unit + component + integration)
+  # ─────────────────────────────────────────────────────────────────────────
+  test:
+    name: Test (unit + component + integration)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - name: Run workspace tests
+        run: pnpm test
+      - name: Upload coverage artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ github.run_id }}
+          path: |
+            packages/**/coverage
+            customer-web/coverage
+            driver-web/coverage
+          if-no-files-found: ignore
+          retention-days: 14
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # 4. Build (Turborepo orchestrates per-app builds)
+  # ─────────────────────────────────────────────────────────────────────────
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - name: Build all
+        run: pnpm build
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # 5. E2E (Playwright) — kicks in once an app has a playwright.config.ts
+  # ─────────────────────────────────────────────────────────────────────────
+  e2e:
+    name: E2E (Playwright)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [build]
+    if: hashFiles('customer-web/playwright.config.ts', 'driver-web/playwright.config.ts') != ''
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [customer-web, driver-web]
+        browser: [chromium, firefox, webkit]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - name: Install Playwright browsers
+        run: pnpm --filter ./${{ matrix.app }} exec playwright install --with-deps ${{ matrix.browser }}
+      - name: Run Playwright tests
+        run: pnpm --filter ./${{ matrix.app }} test:e2e --project=${{ matrix.browser }}
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-${{ matrix.app }}-${{ matrix.browser }}-${{ github.run_id }}
+          path: |
+            ${{ matrix.app }}/playwright-report
+            ${{ matrix.app }}/test-results
+          if-no-files-found: ignore
+          retention-days: 14
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # 6. Security — npm audit + Semgrep SAST
+  # ─────────────────────────────────────────────────────────────────────────
+  security-audit:
+    name: Security audit (pnpm audit)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - name: pnpm audit (production, high+critical only)
+        run: pnpm audit --prod --audit-level=high
+
+  semgrep:
+    name: Semgrep SAST
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    container:
+      image: returntocorp/semgrep
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Semgrep auto config
+        run: |
+          semgrep ci --config=auto \
+            --exclude="customer-app" \
+            --exclude="delivery-app" \
+            --exclude="marketing" \
+            --exclude="**/node_modules/**" \
+            --exclude="**/.next/**" \
+            --exclude="**/dist/**"
+        env:
+          SEMGREP_RULES: p/owasp-top-ten p/javascript p/typescript p/react p/nextjs p/jwt p/secrets
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # 7. Gate — single required check that fans-in everything above
+  # ─────────────────────────────────────────────────────────────────────────
+  ci-gate:
+    name: CI Gate
+    runs-on: ubuntu-latest
+    needs: [lint, typecheck, test, build, security-audit, semgrep]
+    if: always()
+    steps:
+      - name: Verify all required jobs passed
+        run: |
+          if [ "${{ needs.lint.result }}" != "success" ] || \
+             [ "${{ needs.typecheck.result }}" != "success" ] || \
+             [ "${{ needs.test.result }}" != "success" ] || \
+             [ "${{ needs.build.result }}" != "success" ] || \
+             [ "${{ needs.security-audit.result }}" != "success" ] || \
+             [ "${{ needs.semgrep.result }}" != "success" ]; then
+            echo "::error::One or more required jobs failed."
+            exit 1
+          fi

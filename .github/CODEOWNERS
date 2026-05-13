@@ -1,0 +1,11 @@
+# Default owner for everything — falls through to @mahmoodhamdi.
+* @mahmoodhamdi
+
+# Web migration is owned by Mahmoud directly until the team grows.
+/packages/        @mahmoodhamdi
+/customer-web/    @mahmoodhamdi
+/driver-web/      @mahmoodhamdi
+/.github/         @mahmoodhamdi
+/turbo.json       @mahmoodhamdi
+/pnpm-workspace.yaml @mahmoodhamdi
+/WEB_MIGRATION_PLAN.md @mahmoodhamdi
