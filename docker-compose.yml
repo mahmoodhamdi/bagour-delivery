@@ -78,6 +78,44 @@ services:
     networks:
       - bagour-network
 
+  # Customer PWA (web migration)
+  customer-web:
+    build:
+      context: .
+      dockerfile: ./customer-web/Dockerfile
+    container_name: bagour-customer-web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: ${API_URL:-http://localhost:5000}
+      NEXT_PUBLIC_APP_URL: ${CUSTOMER_WEB_URL:-http://localhost:3000}
+      NEXT_PUBLIC_DEFAULT_LOCALE: ar
+    depends_on:
+      - backend
+    networks:
+      - bagour-network
+
+  # Driver PWA
+  driver-web:
+    build:
+      context: .
+      dockerfile: ./driver-web/Dockerfile
+    container_name: bagour-driver-web
+    restart: unless-stopped
+    ports:
+      - "3010:3001"
+    environment:
+      NEXT_PUBLIC_API_URL: ${API_URL:-http://localhost:5000}
+      NEXT_PUBLIC_APP_URL: ${DRIVER_WEB_URL:-http://localhost:3010}
+      NEXT_PUBLIC_DEFAULT_LOCALE: ar
+      NEXT_PUBLIC_MAP_TILE_URL: ${MAP_TILE_URL:-https://tile.openstreetmap.org/{z}/{x}/{y}.png}
+      NEXT_PUBLIC_OSRM_URL: ${OSRM_URL:-https://router.project-osrm.org}
+    depends_on:
+      - backend
+    networks:
+      - bagour-network
+
 volumes:
   mongodb_data:
 

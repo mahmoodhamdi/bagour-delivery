@@ -16,6 +16,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   typedRoutes: true,
+  output: "standalone",
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "res.cloudinary.com" },

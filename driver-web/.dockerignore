@@ -1,0 +1,14 @@
+node_modules
+.next
+out
+build
+coverage
+.env*.local
+.vercel
+*.tsbuildinfo
+playwright-report
+test-results
+public/sw.js
+public/sw.js.map
+public/swe-worker-*.js
+.git
