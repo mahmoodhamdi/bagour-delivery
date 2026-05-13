@@ -49,6 +49,34 @@
     "subtitle": "اللينك ممكن يكون قديم أو الصفحة اتشالت.",
     "backHome": "ارجع للرئيسية"
   },
+  "Profile": {
+    "title": "حسابي",
+    "subtitle": "بياناتك وحالة الحساب والإحصائيات.",
+    "loadError": "ما قدرناش نجيب بيانات الحساب.",
+    "vehicle": "بيانات الموتور",
+    "vehicleType": "نوع المركبة",
+    "vehicleTypes": {
+      "motorcycle": "موتوسيكل",
+      "bicycle": "دراجة",
+      "car": "عربية"
+    },
+    "documents": "المستندات",
+    "driverStatus": {
+      "approved": "حسابك معتمد ✓",
+      "pending": "الحساب تحت المراجعة",
+      "rejected": "تم رفض الحساب",
+      "suspended": "الحساب موقوف"
+    },
+    "stats": {
+      "deliveries": "إجمالي التوصيلات",
+      "earnings": "إجمالي الأرباح"
+    },
+    "actions": {
+      "editKyc": "أكمل البيانات",
+      "editVehicle": "تعديل الموتور",
+      "editDocuments": "تعديل المستندات"
+    }
+  },
   "Earnings": {
     "title": "أرباحي",
     "subtitle": "ملخص أرباحك ومعدل التوصيلات.",

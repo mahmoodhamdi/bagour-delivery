@@ -49,6 +49,34 @@
     "subtitle": "The link may be broken, or the page may have been removed.",
     "backHome": "Back to home"
   },
+  "Profile": {
+    "title": "Profile",
+    "subtitle": "Your account, status, and stats.",
+    "loadError": "Couldn't load your profile.",
+    "vehicle": "Vehicle",
+    "vehicleType": "Vehicle type",
+    "vehicleTypes": {
+      "motorcycle": "Motorcycle",
+      "bicycle": "Bicycle",
+      "car": "Car"
+    },
+    "documents": "Documents",
+    "driverStatus": {
+      "approved": "Account approved ✓",
+      "pending": "Account under review",
+      "rejected": "Account rejected",
+      "suspended": "Account suspended"
+    },
+    "stats": {
+      "deliveries": "Total deliveries",
+      "earnings": "Total earnings"
+    },
+    "actions": {
+      "editKyc": "Complete profile",
+      "editVehicle": "Edit vehicle",
+      "editDocuments": "Edit documents"
+    }
+  },
   "Earnings": {
     "title": "Earnings",
     "subtitle": "Your earnings summary and recent activity.",
