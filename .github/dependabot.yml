@@ -1,0 +1,58 @@
+version: 2
+updates:
+  # GitHub Actions versions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels: ["dependencies", "ci"]
+
+  # Root pnpm workspace + nested packages
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 10
+    labels: ["dependencies", "web"]
+    groups:
+      types-and-eslint:
+        patterns:
+          - "@types/*"
+          - "eslint*"
+          - "@typescript-eslint/*"
+          - "typescript-eslint"
+      tailwind:
+        patterns:
+          - "tailwindcss*"
+          - "@tailwindcss/*"
+          - "tw-animate-css"
+      testing:
+        patterns:
+          - "vitest*"
+          - "@vitest/*"
+          - "@testing-library/*"
+          - "@playwright/*"
+          - "playwright*"
+          - "msw"
+          - "jsdom"
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
+      radix:
+        patterns:
+          - "@radix-ui/*"
+          - "radix-ui"
+    ignore:
+      # Don't touch Next.js majors automatically — we want to plan upgrades.
+      - dependency-name: "next"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
