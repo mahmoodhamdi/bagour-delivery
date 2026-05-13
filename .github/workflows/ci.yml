@@ -86,6 +86,8 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      SERWIST_SUPPRESS_TURBOPACK_WARNING: "1"
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
@@ -96,7 +98,7 @@ jobs:
   # 5. E2E (Playwright) — kicks in once an app has a playwright.config.ts
   # ─────────────────────────────────────────────────────────────────────────
   e2e:
-    name: E2E (Playwright)
+    name: E2E — ${{ matrix.app }} / ${{ matrix.browser }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     needs: [build]
@@ -106,15 +108,31 @@ jobs:
       matrix:
         app: [customer-web, driver-web]
         browser: [chromium, firefox, webkit]
+    env:
+      SERWIST_SUPPRESS_TURBOPACK_WARNING: "1"
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
+      - name: Skip if app does not exist yet
+        id: gate
+        run: |
+          if [ ! -f "${{ matrix.app }}/playwright.config.ts" ]; then
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Skipping E2E for ${{ matrix.app }} — no playwright.config.ts yet."
+          else
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          fi
       - name: Install Playwright browsers
+        if: steps.gate.outputs.exists == 'true'
         run: pnpm --filter ./${{ matrix.app }} exec playwright install --with-deps ${{ matrix.browser }}
+      - name: Build the app (Playwright webServer runs `pnpm start`)
+        if: steps.gate.outputs.exists == 'true'
+        run: pnpm --filter ./${{ matrix.app }} build
       - name: Run Playwright tests
+        if: steps.gate.outputs.exists == 'true'
         run: pnpm --filter ./${{ matrix.app }} test:e2e --project=${{ matrix.browser }}
       - name: Upload Playwright report
-        if: always()
+        if: always() && steps.gate.outputs.exists == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: playwright-${{ matrix.app }}-${{ matrix.browser }}-${{ github.run_id }}
