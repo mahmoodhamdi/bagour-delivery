@@ -127,7 +127,33 @@
   },
   "Orders": {
     "title": "طلباتي",
-    "subtitle": "تتبع الطلبات الحالية واطّلع على تاريخ الطلبات اللي فاتت."
+    "subtitle": "تتبع الطلبات الحالية واطّلع على تاريخ الطلبات اللي فاتت.",
+    "tracking": "تتبع الطلب",
+    "orderNumber": "رقم الطلب",
+    "deliveryAddress": "عنوان التوصيل",
+    "itemsLabel": "صنف",
+    "empty": "لسه ما فيش طلبات",
+    "emptyDesc": "أول مطعم تطلب منه هيظهر هنا.",
+    "browseRestaurants": "تصفح المطاعم",
+    "backToList": "← رجوع للقائمة",
+    "loadError": "حصلت مشكلة في عرض الطلبات. حاول تاني.",
+    "cancelPrompt": "ليه عاوز تلغي الطلب؟ (اختياري)",
+    "status": {
+      "pending": "قيد الانتظار",
+      "confirmed": "تم القبول",
+      "preparing": "جاري التحضير",
+      "ready": "جاهز للاستلام",
+      "picked_up": "تم الاستلام",
+      "on_the_way": "في الطريق",
+      "delivered": "تم التوصيل",
+      "cancelled": "ملغي"
+    },
+    "actions": {
+      "cancelOrder": "إلغاء الطلب"
+    },
+    "toasts": {
+      "cancelled": "تم إلغاء الطلب."
+    }
   },
   "Profile": {
     "title": "حسابي",

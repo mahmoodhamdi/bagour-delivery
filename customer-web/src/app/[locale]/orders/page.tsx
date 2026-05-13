@@ -1,8 +1,8 @@
-import { Package } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 
-import { PlaceholderPage } from "@/components/placeholder-page";
+import { OrdersList } from "@/components/orders/orders-list";
+import { ProtectedRoute } from "@/components/protected-route";
 
 export async function generateMetadata({
   params,
@@ -21,11 +21,18 @@ export default async function OrdersPage({ params }: { params: Promise<{ locale:
   const t = await getTranslations("Orders");
 
   return (
-    <PlaceholderPage
-      title={t("title")}
-      subtitle={t("subtitle")}
-      icon={<Package className="size-10" aria-hidden />}
-      testId="orders-page"
-    />
+    <ProtectedRoute>
+      <main
+        id="main"
+        className="container mx-auto max-w-3xl px-4 py-8 md:py-12"
+        data-testid="orders-page"
+      >
+        <header className="mb-6 space-y-1">
+          <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
+          <p className="text-muted-foreground">{t("subtitle")}</p>
+        </header>
+        <OrdersList />
+      </main>
+    </ProtectedRoute>
   );
 }
