@@ -37,7 +37,26 @@
   },
   "Restaurants": {
     "title": "المطاعم",
-    "subtitle": "نعرض كل المطاعم اللي بتوصّل لمنطقتك."
+    "subtitle": "نعرض كل المطاعم اللي بتوصّل لمنطقتك.",
+    "featured": "مختار لك",
+    "searchPlaceholder": "ابحث عن مطعم أو نوع أكل…",
+    "clearSearch": "مسح البحث",
+    "allCuisines": "كل الأنواع",
+    "sortLabel": "ترتيب:",
+    "sort": {
+      "rating": "الأعلى تقييماً",
+      "deliveryTime": "الأسرع توصيلاً",
+      "deliveryFee": "أرخص توصيل",
+      "popularity": "الأشهر"
+    },
+    "loadMore": "عرض المزيد",
+    "noResults": "مفيش مطاعم بتطابق البحث",
+    "noResultsDesc": "جرب تغيّر النوع أو امسح البحث.",
+    "rating": "التقييم",
+    "starsLabel": "نجوم",
+    "closedNow": "مقفول دلوقتي",
+    "deliveryFee": "توصيل {fee}",
+    "minOrder": "حد أدنى {amount}"
   },
   "Orders": {
     "title": "طلباتي",

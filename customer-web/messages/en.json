@@ -37,7 +37,26 @@
   },
   "Restaurants": {
     "title": "Restaurants",
-    "subtitle": "Every place that delivers to your zone."
+    "subtitle": "Every place that delivers to your zone.",
+    "featured": "Featured for you",
+    "searchPlaceholder": "Search for a restaurant or cuisine…",
+    "clearSearch": "Clear search",
+    "allCuisines": "All cuisines",
+    "sortLabel": "Sort by:",
+    "sort": {
+      "rating": "Top rated",
+      "deliveryTime": "Fastest delivery",
+      "deliveryFee": "Cheapest delivery",
+      "popularity": "Most popular"
+    },
+    "loadMore": "Load more",
+    "noResults": "No restaurants match your filters",
+    "noResultsDesc": "Try a different cuisine or clear your search.",
+    "rating": "Rating",
+    "starsLabel": "stars",
+    "closedNow": "Closed now",
+    "deliveryFee": "Delivery {fee}",
+    "minOrder": "Min order {amount}"
   },
   "Orders": {
     "title": "My orders",
