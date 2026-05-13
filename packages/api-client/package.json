@@ -1,0 +1,44 @@
+{
+  "name": "@bagour/api-client",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Typed HTTP client for the Bagour Delivery REST API. Axios-based, Zod-validated, with built-in JWT refresh and MSW test handlers.",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./test-handlers": {
+      "types": "./src/test/handlers.ts",
+      "default": "./src/test/handlers.ts"
+    },
+    "./factories": {
+      "types": "./src/test/factories.ts",
+      "default": "./src/test/factories.ts"
+    }
+  },
+  "files": [
+    "src/**/*"
+  ],
+  "scripts": {
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@bagour/types": "workspace:*",
+    "axios": "^1.13.2",
+    "zod": "^4.3.4"
+  },
+  "devDependencies": {
+    "@bagour/config-tsconfig": "workspace:*",
+    "msw": "^2.7.0",
+    "typescript": "^5.9.3",
+    "vitest": "^2.1.0"
+  }
+}
