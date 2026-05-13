@@ -87,6 +87,16 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} dir={dir} className={cairo.variable} suppressHydrationWarning>
+      <head>
+        {process.env.NEXT_PUBLIC_API_URL ? (
+          <>
+            <link rel="preconnect" href={process.env.NEXT_PUBLIC_API_URL} crossOrigin="" />
+            <link rel="dns-prefetch" href={process.env.NEXT_PUBLIC_API_URL} />
+          </>
+        ) : null}
+        <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="" />
+        <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+      </head>
       <body className="bg-background text-foreground antialiased min-h-screen flex flex-col">
         <NextIntlClientProvider messages={messages} locale={locale}>
           <Providers>
