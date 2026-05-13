@@ -25,15 +25,17 @@ vi.mock("@/i18n/navigation", () => ({
 
 const setSession = vi.fn();
 vi.mock("@/stores/auth-store", () => ({
-  useAuthStore: ((selector: unknown) => {
-    // selector is `(s) => s.setSession`
-    return (selector as (s: { setSession: typeof setSession }) => unknown)({ setSession });
-  }) as unknown as () => unknown,
+  useAuthStore: (selector: (s: { setSession: typeof setSession }) => unknown): unknown =>
+    selector({ setSession }),
 }));
 
 const toastSuccess = vi.fn();
 vi.mock("sonner", () => ({
-  toast: { success: (...args: unknown[]) => toastSuccess(...args) },
+  toast: {
+    success: (...args: unknown[]) => {
+      toastSuccess(...args);
+    },
+  },
 }));
 
 function renderForm() {
