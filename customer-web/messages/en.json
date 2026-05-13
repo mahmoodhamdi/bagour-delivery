@@ -51,6 +51,80 @@
     "comingSoon": "Coming soon",
     "comingSoonBody": "We're polishing this part of the app. Check back shortly."
   },
+  "Auth": {
+    "login": {
+      "title": "Welcome back",
+      "subtitle": "Sign in to pick up where you left off.",
+      "noAccount": "No account yet?",
+      "createAccount": "Create one"
+    },
+    "register": {
+      "title": "Create your account",
+      "subtitle": "One quick step keeps Bagour's kitchens at your fingertips.",
+      "haveAccount": "Already registered?",
+      "signIn": "Sign in"
+    },
+    "verifyOtp": {
+      "title": "Verify your email",
+      "subtitle": "We sent you a 6-digit code. Enter it to confirm your account."
+    },
+    "forgotPassword": {
+      "title": "Forgot your password?",
+      "subtitle": "Enter your email and we'll send a reset code.",
+      "backToLogin": "← Back to sign in"
+    },
+    "resetPassword": {
+      "title": "Reset your password",
+      "subtitle": "Type the code from your email and pick a new password."
+    },
+    "otp": {
+      "sentTo": "We sent the code to <b>{email}</b>"
+    },
+    "fields": {
+      "name": "Full name",
+      "email": "Email",
+      "phone": "Mobile number",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "newPassword": "New password",
+      "otp": "Verification code",
+      "acceptTerms": "I agree to the terms of service and privacy policy"
+    },
+    "actions": {
+      "signIn": "Sign in",
+      "signOut": "Sign out",
+      "createAccount": "Create account",
+      "verify": "Verify",
+      "resendOtp": "Resend code",
+      "resendIn": "Resend in {seconds}s",
+      "forgotPassword": "Forgot password?",
+      "sendResetCode": "Send reset code",
+      "resetPassword": "Save new password",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "openAccountMenu": "Account menu"
+    },
+    "errors": {
+      "emailRequired": "Email is required",
+      "invalidEmail": "Email looks invalid",
+      "passwordTooShort": "Password must be at least 8 characters",
+      "confirmPasswordRequired": "Please confirm your password",
+      "passwordsDontMatch": "Passwords don't match",
+      "invalidPhone": "Phone must start with 01 and be 11 digits",
+      "nameTooShort": "Name is too short",
+      "nameTooLong": "Name is too long",
+      "acceptTermsRequired": "You must accept the terms",
+      "otpInvalid": "Invalid code. Try again.",
+      "invalidCredentials": "Email or password is incorrect."
+    },
+    "toasts": {
+      "signedIn": "Welcome back!",
+      "signedOut": "Signed out.",
+      "otpSent": "Code sent — check your inbox.",
+      "otpResent": "We've sent a new code.",
+      "passwordReset": "Password updated. Sign in to continue."
+    }
+  },
   "Pwa": {
     "installPrompt": "Install Bagour on your phone",
     "installButton": "Install",

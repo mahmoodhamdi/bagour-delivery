@@ -51,6 +51,80 @@
     "comingSoon": "قريباً جداً",
     "comingSoonBody": "بنشتغل على المرحلة دي من التطبيق دلوقتي. ابقى تابعنا قريب."
   },
+  "Auth": {
+    "login": {
+      "title": "أهلاً بيك تاني",
+      "subtitle": "ادخل بحسابك وكمّل من اللي وقفت فيه.",
+      "noAccount": "ليس لديك حساب بعد؟",
+      "createAccount": "أنشئ حساب جديد"
+    },
+    "register": {
+      "title": "أنشئ حسابك",
+      "subtitle": "خلّيك دائماً قريب من أكل البلد. التسجيل خطوة واحدة بس.",
+      "haveAccount": "عندك حساب بالفعل؟",
+      "signIn": "ادخل"
+    },
+    "verifyOtp": {
+      "title": "أكّد البريد الإلكتروني",
+      "subtitle": "بعتنالك كود مكوّن من ٦ أرقام. ادخّله علشان نأكّد حسابك."
+    },
+    "forgotPassword": {
+      "title": "نسيت كلمة السر؟",
+      "subtitle": "ادخل بريدك وهنبعتلك كود لإعادة التعيين.",
+      "backToLogin": "← الرجوع لتسجيل الدخول"
+    },
+    "resetPassword": {
+      "title": "إعادة تعيين كلمة السر",
+      "subtitle": "اكتب الكود اللي وصلك على البريد واختار كلمة سر جديدة."
+    },
+    "otp": {
+      "sentTo": "بعتنالك الكود على <b>{email}</b>"
+    },
+    "fields": {
+      "name": "الاسم بالكامل",
+      "email": "البريد الإلكتروني",
+      "phone": "رقم الموبايل",
+      "password": "كلمة السر",
+      "confirmPassword": "تأكيد كلمة السر",
+      "newPassword": "كلمة السر الجديدة",
+      "otp": "كود التحقق",
+      "acceptTerms": "موافق على شروط الاستخدام وسياسة الخصوصية"
+    },
+    "actions": {
+      "signIn": "تسجيل الدخول",
+      "signOut": "تسجيل الخروج",
+      "createAccount": "إنشاء حساب",
+      "verify": "تأكيد",
+      "resendOtp": "إعادة إرسال الكود",
+      "resendIn": "إعادة الإرسال خلال {seconds} ثانية",
+      "forgotPassword": "نسيت كلمة السر؟",
+      "sendResetCode": "إرسال الكود",
+      "resetPassword": "تأكيد وحفظ",
+      "showPassword": "عرض كلمة السر",
+      "hidePassword": "إخفاء كلمة السر",
+      "openAccountMenu": "قائمة الحساب"
+    },
+    "errors": {
+      "emailRequired": "البريد الإلكتروني مطلوب",
+      "invalidEmail": "البريد الإلكتروني غير صالح",
+      "passwordTooShort": "كلمة السر لازم تكون ٨ حروف على الأقل",
+      "confirmPasswordRequired": "تأكيد كلمة السر مطلوب",
+      "passwordsDontMatch": "كلمتا السر مش متطابقتين",
+      "invalidPhone": "رقم الموبايل لازم يبدأ بـ ٠١ ويكون ١١ رقم",
+      "nameTooShort": "الاسم قصير جداً",
+      "nameTooLong": "الاسم طويل جداً",
+      "acceptTermsRequired": "لازم توافق على الشروط",
+      "otpInvalid": "الكود غير صحيح. حاول تاني.",
+      "invalidCredentials": "البريد أو كلمة السر مش صح."
+    },
+    "toasts": {
+      "signedIn": "أهلاً بيك مجدداً!",
+      "signedOut": "تم تسجيل الخروج بنجاح.",
+      "otpSent": "بعتنالك الكود — تأكد من البريد.",
+      "otpResent": "تم إرسال كود جديد.",
+      "passwordReset": "تم تغيير كلمة السر. سجل الدخول دلوقتي."
+    }
+  },
   "Pwa": {
     "installPrompt": "ثبّت التطبيق علي الهاتف",
     "installButton": "تثبيت",
