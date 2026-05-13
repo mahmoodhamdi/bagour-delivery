@@ -149,10 +149,41 @@
       "cancelled": "ملغي"
     },
     "actions": {
-      "cancelOrder": "إلغاء الطلب"
+      "cancelOrder": "إلغاء الطلب",
+      "reorder": "اطلب تاني"
     },
     "toasts": {
-      "cancelled": "تم إلغاء الطلب."
+      "cancelled": "تم إلغاء الطلب.",
+      "reordered": "تمت إضافة الأصناف للسلة."
+    }
+  },
+  "Reviews": {
+    "title": "قيّم طلبك",
+    "subtitle": "احكيلنا الأكل عامل إيه، والمطعم، والكابتن إزاي.",
+    "fields": {
+      "overall": "تقييم عام",
+      "restaurant": "المطعم",
+      "food": "الأكل",
+      "driver": "الكابتن",
+      "comment": "تعليق (اختياري)"
+    },
+    "placeholders": {
+      "comment": "في حاجة تاني تحب تقولهالنا؟"
+    },
+    "actions": {
+      "submit": "اعتماد التقييم",
+      "cancel": "إلغاء"
+    },
+    "cta": {
+      "rate": "قيّم الطلب",
+      "editReview": "تعديل تقييمك"
+    },
+    "errors": {
+      "required": "اختار تقييم من ١ لـ ٥.",
+      "commentTooLong": "التعليق طويل جداً."
+    },
+    "toasts": {
+      "submitted": "شكراً لتقييمك!"
     }
   },
   "Profile": {

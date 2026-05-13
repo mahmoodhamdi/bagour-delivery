@@ -149,10 +149,41 @@
       "cancelled": "Cancelled"
     },
     "actions": {
-      "cancelOrder": "Cancel order"
+      "cancelOrder": "Cancel order",
+      "reorder": "Reorder"
     },
     "toasts": {
-      "cancelled": "Order cancelled."
+      "cancelled": "Order cancelled.",
+      "reordered": "Items added back to your cart."
+    }
+  },
+  "Reviews": {
+    "title": "Rate your order",
+    "subtitle": "Tell us how the food, the restaurant, and the delivery went.",
+    "fields": {
+      "overall": "Overall experience",
+      "restaurant": "Restaurant",
+      "food": "Food",
+      "driver": "Driver",
+      "comment": "Comment (optional)"
+    },
+    "placeholders": {
+      "comment": "Anything else we should know?"
+    },
+    "actions": {
+      "submit": "Submit review",
+      "cancel": "Cancel"
+    },
+    "cta": {
+      "rate": "Rate this order",
+      "editReview": "Edit your review"
+    },
+    "errors": {
+      "required": "Pick a rating from 1 to 5.",
+      "commentTooLong": "Comment is too long."
+    },
+    "toasts": {
+      "submitted": "Thanks for your review!"
     }
   },
   "Profile": {
