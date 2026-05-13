@@ -27,6 +27,30 @@
     "switchToArabic": "العربية",
     "skipToContent": "Skip to main content"
   },
+  "Nav": {
+    "primary": "Primary navigation",
+    "menu": "Menu",
+    "home": "Home",
+    "restaurants": "Restaurants",
+    "orders": "Orders",
+    "profile": "Profile"
+  },
+  "Restaurants": {
+    "title": "Restaurants",
+    "subtitle": "Every place that delivers to your zone."
+  },
+  "Orders": {
+    "title": "My orders",
+    "subtitle": "Track current orders and revisit past ones."
+  },
+  "Profile": {
+    "title": "Profile",
+    "subtitle": "Manage your account, addresses, and payment methods."
+  },
+  "Placeholder": {
+    "comingSoon": "Coming soon",
+    "comingSoonBody": "We're polishing this part of the app. Check back shortly."
+  },
   "Pwa": {
     "installPrompt": "Install Bagour on your phone",
     "installButton": "Install",

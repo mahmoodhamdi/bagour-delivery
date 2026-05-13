@@ -5,6 +5,10 @@ import { notFound } from "next/navigation";
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 
+import { BottomNav } from "@/components/bottom-nav";
+import { Header } from "@/components/header";
+import { Providers } from "@/components/providers";
+import { SkipLink } from "@/components/skip-link";
 import { routing } from "@/i18n/routing";
 
 const cairo = Cairo({
@@ -83,9 +87,14 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} dir={dir} className={cairo.variable} suppressHydrationWarning>
-      <body className="bg-background text-foreground antialiased min-h-screen">
+      <body className="bg-background text-foreground antialiased min-h-screen flex flex-col">
         <NextIntlClientProvider messages={messages} locale={locale}>
-          {children}
+          <Providers>
+            <SkipLink />
+            <Header />
+            <div className="flex-1 pb-20 md:pb-0">{children}</div>
+            <BottomNav />
+          </Providers>
         </NextIntlClientProvider>
       </body>
     </html>
