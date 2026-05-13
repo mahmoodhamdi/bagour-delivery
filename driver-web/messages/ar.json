@@ -86,11 +86,35 @@
     "actions": {
       "accept": "اقبل",
       "pass": "تخطي",
-      "close": "إغلاق"
+      "close": "إغلاق",
+      "pickup": "أكّد الاستلام من المطعم",
+      "onTheWay": "في الطريق للعميل",
+      "delivered": "تأكيد التسليم",
+      "takeProof": "صور إثبات التسليم",
+      "replaceProof": "صور تاني"
     },
+    "detail": {
+      "deliveryAddress": "عنوان التوصيل",
+      "buildingShort": "عمارة",
+      "items": "الأصناف",
+      "subtotal": "إجمالي الأصناف",
+      "deliveryFee": "رسوم التوصيل",
+      "total": "الإجمالي",
+      "yourEarnings": "نصيبك",
+      "deliveryProof": "إثبات التسليم",
+      "proofHint": "صور المنتج عند العميل أو الباب — لازم نوع JPG/PNG/WEBP.",
+      "proofReady": "تم رفع الصورة ✓",
+      "waitingRestaurant": "بنستنى المطعم يجهّز الطلب."
+    },
+    "backToActive": "← الطلبات الحالية",
     "toasts": {
       "accepted": "خدت طلب #{orderNumber}.",
-      "acceptFailed": "ما قدرناش نأكد الطلب. ممكن سائق تاني سبقك."
+      "acceptFailed": "ما قدرناش نأكد الطلب. ممكن سائق تاني سبقك.",
+      "pickedUp": "تم تأكيد الاستلام.",
+      "onTheWay": "أنت في طريقك للعميل.",
+      "delivered": "تم التسليم. مبروك!",
+      "proofUploaded": "تم رفع صورة الإثبات.",
+      "proofFailed": "حصلت مشكلة في رفع الصورة."
     }
   },
   "Online": {

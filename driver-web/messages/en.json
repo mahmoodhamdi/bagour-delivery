@@ -86,11 +86,35 @@
     "actions": {
       "accept": "Accept",
       "pass": "Pass",
-      "close": "Close"
+      "close": "Close",
+      "pickup": "Confirm pickup",
+      "onTheWay": "On the way to customer",
+      "delivered": "Mark delivered",
+      "takeProof": "Capture proof",
+      "replaceProof": "Retake proof"
     },
+    "detail": {
+      "deliveryAddress": "Delivery address",
+      "buildingShort": "Bldg.",
+      "items": "Items",
+      "subtotal": "Subtotal",
+      "deliveryFee": "Delivery fee",
+      "total": "Total",
+      "yourEarnings": "Your earnings",
+      "deliveryProof": "Delivery proof",
+      "proofHint": "Snap a photo of the order at the door — JPG/PNG/WEBP.",
+      "proofReady": "Photo uploaded ✓",
+      "waitingRestaurant": "Waiting on the restaurant to prepare the order."
+    },
+    "backToActive": "← Active orders",
     "toasts": {
       "accepted": "Accepted order #{orderNumber}.",
-      "acceptFailed": "Couldn't accept the order — another driver may have taken it."
+      "acceptFailed": "Couldn't accept the order — another driver may have taken it.",
+      "pickedUp": "Pickup confirmed.",
+      "onTheWay": "You're on the way.",
+      "delivered": "Delivered. Nice work!",
+      "proofUploaded": "Proof uploaded.",
+      "proofFailed": "Couldn't upload the proof."
     }
   },
   "Online": {
