@@ -35,6 +35,32 @@
     "orders": "طلباتي",
     "profile": "حسابي"
   },
+  "Menu": {
+    "featured": "مختار",
+    "unavailable": "غير متاح",
+    "openItem": "افتح {name}",
+    "addToCart": "أضف للسلة · {total}",
+    "addons": "إضافات",
+    "specialInstructions": "ملاحظات للمطعم",
+    "specialInstructionsPlaceholder": "مثلاً: من غير بصل، حار شوية…",
+    "required": "إجباري",
+    "noItems": "المنيو فاضي حالياً. ارجع تاني قريب.",
+    "emptyCategory": "مفيش أكلات في القسم ده دلوقتي.",
+    "decreaseQuantity": "تقليل العدد",
+    "increaseQuantity": "زيادة العدد",
+    "closeModal": "إغلاق",
+    "confirmSwitchRestaurant": "السلة دلوقتي بتاعت مطعم تاني. عاوز نمسحها ونبدأ من جديد؟",
+    "errors": {
+      "missingRequired": "اختار {name} الأول."
+    },
+    "toasts": {
+      "addedToCart": "{name} اتضافت للسلة."
+    }
+  },
+  "Cart": {
+    "cartLabel": "السلة",
+    "itemsCount": "{count, plural, one {صنف واحد} two {صنفين} few {# أصناف} many {# صنف} other {# صنف}}"
+  },
   "Restaurants": {
     "title": "المطاعم",
     "subtitle": "نعرض كل المطاعم اللي بتوصّل لمنطقتك.",
