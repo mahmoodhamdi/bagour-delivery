@@ -1,0 +1,28 @@
+{
+  "name": "@bagour/config-eslint",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Shared ESLint flat configs for Bagour Delivery web apps and packages.",
+  "type": "module",
+  "main": "./base.mjs",
+  "files": [
+    "base.mjs",
+    "next.mjs",
+    "react.mjs"
+  ],
+  "peerDependencies": {
+    "eslint": "^9.0.0"
+  },
+  "dependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint-config-prettier": "^10.0.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-jsx-a11y": "^6.10.0",
+    "eslint-plugin-react": "^7.37.0",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-security": "^3.0.0",
+    "globals": "^15.14.0",
+    "typescript-eslint": "^8.0.0"
+  }
+}

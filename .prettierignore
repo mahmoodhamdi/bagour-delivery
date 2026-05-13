@@ -1,0 +1,30 @@
+# Lockfiles
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Build outputs
+.next/
+out/
+build/
+dist/
+coverage/
+
+# Workspace caches
+.turbo/
+.cache/
+
+# Existing apps and backend (own formatting policies)
+admin-dashboard/
+restaurant-dashboard/
+backend/
+customer-app/
+delivery-app/
+marketing/screenshots/
+marketing/videos/
+
+# Generated
+**/*.tsbuildinfo
+**/.env*
+**/node_modules/
+**/postman_collection.json

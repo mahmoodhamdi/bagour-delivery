@@ -1,0 +1,64 @@
+/* Bagour Delivery — brand tokens (Tailwind v4 @theme inline)
+ *
+ * Override these in a client-branded build by re-importing this file and
+ * overriding the CSS custom properties at the :root level.
+ */
+
+:root {
+  /* Brand */
+  --brand-primary: oklch(0.7 0.18 38);        /* warm Bagour orange */
+  --brand-primary-foreground: oklch(0.985 0 0);
+  --brand-accent: oklch(0.65 0.16 145);       /* fresh green for CTAs (online, available) */
+  --brand-accent-foreground: oklch(0.985 0 0);
+  --brand-warning: oklch(0.78 0.15 75);       /* honey amber for in-progress */
+  --brand-danger: oklch(0.6 0.24 27);         /* delivery red for offline/error */
+
+  /* Surfaces */
+  --radius: 0.75rem;
+  --background: oklch(0.99 0.002 80);
+  --foreground: oklch(0.18 0.01 80);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.18 0.01 80);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0.01 80);
+  --primary: var(--brand-primary);
+  --primary-foreground: var(--brand-primary-foreground);
+  --secondary: oklch(0.96 0.005 80);
+  --secondary-foreground: oklch(0.18 0.01 80);
+  --muted: oklch(0.96 0.005 80);
+  --muted-foreground: oklch(0.5 0.01 80);
+  --accent: var(--brand-accent);
+  --accent-foreground: var(--brand-accent-foreground);
+  --destructive: var(--brand-danger);
+  --border: oklch(0.91 0.005 80);
+  --input: oklch(0.91 0.005 80);
+  --ring: oklch(0.7 0.18 38 / 0.6);
+
+  /* Charts */
+  --chart-1: oklch(0.7 0.18 38);
+  --chart-2: oklch(0.65 0.16 145);
+  --chart-3: oklch(0.78 0.15 75);
+  --chart-4: oklch(0.6 0.18 250);
+  --chart-5: oklch(0.55 0.2 320);
+}
+
+.dark {
+  --background: oklch(0.14 0.01 80);
+  --foreground: oklch(0.97 0.003 80);
+  --card: oklch(0.2 0.01 80);
+  --card-foreground: oklch(0.97 0.003 80);
+  --popover: oklch(0.2 0.01 80);
+  --popover-foreground: oklch(0.97 0.003 80);
+  --primary: oklch(0.74 0.17 38);
+  --primary-foreground: oklch(0.14 0.01 80);
+  --secondary: oklch(0.27 0.005 80);
+  --secondary-foreground: oklch(0.97 0.003 80);
+  --muted: oklch(0.27 0.005 80);
+  --muted-foreground: oklch(0.7 0.005 80);
+  --accent: oklch(0.7 0.16 145);
+  --accent-foreground: oklch(0.14 0.01 80);
+  --destructive: oklch(0.68 0.2 27);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 16%);
+  --ring: oklch(0.74 0.17 38 / 0.6);
+}

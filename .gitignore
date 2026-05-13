@@ -98,3 +98,28 @@ firebase-debug.log
 
 # Misc
 .cache/
+
+# Turborepo
+.turbo/
+
+# pnpm
+.pnpm-store/
+
+# Playwright
+playwright-report/
+test-results/
+blob-report/
+playwright/.cache/
+
+# Vitest
+coverage/
+
+# PWA generated artifacts
+public/sw.js
+public/sw.js.map
+public/workbox-*.js
+public/worker-*.js
+public/fallback-*.js
+
+# Sentry (future)
+.sentryclirc
