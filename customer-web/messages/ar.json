@@ -45,7 +45,70 @@
   },
   "Profile": {
     "title": "حسابي",
-    "subtitle": "إدارة بياناتك الشخصية، عناوينك، ووسائل الدفع."
+    "subtitle": "إدارة بياناتك الشخصية، عناوينك، ووسائل الدفع.",
+    "editProfile": "تعديل البيانات",
+    "editProfileSubtitle": "حدّث اسمك ورقم الموبايل.",
+    "changePassword": "تغيير كلمة السر",
+    "changePasswordDesc": "اختار كلمة سر جديدة. هتلزمك تسجل الدخول من تاني بعد التغيير.",
+    "addresses": "العناوين",
+    "addressesDesc": "ضيف وعدل العناوين اللي بتطلب عليها.",
+    "address": "عنوان",
+    "newAddress": "ضيف عنوان جديد",
+    "newAddressDesc": "ادخل تفاصيل العنوان اللي عاوز نوصلك عليه.",
+    "editAddress": "تعديل العنوان",
+    "editAddressDesc": "حدّث تفاصيل العنوان ده.",
+    "addressNotFound": "العنوان ده مش موجود. هنرجع للقايمة.",
+    "noAddresses": "مفيش عناوين لسه",
+    "noAddressesDesc": "أول عنوان لازم تضيفه قبل ما تطلب.",
+    "defaultAddressBadge": "افتراضي",
+    "confirmDeleteAddress": "هل أنت متأكد إنك عاوز تمسح العنوان ده؟",
+    "emailVerified": "البريد متحقق منه",
+    "loyaltyPoints": "نقاط الولاء",
+    "yes": "نعم",
+    "no": "لا",
+    "actions": {
+      "saveChanges": "حفظ التعديلات",
+      "changePassword": "تغيير كلمة السر",
+      "addAddress": "ضيف عنوان",
+      "addFirstAddress": "ضيف أول عنوان",
+      "saveAddress": "حفظ العنوان",
+      "editAddress": "تعديل",
+      "deleteAddress": "مسح",
+      "setAsDefault": "اجعله الافتراضي",
+      "addressMenu": "خيارات العنوان",
+      "cancel": "إلغاء"
+    },
+    "fields": {
+      "currentPassword": "كلمة السر الحالية",
+      "addressLabel": "اسم العنوان (البيت / الشغل…)",
+      "street": "اسم الشارع",
+      "area": "المنطقة",
+      "city": "المحافظة",
+      "buildingNumber": "رقم العمارة",
+      "floor": "الدور",
+      "apartment": "رقم الشقة",
+      "landmark": "علامة مميزة (محل / مسجد…)",
+      "isDefault": "اجعل ده العنوان الافتراضي"
+    },
+    "placeholders": {
+      "addressLabel": "مثلاً: البيت",
+      "landmark": "اختياري — يساعد السائق يلاقيك أسرع"
+    },
+    "errors": {
+      "streetRequired": "الشارع مطلوب",
+      "areaRequired": "المنطقة مطلوبة",
+      "cityRequired": "المحافظة مطلوبة",
+      "newPasswordMustDiffer": "كلمة السر الجديدة لازم تختلف عن الحالية.",
+      "currentPasswordWrong": "كلمة السر الحالية غير صحيحة."
+    },
+    "toasts": {
+      "saved": "تم الحفظ.",
+      "passwordChanged": "تم تغيير كلمة السر.",
+      "addressAdded": "تم إضافة العنوان.",
+      "addressUpdated": "تم تحديث العنوان.",
+      "addressDeleted": "تم مسح العنوان.",
+      "addressDefaultUpdated": "تم تعيين العنوان كافتراضي."
+    }
   },
   "Placeholder": {
     "comingSoon": "قريباً جداً",
