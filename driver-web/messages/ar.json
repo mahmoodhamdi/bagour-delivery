@@ -48,5 +48,80 @@
     "title": "الصفحة مش موجودة",
     "subtitle": "اللينك ممكن يكون قديم أو الصفحة اتشالت.",
     "backHome": "ارجع للرئيسية"
+  },
+  "Auth": {
+    "login": {
+      "title": "أهلاً بعودتك يا كابتن",
+      "subtitle": "سجّل دخولك وكمل شغلك.",
+      "noAccount": "لسه ما عملتش حساب؟",
+      "createAccount": "سجّل كسائق جديد"
+    },
+    "register": {
+      "title": "سجّل كسائق",
+      "subtitle": "خطوة سريعة عشان نبدأ الشغل سوا.",
+      "haveAccount": "عندك حساب بالفعل؟",
+      "signIn": "تسجيل الدخول"
+    },
+    "verifyOtp": {
+      "title": "أكّد بريدك الإلكتروني",
+      "subtitle": "بعتنالك كود من ٦ أرقام. اكتبه هنا عشان نأكد الحساب."
+    },
+    "forgotPassword": {
+      "title": "نسيت كلمة السر؟",
+      "subtitle": "اكتب بريدك ونبعتلك كود لتغيير الباسورد.",
+      "backToLogin": "← رجوع لتسجيل الدخول"
+    },
+    "resetPassword": {
+      "title": "اعمل كلمة سر جديدة",
+      "subtitle": "اكتب الكود اللي وصلك على البريد واختار باسورد جديد."
+    },
+    "otp": {
+      "sentTo": "بعتنا الكود على <b>{email}</b>"
+    },
+    "fields": {
+      "name": "الاسم الكامل",
+      "email": "البريد الإلكتروني",
+      "phone": "رقم الموبايل",
+      "password": "كلمة السر",
+      "confirmPassword": "تأكيد كلمة السر",
+      "newPassword": "كلمة السر الجديدة",
+      "otp": "كود التحقق",
+      "acceptTerms": "موافق على شروط الخدمة وسياسة الخصوصية"
+    },
+    "actions": {
+      "signIn": "تسجيل الدخول",
+      "signOut": "تسجيل الخروج",
+      "createAccount": "إنشاء حساب",
+      "verify": "تأكيد",
+      "resendOtp": "إعادة إرسال الكود",
+      "resendIn": "إعادة الإرسال خلال {seconds} ث",
+      "forgotPassword": "نسيت كلمة السر؟",
+      "sendResetCode": "ابعت كود التغيير",
+      "resetPassword": "حفظ كلمة السر الجديدة",
+      "showPassword": "إظهار كلمة السر",
+      "hidePassword": "إخفاء كلمة السر",
+      "openAccountMenu": "قائمة الحساب"
+    },
+    "errors": {
+      "emailRequired": "البريد الإلكتروني مطلوب",
+      "invalidEmail": "البريد الإلكتروني غير صالح",
+      "passwordTooShort": "كلمة السر لازم تكون ٨ حروف على الأقل",
+      "confirmPasswordRequired": "أكّد كلمة السر",
+      "passwordsDontMatch": "كلمتا السر مش متطابقتين",
+      "invalidPhone": "الرقم لازم يبدأ بـ 01 ويكون ١١ رقم",
+      "nameTooShort": "الاسم قصير جداً",
+      "nameTooLong": "الاسم طويل جداً",
+      "acceptTermsRequired": "لازم توافق على الشروط",
+      "otpInvalid": "الكود غير صحيح، حاول تاني.",
+      "invalidCredentials": "البريد أو كلمة السر مش مظبوطين.",
+      "notADriver": "الحساب ده مش حساب سائق. ابعت رسالة للدعم لو كده غلط."
+    },
+    "toasts": {
+      "signedIn": "أهلاً بعودتك!",
+      "signedOut": "تم تسجيل الخروج.",
+      "otpSent": "بعتنا كود — افتح إيميلك.",
+      "otpResent": "بعتنالك كود جديد.",
+      "passwordReset": "تم تحديث كلمة السر. سجّل دخولك تاني."
+    }
   }
 }
