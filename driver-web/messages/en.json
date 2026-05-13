@@ -49,6 +49,48 @@
     "subtitle": "The link may be broken, or the page may have been removed.",
     "backHome": "Back to home"
   },
+  "Onboarding": {
+    "title": "Complete your driver profile",
+    "subtitle": "Tell us about your vehicle and upload your documents so we can review your account.",
+    "pendingNote": "Your account is under review. Upload your documents to speed up approval.",
+    "alreadyApproved": "Your account is approved! You can start accepting orders right away.",
+    "vehicleSection": "Vehicle details",
+    "vehicleHint": "Information riders use to identify you.",
+    "documentsSection": "Documents",
+    "documentsHint": "Clear photo of each side. Max 5 MB per file.",
+    "fields": {
+      "vehicleModel": "Vehicle model",
+      "vehicleColor": "Vehicle color",
+      "vehiclePlateNumber": "Plate number"
+    },
+    "documents": {
+      "nationalIdFront": "National ID — front",
+      "nationalIdBack": "National ID — back",
+      "nationalIdDesc": "Clear photo of your ID card.",
+      "driverLicenseFront": "Driver license — front",
+      "driverLicenseBack": "Driver license — back",
+      "driverLicenseDesc": "License must still be valid."
+    },
+    "actions": {
+      "upload": "Upload",
+      "replace": "Replace",
+      "remove": "Remove",
+      "submit": "Submit for review"
+    },
+    "errors": {
+      "fileTooLarge": "File is larger than 5 MB.",
+      "uploadFailed": "Upload failed. Please try again.",
+      "vehicleModelRequired": "Enter the vehicle model",
+      "vehicleModelTooLong": "Model is too long",
+      "vehicleColorRequired": "Enter the vehicle color",
+      "vehicleColorTooLong": "Color is too long",
+      "vehiclePlateRequired": "Enter the plate number",
+      "vehiclePlateTooLong": "Plate number is too long"
+    },
+    "toasts": {
+      "submitted": "Submitted. We'll notify you once admin has reviewed your account."
+    }
+  },
   "Auth": {
     "login": {
       "title": "Welcome back, Captain",
