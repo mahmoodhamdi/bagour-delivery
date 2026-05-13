@@ -1,7 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 
-import { PlaceholderPage } from "@/components/placeholder-page";
+import { DriverProfileView } from "@/components/profile/driver-profile-view";
 import { ProtectedRoute } from "@/components/protected-route";
 
 export async function generateMetadata({
@@ -11,22 +11,28 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   setRequestLocale(locale);
-  const t = await getTranslations("Nav");
-  return { title: t("profile") };
+  const t = await getTranslations("Profile");
+  return { title: t("title") };
 }
 
 export default async function ProfilePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const t = await getTranslations();
+  const t = await getTranslations("Profile");
 
   return (
     <ProtectedRoute>
-      <PlaceholderPage
-        title={t("Nav.profile")}
-        subtitle={t("Placeholder.comingSoon")}
-        body={t("Placeholder.comingSoonBody")}
-      />
+      <main
+        id="main"
+        className="container mx-auto max-w-2xl px-4 py-8 md:py-12"
+        data-testid="profile-page"
+      >
+        <header className="mb-6 space-y-1">
+          <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
+          <p className="text-muted-foreground">{t("subtitle")}</p>
+        </header>
+        <DriverProfileView />
+      </main>
     </ProtectedRoute>
   );
 }
