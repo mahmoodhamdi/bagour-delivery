@@ -1,0 +1,61 @@
+name: Lighthouse
+
+on:
+  pull_request:
+    paths:
+      - "customer-web/**"
+      - "driver-web/**"
+      - "packages/**"
+      - "pnpm-lock.yaml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: lighthouse-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lighthouse:
+    name: Lighthouse — ${{ matrix.app }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [customer-web, driver-web]
+    env:
+      SERWIST_SUPPRESS_TURBOPACK_WARNING: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - name: Skip when app has no Lighthouse config yet
+        id: gate
+        run: |
+          if [ ! -f "${{ matrix.app }}/.lighthouserc.json" ]; then
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Skipping Lighthouse for ${{ matrix.app }}."
+          else
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Build app
+        if: steps.gate.outputs.exists == 'true'
+        run: pnpm --filter ./${{ matrix.app }} build
+      - name: Run Lighthouse CI
+        if: steps.gate.outputs.exists == 'true'
+        run: |
+          pnpm dlx @lhci/cli@0.14.x autorun \
+            --config=./${{ matrix.app }}/.lighthouserc.json \
+            --collect.startServerCommand="pnpm --filter ./${{ matrix.app }} start" \
+            --collect.url=http://localhost:${{ matrix.app == 'driver-web' && '3001' || '3000' }} \
+            --upload.target=temporary-public-storage
+      - name: Upload Lighthouse reports
+        if: always() && steps.gate.outputs.exists == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-${{ matrix.app }}-${{ github.run_id }}
+          path: ${{ matrix.app }}/.lighthouseci
+          if-no-files-found: ignore
+          retention-days: 14
