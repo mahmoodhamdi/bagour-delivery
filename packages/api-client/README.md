@@ -24,17 +24,17 @@ const order = await api.orders.create({ restaurantId, items, paymentMethod: "cas
 
 ## What's wired
 
-| Namespace | Endpoints |
-|---|---|
-| `api.auth` | register, verifyEmail, resendOtp, login, google, forgotPassword, resetPassword, changePassword, refresh, updateFcmToken, logout, me |
-| `api.customer` | profile, loyaltyPoints, addresses (CRUD + default), favorites |
-| `api.restaurants` | search, featured, nearby, bySlug, menu |
-| `api.orders` | create, myOrders, byId, cancel, rate, reorder |
-| `api.drivers` | profile, updateProfile/avatar/location/online/availability/documents, stats, availableOrders, myOrders, accept/reject/pickup/on-the-way/delivered |
-| `api.coupons` | available, validate |
-| `api.notifications` | list, unreadCount, markRead, markAllRead, remove, subscribePush, unsubscribePush |
-| `api.reviews` | forRestaurant, myReviews, create |
-| `api.uploads` | upload, deleteUpload |
+| Namespace           | Endpoints                                                                                                                                         |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `api.auth`          | register, verifyEmail, resendOtp, login, google, forgotPassword, resetPassword, changePassword, refresh, updateFcmToken, logout, me               |
+| `api.customer`      | profile, loyaltyPoints, addresses (CRUD + default), favorites                                                                                     |
+| `api.restaurants`   | search, featured, nearby, bySlug, menu                                                                                                            |
+| `api.orders`        | create, myOrders, byId, cancel, rate, reorder                                                                                                     |
+| `api.drivers`       | profile, updateProfile/avatar/location/online/availability/documents, stats, availableOrders, myOrders, accept/reject/pickup/on-the-way/delivered |
+| `api.coupons`       | available, validate                                                                                                                               |
+| `api.notifications` | list, unreadCount, markRead, markAllRead, remove, subscribePush, unsubscribePush                                                                  |
+| `api.reviews`       | forRestaurant, myReviews, create                                                                                                                  |
+| `api.uploads`       | upload, deleteUpload                                                                                                                              |
 
 Restaurant-owner and admin endpoints will be added when the customer-web + driver-web cover them — the admin/restaurant dashboards already have their own clients today.
 

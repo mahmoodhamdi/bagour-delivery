@@ -23,7 +23,7 @@ To rebrand without forking, override the CSS variables in your app's own globals
 @import "@bagour/config-tailwind/brand.css";
 
 :root {
-  --brand-primary: oklch(0.65 0.2 250);     /* swap to a cool blue */
+  --brand-primary: oklch(0.65 0.2 250); /* swap to a cool blue */
   --brand-accent: oklch(0.75 0.18 180);
 }
 

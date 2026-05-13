@@ -9,12 +9,19 @@
 
 import { http, HttpResponse } from "msw";
 
-import { makeAuthTokens, makeBaseUser, makeCustomer, makeDriver, makeOrder, makeRestaurant } from "./factories";
+import {
+  makeAuthTokens,
+  makeBaseUser,
+  makeCustomer,
+  makeDriver,
+  makeOrder,
+  makeRestaurant,
+} from "./factories";
 
-const success = <T,>(data: T, message?: string) =>
+const success = <T>(data: T, message?: string) =>
   HttpResponse.json({ success: true, data, ...(message ? { message } : {}) });
 
-const paginated = <T,>(items: T[], page = 1, limit = 20) =>
+const paginated = <T>(items: T[], page = 1, limit = 20) =>
   HttpResponse.json({
     success: true,
     data: items,
@@ -45,7 +52,9 @@ export const createDefaultHandlers = (baseURL = "http://localhost:5000") => [
   ),
   http.post(`${baseURL}/api/v1/auth/forgot-password`, () => success({ message: "OTP sent" })),
   http.post(`${baseURL}/api/v1/auth/reset-password`, () => success({ message: "Password reset" })),
-  http.post(`${baseURL}/api/v1/auth/change-password`, () => success({ message: "Password changed" })),
+  http.post(`${baseURL}/api/v1/auth/change-password`, () =>
+    success({ message: "Password changed" }),
+  ),
   http.post(`${baseURL}/api/v1/auth/refresh-token`, () => success(makeAuthTokens())),
   http.post(`${baseURL}/api/v1/auth/update-fcm-token`, () => success({ message: "Updated" })),
   http.post(`${baseURL}/api/v1/auth/logout`, () => success({ message: "Logged out" })),
@@ -53,7 +62,9 @@ export const createDefaultHandlers = (baseURL = "http://localhost:5000") => [
 
   // ── customer ────────────────────────────────────────────────────────────
   http.get(`${baseURL}/api/v1/customer/profile`, () => success(makeCustomer())),
-  http.get(`${baseURL}/api/v1/customer/loyalty-points`, () => success({ points: 50, tier: "silver" })),
+  http.get(`${baseURL}/api/v1/customer/loyalty-points`, () =>
+    success({ points: 50, tier: "silver" }),
+  ),
   http.get(`${baseURL}/api/v1/customer/addresses`, () => success([])),
   http.get(`${baseURL}/api/v1/customer/addresses/default`, () => success(null)),
   http.post(`${baseURL}/api/v1/customer/addresses`, async ({ request }) => {
@@ -69,22 +80,32 @@ export const createDefaultHandlers = (baseURL = "http://localhost:5000") => [
     success({ id: params.id, isDefault: true }),
   ),
   http.get(`${baseURL}/api/v1/customer/favorites`, () => success([])),
-  http.post(`${baseURL}/api/v1/customer/favorites/:restaurantId`, () => success({ message: "Added" })),
-  http.delete(`${baseURL}/api/v1/customer/favorites/:restaurantId`, () => success({ message: "Removed" })),
-  http.get(`${baseURL}/api/v1/customer/favorites/:restaurantId/check`, () => success({ isFavorite: false })),
+  http.post(`${baseURL}/api/v1/customer/favorites/:restaurantId`, () =>
+    success({ message: "Added" }),
+  ),
+  http.delete(`${baseURL}/api/v1/customer/favorites/:restaurantId`, () =>
+    success({ message: "Removed" }),
+  ),
+  http.get(`${baseURL}/api/v1/customer/favorites/:restaurantId/check`, () =>
+    success({ isFavorite: false }),
+  ),
 
   // ── restaurants ─────────────────────────────────────────────────────────
   http.get(`${baseURL}/api/v1/restaurants/featured`, () => success([makeRestaurant()])),
   http.get(`${baseURL}/api/v1/restaurants/nearby`, () => success([makeRestaurant()])),
   http.get(`${baseURL}/api/v1/restaurants`, () => paginated([makeRestaurant(), makeRestaurant()])),
-  http.get(`${baseURL}/api/v1/restaurants/:slug/menu`, () => success({ categories: [], items: [] })),
+  http.get(`${baseURL}/api/v1/restaurants/:slug/menu`, () =>
+    success({ categories: [], items: [] }),
+  ),
   http.get(`${baseURL}/api/v1/restaurants/:slug`, () => success(makeRestaurant())),
 
   // ── orders (customer) ───────────────────────────────────────────────────
   http.post(`${baseURL}/api/v1/orders`, () => success(makeOrder())),
   http.get(`${baseURL}/api/v1/orders`, () => paginated([makeOrder()])),
   http.get(`${baseURL}/api/v1/orders/:id`, () => success(makeOrder())),
-  http.put(`${baseURL}/api/v1/orders/:id/cancel`, () => success(makeOrder({ status: "cancelled" }))),
+  http.put(`${baseURL}/api/v1/orders/:id/cancel`, () =>
+    success(makeOrder({ status: "cancelled" })),
+  ),
   http.post(`${baseURL}/api/v1/orders/:id/rate`, () => success(makeOrder())),
   http.post(`${baseURL}/api/v1/orders/:id/reorder`, () => success(makeOrder())),
 
@@ -94,7 +115,9 @@ export const createDefaultHandlers = (baseURL = "http://localhost:5000") => [
   http.put(`${baseURL}/api/v1/driver/avatar`, () => success(makeDriver())),
   http.put(`${baseURL}/api/v1/driver/location`, () => success({ message: "Updated" })),
   http.put(`${baseURL}/api/v1/driver/online`, () => success(makeDriver({ isOnline: true }))),
-  http.put(`${baseURL}/api/v1/driver/availability`, () => success(makeDriver({ isAvailable: true }))),
+  http.put(`${baseURL}/api/v1/driver/availability`, () =>
+    success(makeDriver({ isAvailable: true })),
+  ),
   http.get(`${baseURL}/api/v1/driver/stats`, () =>
     success({
       totalDeliveries: 0,
@@ -106,11 +129,17 @@ export const createDefaultHandlers = (baseURL = "http://localhost:5000") => [
     }),
   ),
   http.put(`${baseURL}/api/v1/driver/documents`, () => success(makeDriver())),
-  http.get(`${baseURL}/api/v1/driver/orders/available`, () => success([makeOrder({ status: "ready" })])),
+  http.get(`${baseURL}/api/v1/driver/orders/available`, () =>
+    success([makeOrder({ status: "ready" })]),
+  ),
   http.get(`${baseURL}/api/v1/driver/orders`, () => paginated([makeOrder()])),
-  http.put(`${baseURL}/api/v1/driver/orders/:id/accept`, () => success(makeOrder({ status: "picked_up" }))),
+  http.put(`${baseURL}/api/v1/driver/orders/:id/accept`, () =>
+    success(makeOrder({ status: "picked_up" })),
+  ),
   http.put(`${baseURL}/api/v1/driver/orders/:id/reject`, () => success({ message: "Rejected" })),
-  http.put(`${baseURL}/api/v1/driver/orders/:id/pickup`, () => success(makeOrder({ status: "picked_up" }))),
+  http.put(`${baseURL}/api/v1/driver/orders/:id/pickup`, () =>
+    success(makeOrder({ status: "picked_up" })),
+  ),
   http.put(`${baseURL}/api/v1/driver/orders/:id/on-the-way`, () =>
     success(makeOrder({ status: "on_the_way" })),
   ),
@@ -150,7 +179,9 @@ export const createDefaultHandlers = (baseURL = "http://localhost:5000") => [
   http.put(`${baseURL}/api/v1/notifications/:id/read`, () => success({ message: "Read" })),
   http.put(`${baseURL}/api/v1/notifications/read-all`, () => success({ message: "All read" })),
   http.delete(`${baseURL}/api/v1/notifications/:id`, () => success({ message: "Removed" })),
-  http.post(`${baseURL}/api/v1/notifications/push/subscribe`, () => success({ message: "Subscribed" })),
+  http.post(`${baseURL}/api/v1/notifications/push/subscribe`, () =>
+    success({ message: "Subscribed" }),
+  ),
   http.post(`${baseURL}/api/v1/notifications/push/unsubscribe`, () =>
     success({ message: "Unsubscribed" }),
   ),

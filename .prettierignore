@@ -14,14 +14,30 @@ coverage/
 .turbo/
 .cache/
 
-# Existing apps and backend (own formatting policies)
+# Existing apps and backend (own formatting policies — don't reformat in
+# this workspace, each app may have its own .prettierrc).
 admin-dashboard/
 restaurant-dashboard/
+restaurant-app/
 backend/
 customer-app/
 delivery-app/
-marketing/screenshots/
-marketing/videos/
+marketing/
+
+# Legacy docs at the repo root — these were authored by hand and we don't
+# want to reformat them in PRs that focus on the web migration.
+docs/
+*.md
+!WEB_MIGRATION_PLAN.md
+!packages/**/*.md
+!.github/**/*.md
+
+# Existing shared/ types were authored for the Flutter side; we re-export
+# them via packages/types/. Don't reformat them in place.
+shared/
+
+# Repo-level config files predating the web migration.
+docker-compose.yml
 
 # Generated
 **/*.tsbuildinfo

@@ -4,11 +4,11 @@ Shared TypeScript configurations used by the Bagour Delivery web apps and shared
 
 ## Available configs
 
-| File | Use for |
-|---|---|
-| `base.json` | Anything — sensible strict defaults. |
-| `nextjs.json` | Next.js apps (`customer-web`, `driver-web`). |
-| `node.json` | Pure-Node libraries (CLI tools, server-side packages). |
+| File                 | Use for                                                |
+| -------------------- | ------------------------------------------------------ |
+| `base.json`          | Anything — sensible strict defaults.                   |
+| `nextjs.json`        | Next.js apps (`customer-web`, `driver-web`).           |
+| `node.json`          | Pure-Node libraries (CLI tools, server-side packages). |
 | `react-library.json` | React component or hook libraries (e.g. `@bagour/ui`). |
 
 ## Usage
@@ -19,10 +19,10 @@ Shared TypeScript configurations used by the Bagour Delivery web apps and shared
   "extends": "@bagour/config-tsconfig/nextjs.json",
   "compilerOptions": {
     "baseUrl": ".",
-    "paths": { "@/*": ["./src/*"] }
+    "paths": { "@/*": ["./src/*"] },
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules"],
 }
 ```
 
