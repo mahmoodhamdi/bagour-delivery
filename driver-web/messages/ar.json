@@ -1,0 +1,52 @@
+{
+  "Brand": {
+    "name": "كابتن باجور",
+    "tagline": "وصّل الطلبات بسرعة وأمان واكسب أكتر"
+  },
+  "Home": {
+    "heroTitle": "كابتن باجور — اشتغل ساعتك وأنت مرتاح",
+    "heroSubtitle": "خد طلبات قريبة منك، تابع المسار، وادفع لك أرباحك يومياً.",
+    "goOnline": "ابدأ الشغل",
+    "viewActiveOrders": "الطلبات الحالية",
+    "viewEarnings": "أرباحي",
+    "highlights": {
+      "flexible": "أوقات شغل مرنة",
+      "flexibleDesc": "اشتغل وقت ما تحب — بدون مواعيد ثابتة",
+      "earnings": "تحويل يومي",
+      "earningsDesc": "ادفع أرباحك في حسابك كل يوم",
+      "support": "دعم على مدار اليوم",
+      "supportDesc": "فريقنا معاك في أي مشكلة"
+    }
+  },
+  "Common": {
+    "loading": "جاري التحميل…",
+    "error": "في حاجة غلط",
+    "retry": "حاول تاني",
+    "language": "اللغة",
+    "switchToEnglish": "English",
+    "switchToArabic": "العربية",
+    "skipToContent": "تخطي للمحتوى الرئيسي"
+  },
+  "Nav": {
+    "primary": "التنقل الرئيسي",
+    "menu": "القائمة",
+    "home": "الرئيسية",
+    "active": "الطلبات الحالية",
+    "earnings": "أرباحي",
+    "profile": "حسابي"
+  },
+  "Placeholder": {
+    "comingSoon": "قريبًا",
+    "comingSoonBody": "بنشتغل على الجزء ده دلوقتي. ارجعلنا قريب."
+  },
+  "Pwa": {
+    "installPrompt": "ثبّت كابتن باجور على موبايلك",
+    "installButton": "تثبيت",
+    "dismiss": "مش دلوقتي"
+  },
+  "NotFound": {
+    "title": "الصفحة مش موجودة",
+    "subtitle": "اللينك ممكن يكون قديم أو الصفحة اتشالت.",
+    "backHome": "ارجع للرئيسية"
+  }
+}

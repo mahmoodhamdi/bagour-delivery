@@ -1,0 +1,52 @@
+{
+  "Brand": {
+    "name": "Bagour Driver",
+    "tagline": "Deliver fast, deliver safely, earn more"
+  },
+  "Home": {
+    "heroTitle": "Bagour Driver — work your hours, your way",
+    "heroSubtitle": "Pick up nearby orders, navigate the route, and get paid out daily.",
+    "goOnline": "Start working",
+    "viewActiveOrders": "Active orders",
+    "viewEarnings": "Earnings",
+    "highlights": {
+      "flexible": "Flexible hours",
+      "flexibleDesc": "Work whenever you want — no fixed schedules",
+      "earnings": "Daily payouts",
+      "earningsDesc": "Get your earnings transferred every day",
+      "support": "24/7 support",
+      "supportDesc": "Our team is here whenever you need help"
+    }
+  },
+  "Common": {
+    "loading": "Loading…",
+    "error": "Something went wrong",
+    "retry": "Try again",
+    "language": "Language",
+    "switchToEnglish": "English",
+    "switchToArabic": "العربية",
+    "skipToContent": "Skip to main content"
+  },
+  "Nav": {
+    "primary": "Primary navigation",
+    "menu": "Menu",
+    "home": "Home",
+    "active": "Active orders",
+    "earnings": "Earnings",
+    "profile": "Profile"
+  },
+  "Placeholder": {
+    "comingSoon": "Coming soon",
+    "comingSoonBody": "We're polishing this part of the app. Check back shortly."
+  },
+  "Pwa": {
+    "installPrompt": "Install Bagour Driver on your phone",
+    "installButton": "Install",
+    "dismiss": "Not now"
+  },
+  "NotFound": {
+    "title": "Page not found",
+    "subtitle": "The link may be broken, or the page may have been removed.",
+    "backHome": "Back to home"
+  }
+}
