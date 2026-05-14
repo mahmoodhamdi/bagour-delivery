@@ -45,12 +45,8 @@ jobs:
         run: pnpm --filter ./${{ matrix.app }} build
       - name: Run Lighthouse CI
         if: steps.gate.outputs.exists == 'true'
-        run: |
-          pnpm dlx @lhci/cli@0.14.x autorun \
-            --config=./${{ matrix.app }}/.lighthouserc.json \
-            --collect.startServerCommand="pnpm --filter ./${{ matrix.app }} start" \
-            --collect.url=http://localhost:${{ matrix.app == 'driver-web' && '3001' || '3000' }} \
-            --upload.target=temporary-public-storage
+        working-directory: ${{ matrix.app }}
+        run: pnpm dlx @lhci/cli@0.14.x autorun
       - name: Upload Lighthouse reports
         if: always() && steps.gate.outputs.exists == 'true'
         uses: actions/upload-artifact@v4
