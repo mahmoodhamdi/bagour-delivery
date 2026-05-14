@@ -19,6 +19,7 @@ RUN pnpm build
 
 # --- runner -----------------------------------------------------------------
 FROM node:20-alpine AS runner
+RUN apk add --no-cache wget
 WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
@@ -35,4 +36,8 @@ COPY --from=builder --chown=nextjs:nodejs /repo/customer-web/public ./customer-w
 
 USER nextjs
 EXPOSE 3000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+  CMD wget --quiet --tries=1 --spider http://localhost:3000/api/health || exit 1
+
 CMD ["node", "customer-web/server.js"]
