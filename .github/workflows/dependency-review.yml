@@ -13,6 +13,10 @@ jobs:
     name: Review dependency changes
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    # Soft-fail until Dependency Graph is enabled (Settings → Code security
+    # & analysis). Until then this action errors out before it can run.
+    # Once enabled, flip this to `false` to make the gate enforceable.
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/dependency-review-action@v4
