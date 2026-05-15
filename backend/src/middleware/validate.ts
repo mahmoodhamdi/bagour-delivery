@@ -41,8 +41,18 @@ export const validate = (
       );
     }
 
-    // Replace the source data with validated and sanitized data
-    req[source] = value;
+    // Replace the source data with validated and sanitized data.
+    // Express 5 / connect makes `req.query` a getter-only property, so we
+    // mutate it in place for `query` and assign for the other sources.
+    if (source === 'query') {
+      const target = req.query as Record<string, unknown>;
+      for (const key of Object.keys(target)) {
+        delete target[key];
+      }
+      Object.assign(target, value);
+    } else {
+      req[source] = value;
+    }
     next();
   };
 };
@@ -73,6 +83,12 @@ export const validateMultiple = (
           }
           allErrors[key].push(detail.message);
         });
+      } else if (source === 'query') {
+        const target = req.query as Record<string, unknown>;
+        for (const key of Object.keys(target)) {
+          delete target[key];
+        }
+        Object.assign(target, value);
       } else {
         req[source as ValidationSource] = value;
       }
