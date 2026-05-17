@@ -137,7 +137,7 @@ export const createDefaultHandlers = (baseURL = "http://localhost:5000") => [
     success(makeOrder({ status: "picked_up" })),
   ),
   http.put(`${baseURL}/api/v1/driver/orders/:id/reject`, () => success({ message: "Rejected" })),
-  http.put(`${baseURL}/api/v1/driver/orders/:id/pickup`, () =>
+  http.put(`${baseURL}/api/v1/driver/orders/:id/picked-up`, () =>
     success(makeOrder({ status: "picked_up" })),
   ),
   http.put(`${baseURL}/api/v1/driver/orders/:id/on-the-way`, () =>

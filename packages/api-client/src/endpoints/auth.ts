@@ -31,6 +31,26 @@ export interface ChangePasswordPayload {
   newPassword: string;
 }
 
+/**
+ * The backend returns auth tokens at the top level of `data` rather than
+ * nested under `tokens`. Centralise the reshape so every caller can rely
+ * on the `LoginResponse` contract.
+ */
+interface BackendAuthPayload {
+  user: BaseUser;
+  accessToken?: string;
+  refreshToken?: string;
+  tokens?: AuthTokens;
+}
+
+const toLoginResponse = (body: BackendAuthPayload): LoginResponse => {
+  const tokens: AuthTokens = body.tokens ?? {
+    accessToken: body.accessToken ?? "",
+    refreshToken: body.refreshToken ?? "",
+  };
+  return { user: body.user, tokens };
+};
+
 export const authEndpoints = (http: AxiosInstance) => ({
   async register(payload: RegisterPayload): Promise<RegisterResponse> {
     const { data } = await http.post<ApiResponse<RegisterResponse>>(
@@ -41,11 +61,11 @@ export const authEndpoints = (http: AxiosInstance) => ({
   },
 
   async verifyEmail(payload: OtpVerifyPayload): Promise<LoginResponse> {
-    const { data } = await http.post<ApiResponse<LoginResponse>>(
+    const { data } = await http.post<ApiResponse<BackendAuthPayload>>(
       "/api/v1/auth/verify-email",
       payload,
     );
-    return data.data;
+    return toLoginResponse(data.data);
   },
 
   async resendOtp(payload: { email: string }): Promise<{ message: string }> {
@@ -57,13 +77,19 @@ export const authEndpoints = (http: AxiosInstance) => ({
   },
 
   async login(payload: LoginPayload): Promise<LoginResponse> {
-    const { data } = await http.post<ApiResponse<LoginResponse>>("/api/v1/auth/login", payload);
-    return data.data;
+    const { data } = await http.post<ApiResponse<BackendAuthPayload>>(
+      "/api/v1/auth/login",
+      payload,
+    );
+    return toLoginResponse(data.data);
   },
 
   async google(payload: GoogleSignInPayload): Promise<LoginResponse> {
-    const { data } = await http.post<ApiResponse<LoginResponse>>("/api/v1/auth/google", payload);
-    return data.data;
+    const { data } = await http.post<ApiResponse<BackendAuthPayload>>(
+      "/api/v1/auth/google",
+      payload,
+    );
+    return toLoginResponse(data.data);
   },
 
   async forgotPassword(payload: ForgotPasswordPayload): Promise<{ message: string }> {
