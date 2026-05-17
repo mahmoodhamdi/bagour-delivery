@@ -11,19 +11,25 @@ const orderKey = (id: string) => ["driver", "orders", "by-id", id] as const;
 interface UseAvailableOrdersOptions {
   /** Only poll while the driver is online. */
   enabled: boolean;
+  /** Driver's current geolocation — backend filters orders by proximity. */
+  location: { lat: number; lng: number } | null;
   /** Default 8 s — feels fresh without hammering the backend. */
   refetchIntervalMs?: number;
 }
 
 export function useAvailableOrders({
   enabled,
+  location,
   refetchIntervalMs = 8_000,
 }: UseAvailableOrdersOptions) {
   const api = useApi();
+  // Quantize location to ~10 m so micro-jitter doesn't bust the query cache.
+  const lat = location ? Math.round(location.lat * 10_000) / 10_000 : null;
+  const lng = location ? Math.round(location.lng * 10_000) / 10_000 : null;
   return useQuery({
-    queryKey: availableKey,
-    queryFn: () => api.drivers.availableOrders(),
-    enabled,
+    queryKey: [...availableKey, lat, lng] as const,
+    queryFn: () => api.drivers.availableOrders({ lat: lat!, lng: lng! }),
+    enabled: enabled && lat !== null && lng !== null,
     refetchInterval: enabled ? refetchIntervalMs : false,
     refetchOnWindowFocus: enabled,
     staleTime: 0,

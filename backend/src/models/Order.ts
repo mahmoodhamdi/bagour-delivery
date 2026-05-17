@@ -429,8 +429,7 @@ const orderSchema = new Schema<IOrder>(
   }
 );
 
-// Indexes
-orderSchema.index({ orderNumber: 1 }, { unique: true });
+// Indexes — `orderNumber` declares `unique: true` at the field level.
 orderSchema.index({ customerId: 1 });
 orderSchema.index({ restaurantId: 1 });
 orderSchema.index({ driverId: 1 });

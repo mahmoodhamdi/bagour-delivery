@@ -1,14 +1,21 @@
 import type { MenuAddon, MenuItem, MenuOption } from "@bagour/types";
 
 export interface SelectedChoice {
+  /** Server-side variation ID (the option group). */
+  variationId?: string;
+  /** Server-side option ID within the variation. */
+  optionId?: string;
   optionName: string;
   choice: string;
   price: number;
 }
 
 export interface SelectedAddon {
+  /** Server-side addon ID — required to place the order. */
+  addonId?: string;
   name: string;
   price: number;
+  quantity?: number;
 }
 
 export interface CartItemBuilder {

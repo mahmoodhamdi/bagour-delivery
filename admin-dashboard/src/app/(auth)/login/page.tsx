@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import Cookies from 'js-cookie';
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore, type Admin } from '@/stores/auth';
 import { ROUTES, STORAGE_KEYS } from '@/config/constants';
 import { authApi, getErrorMessage } from '@/services/api';
 import { Button } from '@/components/ui/button';
@@ -63,14 +63,18 @@ export default function LoginPage() {
       const response = await authApi.login(data);
 
       if (response.success && response.data) {
-        const { accessToken, refreshToken, user, admin } = response.data;
+        const { accessToken, refreshToken, user, admin, profile } = response.data;
 
         // Save tokens
         Cookies.set(STORAGE_KEYS.accessToken, accessToken, { expires: 7 });
         Cookies.set(STORAGE_KEYS.refreshToken, refreshToken, { expires: 30 });
 
-        // Update store
-        setAuth(user, admin);
+        // Backend ships the role-specific record as `profile`; admin records
+        // are usually null since there's no separate Admin collection.
+        // Fall back to the user object so the dashboard always has someone
+        // to greet by name.
+        const adminRecord = admin ?? profile ?? (user as unknown as Admin);
+        setAuth(user, adminRecord);
 
         toast.success('تم تسجيل الدخول بنجاح');
         router.push(ROUTES.dashboard);

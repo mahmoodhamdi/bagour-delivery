@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { validate } from '../middleware/validate';
 import { authenticate, authorize } from '../middleware/auth';
+import { loadDriverProfile } from '../middleware/loadProfile';
 import { orderActionLimiter } from '../middleware/rateLimiter';
 import {
   updateProfileSchema,
@@ -26,9 +27,12 @@ import {
 
 const router = Router();
 
-// All routes require driver/delivery role authentication
+// All routes require driver/delivery role authentication.
+// `loadDriverProfile` resolves the Driver document so controllers can
+// rely on `req.driverId` instead of repeating the lookup.
 router.use(authenticate);
 router.use(authorize('driver', 'delivery'));
+router.use(loadDriverProfile);
 
 // ==================== Profile Routes ====================
 

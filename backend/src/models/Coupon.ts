@@ -181,8 +181,7 @@ const couponSchema = new Schema<ICoupon>(
   }
 );
 
-// Indexes
-couponSchema.index({ code: 1 }, { unique: true });
+// Indexes — `code` declares `unique: true` at the field level.
 couponSchema.index({ validFrom: 1, validUntil: 1 });
 couponSchema.index({ isActive: 1 });
 

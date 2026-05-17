@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAvailableOrders } from "@/lib/hooks/use-driver-orders";
 import { useDriverProfile } from "@/lib/hooks/use-driver";
+import { useCurrentPosition } from "@/lib/hooks/use-current-position";
 import { formatCurrency, formatTimeAgo } from "@/lib/format";
 
 import { AcceptOrderModal } from "./accept-order-modal";
@@ -24,7 +25,15 @@ export function AvailableOrdersFeed() {
   const isOnline = profile.data?.isOnline ?? false;
   const isApproved = profile.data?.status === "approved";
 
-  const { data, isLoading, isError } = useAvailableOrders({ enabled: isOnline && isApproved });
+  const geo = useCurrentPosition();
+  const location = geo.position
+    ? { lat: geo.position.latitude, lng: geo.position.longitude }
+    : null;
+
+  const { data, isLoading, isError } = useAvailableOrders({
+    enabled: isOnline && isApproved,
+    location,
+  });
 
   const [selected, setSelected] = useState<Order | null>(null);
   const orders = data ?? [];
@@ -38,6 +47,18 @@ export function AvailableOrdersFeed() {
         data-testid="orders-offline-hint"
       >
         {t("offlineHint")}
+      </div>
+    );
+  }
+  if (isOnline && !location && !geo.isLoading) {
+    return (
+      <div
+        role="alert"
+        className="flex items-start gap-2 rounded-2xl border border-amber-500/40 bg-amber-500/10 p-4 text-sm text-amber-900 dark:text-amber-200"
+        data-testid="orders-need-location"
+      >
+        <AlertTriangle aria-hidden className="size-4 mt-0.5" />
+        <span>{t("locationRequired")}</span>
       </div>
     );
   }

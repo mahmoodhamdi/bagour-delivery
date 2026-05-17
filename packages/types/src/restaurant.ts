@@ -65,18 +65,31 @@ export interface MenuCategory {
 }
 
 export interface MenuAddon {
+  /** Backend assigns this — required when referencing the addon on an order. */
+  id?: string;
   name: string;
   nameEn?: string;
   price: number;
   isAvailable: boolean;
+  /** Optional max quantity per addon, defaulting to 1 when omitted. */
+  maxQuantity?: number;
 }
 
 export interface MenuOption {
+  /** Backend assigns this — needed for the variation-on-order payload. */
+  id?: string;
   name: string;
   nameEn?: string;
   required: boolean;
   maxSelections: number;
-  choices: { name: string; nameEn?: string; price: number; isDefault?: boolean }[];
+  choices: {
+    /** Backend assigns this for each choice — needed for order variations. */
+    id?: string;
+    name: string;
+    nameEn?: string;
+    price: number;
+    isDefault?: boolean;
+  }[];
 }
 
 export interface MenuItem {

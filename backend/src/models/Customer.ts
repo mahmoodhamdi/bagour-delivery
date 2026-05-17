@@ -166,9 +166,8 @@ const customerSchema = new Schema<ICustomer>(
   }
 );
 
-// Indexes
-customerSchema.index({ userId: 1 }, { unique: true });
-customerSchema.index({ referralCode: 1 }, { unique: true });
+// Indexes — `userId` and `referralCode` already declare `unique: true`
+// at the field level, which is enough for Mongoose to create the indexes.
 customerSchema.index({ 'addresses.location': '2dsphere' });
 
 // Pre-save hook to generate referral code
