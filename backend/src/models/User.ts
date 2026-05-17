@@ -151,10 +151,9 @@ const userSchema = new Schema<IUser>(
   }
 );
 
-// Indexes
-userSchema.index({ email: 1 }, { unique: true });
-userSchema.index({ phone: 1 }, { unique: true, sparse: true });
-userSchema.index({ googleId: 1 }, { unique: true, sparse: true });
+// Indexes — `email`, `phone`, `googleId` already declare `unique: true` at
+// the field level so Mongoose creates those indexes automatically. The
+// remaining fields below need explicit, non-unique indexes for query speed.
 userSchema.index({ role: 1 });
 userSchema.index({ isActive: 1 });
 userSchema.index({ authProvider: 1 });

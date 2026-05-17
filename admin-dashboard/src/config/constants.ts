@@ -121,12 +121,21 @@ export const API_ENDPOINTS = {
 
   // Analytics
   analytics: '/admin/analytics',
-  dashboardStats: '/admin/analytics/dashboard',
-  revenueReport: '/admin/analytics/revenue',
+  // Backend exposes top-level dashboard summaries under `/admin/dashboard`,
+  // separate from the cross-section `/admin/analytics/*` endpoints.
+  dashboardStats: '/admin/dashboard/stats',
+  revenueReport: '/admin/dashboard/revenue-chart',
+  recentOrders: '/admin/dashboard/recent-orders',
+  topRestaurants: '/admin/dashboard/top-restaurants',
+  ordersAnalytics: '/admin/analytics/orders',
+  popularItems: '/admin/analytics/popular-items',
+  customerStats: '/admin/analytics/customers',
+  financialSummary: '/admin/analytics/financial',
 
   // Settings
   settings: '/admin/settings',
 
-  // Transactions
+  // Transactions — admin transactions are exposed via the transactions
+  // router mounted under `/admin/transactions`.
   transactions: '/admin/transactions',
 };

@@ -1,11 +1,20 @@
 import type { ApiResponse, Driver, DriverDocuments, Order, PaginatedResponse } from "@bagour/types";
 import type { AxiosInstance } from "axios";
 
+import { normalizePaginated, unwrap } from "./_shared";
+
 export interface UpdateLocationPayload {
   coordinates: [number, number]; // [lng, lat]
   heading?: number;
   speed?: number;
   accuracy?: number;
+}
+
+export interface AvailableOrdersQuery {
+  lat: number;
+  lng: number;
+  /** Search radius in km. */
+  maxDistance?: number;
 }
 
 export interface DriverStats {
@@ -65,25 +74,32 @@ export const driverEndpoints = (http: AxiosInstance) => ({
     return data.data;
   },
 
-  async availableOrders(): Promise<Order[]> {
-    const { data } = await http.get<ApiResponse<Order[]>>("/api/v1/driver/orders/available");
-    return data.data;
+  /**
+   * Driver dashboard's "available orders" feed. Backend requires the driver's
+   * current location to filter by distance; the UI should pass live geo from
+   * the browser Geolocation API.
+   */
+  async availableOrders(query: AvailableOrdersQuery): Promise<Order[]> {
+    const { data } = await http.get<ApiResponse<unknown>>("/api/v1/driver/orders/available", {
+      params: query,
+    });
+    const body = data.data;
+    if (Array.isArray(body)) return body as Order[];
+    return unwrap<Order[]>(body, "orders") ?? [];
   },
 
   async myOrders(
     query: { status?: string; page?: number; limit?: number } = {},
   ): Promise<PaginatedResponse<Order>> {
-    const { data } = await http.get<PaginatedResponse<Order>>("/api/v1/driver/orders", {
-      params: query,
-    });
-    return data;
+    const { data } = await http.get<unknown>("/api/v1/driver/orders", { params: query });
+    return normalizePaginated<Order>(data as never, query);
   },
 
   async acceptOrder(id: string): Promise<Order> {
-    const { data } = await http.put<ApiResponse<Order>>(
+    const { data } = await http.put<ApiResponse<unknown>>(
       `/api/v1/driver/orders/${encodeURIComponent(id)}/accept`,
     );
-    return data.data;
+    return unwrap<Order>(data.data, "order");
   },
 
   async rejectOrder(id: string, reason?: string): Promise<{ message: string }> {
@@ -94,26 +110,28 @@ export const driverEndpoints = (http: AxiosInstance) => ({
     return data.data;
   },
 
-  async markPickedUp(id: string): Promise<Order> {
-    const { data } = await http.put<ApiResponse<Order>>(
-      `/api/v1/driver/orders/${encodeURIComponent(id)}/pickup`,
+  async markPickedUp(id: string, note?: string): Promise<Order> {
+    const { data } = await http.put<ApiResponse<unknown>>(
+      `/api/v1/driver/orders/${encodeURIComponent(id)}/picked-up`,
+      note ? { note } : {},
     );
-    return data.data;
+    return unwrap<Order>(data.data, "order");
   },
 
-  async markOnTheWay(id: string): Promise<Order> {
-    const { data } = await http.put<ApiResponse<Order>>(
+  async markOnTheWay(id: string, note?: string): Promise<Order> {
+    const { data } = await http.put<ApiResponse<unknown>>(
       `/api/v1/driver/orders/${encodeURIComponent(id)}/on-the-way`,
+      note ? { note } : {},
     );
-    return data.data;
+    return unwrap<Order>(data.data, "order");
   },
 
   async markDelivered(id: string, payload?: { proofUrl?: string; note?: string }): Promise<Order> {
-    const { data } = await http.put<ApiResponse<Order>>(
+    const { data } = await http.put<ApiResponse<unknown>>(
       `/api/v1/driver/orders/${encodeURIComponent(id)}/delivered`,
       payload ?? {},
     );
-    return data.data;
+    return unwrap<Order>(data.data, "order");
   },
 });
 

@@ -140,8 +140,7 @@ const transactionSchema = new Schema<ITransaction>(
   }
 );
 
-// Indexes
-transactionSchema.index({ transactionNumber: 1 }, { unique: true });
+// Indexes — `transactionNumber` declares `unique: true` at the field level.
 transactionSchema.index({ orderId: 1 });
 transactionSchema.index({ type: 1 });
 transactionSchema.index({ status: 1 });

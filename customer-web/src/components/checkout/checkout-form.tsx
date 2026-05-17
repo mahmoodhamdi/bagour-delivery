@@ -52,6 +52,7 @@ export function CheckoutForm() {
     resolver: zodResolver(checkoutFormSchema),
     defaultValues: {
       addressId: "",
+      phone: "",
       paymentMethod: "cash",
       notes: "",
       deliveryInstructions: "",
@@ -107,21 +108,45 @@ export function CheckoutForm() {
       return;
     }
 
+    const address = addressesQuery.data?.find((a) => a.id === values.addressId);
+    if (!address) {
+      setServerError(t("Checkout.errors.addressRequired"));
+      return;
+    }
+    const coords = address.location?.coordinates;
+    if (!coords) {
+      setServerError(t("Checkout.errors.addressMissingCoordinates"));
+      return;
+    }
+
     const payload: CreateOrderPayload = {
       restaurantId,
       items: lines.map((l) => ({
         menuItemId: l.menuItemId,
         quantity: l.quantity,
-        addons: l.addons,
-        options: l.options,
+        addons: l.selectedAddons,
+        variations: l.selectedVariations,
         specialInstructions: l.specialInstructions,
       })),
-      addressId: values.addressId,
+      deliveryAddress: {
+        name: address.label ?? address.street ?? t("Checkout.defaultAddressLabel"),
+        address: address.street,
+        area: address.area,
+        city: address.city,
+        building: address.buildingNumber,
+        floor: address.floor,
+        apartment: address.apartment,
+        landmark: address.landmark,
+        // Backend requires a phone — fall back to the user's profile phone if
+        // the address didn't capture one explicitly.
+        phone: values.phone,
+        coordinates: coords,
+      },
       paymentMethod: values.paymentMethod,
       couponCode: coupon?.isValid ? values.couponCode : undefined,
-      notes: values.notes ?? undefined,
-      deliveryInstructions: values.deliveryInstructions ?? undefined,
-      tip: values.tip ?? 0,
+      customerNotes: [values.notes, values.deliveryInstructions]
+        .filter(Boolean)
+        .join("\n") || undefined,
     };
 
     try {
@@ -218,6 +243,32 @@ export function CheckoutForm() {
                 <FormMessage>
                   {form.formState.errors.addressId?.message
                     ? t(form.formState.errors.addressId.message as never)
+                    : null}
+                </FormMessage>
+              </FormItem>
+            )}
+          />
+
+          {/* Contact phone — required by backend */}
+          <FormField
+            control={form.control}
+            name="phone"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-base font-bold">{t("Checkout.phone")}</FormLabel>
+                <FormControl>
+                  <Input
+                    type="tel"
+                    inputMode="tel"
+                    placeholder="01XXXXXXXXX"
+                    autoComplete="tel"
+                    data-testid="checkout-phone"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage>
+                  {form.formState.errors.phone?.message
+                    ? t(form.formState.errors.phone.message as never)
                     : null}
                 </FormMessage>
               </FormItem>

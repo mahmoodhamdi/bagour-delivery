@@ -7,6 +7,8 @@ import type {
 } from "@bagour/types";
 import type { AxiosInstance } from "axios";
 
+import { normalizePaginated, unwrap } from "./_shared";
+
 export interface RestaurantSearchQuery {
   q?: string;
   cuisine?: string;
@@ -34,47 +36,38 @@ export interface RestaurantMenuResponse {
 
 export const restaurantEndpoints = (http: AxiosInstance) => ({
   async search(query: RestaurantSearchQuery = {}): Promise<PaginatedResponse<Restaurant>> {
-    const { data } = await http.get<Partial<PaginatedResponse<Restaurant>>>(
-      "/api/v1/restaurants",
-      { params: query },
-    );
-    // Some deployments of the backend return a flat `{success, data: T[]}` without
-    // pagination metadata. Synthesize sensible defaults so callers can rely on
-    // `data.pagination.hasNextPage` without crashing.
-    const items = (data.data ?? []) as Restaurant[];
-    const page = query.page ?? 1;
-    const limit = query.limit ?? items.length;
-    return {
-      success: data.success ?? true,
-      data: items,
-      pagination: data.pagination ?? {
-        page,
-        limit,
-        total: items.length,
-        totalPages: 1,
-        hasNextPage: false,
-        hasPrevPage: page > 1,
-      },
-    };
+    const { data } = await http.get<unknown>("/api/v1/restaurants", { params: query });
+    return normalizePaginated<Restaurant>(data as never, query);
   },
 
   async featured(): Promise<Restaurant[]> {
-    const { data } = await http.get<ApiResponse<Restaurant[]>>("/api/v1/restaurants/featured");
-    return data.data;
+    const { data } = await http.get<ApiResponse<unknown>>("/api/v1/restaurants/featured");
+    const body = data.data;
+    if (Array.isArray(body)) return body as Restaurant[];
+    return unwrap<Restaurant[]>(body, "restaurants") ?? [];
   },
 
   async nearby(query: NearbyQuery): Promise<Restaurant[]> {
-    const { data } = await http.get<ApiResponse<Restaurant[]>>("/api/v1/restaurants/nearby", {
-      params: query,
+    // Backend expects `maxDistance` (km), client surface uses `radius` for clarity.
+    const params = {
+      lat: query.lat,
+      lng: query.lng,
+      maxDistance: query.radius,
+      limit: query.limit,
+    };
+    const { data } = await http.get<ApiResponse<unknown>>("/api/v1/restaurants/nearby", {
+      params,
     });
-    return data.data;
+    const body = data.data;
+    if (Array.isArray(body)) return body as Restaurant[];
+    return unwrap<Restaurant[]>(body, "restaurants") ?? [];
   },
 
   async bySlug(slug: string): Promise<Restaurant> {
-    const { data } = await http.get<ApiResponse<Restaurant>>(
+    const { data } = await http.get<ApiResponse<unknown>>(
       `/api/v1/restaurants/${encodeURIComponent(slug)}`,
     );
-    return data.data;
+    return unwrap<Restaurant>(data.data, "restaurant");
   },
 
   async menu(slug: string, options?: { categoryId?: string }): Promise<RestaurantMenuResponse> {

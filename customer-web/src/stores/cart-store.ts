@@ -6,6 +6,13 @@ import { createJSONStorage, persist, type PersistOptions } from "zustand/middlew
 export interface CartLine extends OrderItem {
   /** Stable id for this configured line so we can update / remove it. */
   lineId: string;
+  /**
+   * Backend-shaped addon selection — needed at checkout time. Mirrors the
+   * customer-visible `addons` array but with the server-side IDs.
+   */
+  selectedAddons?: { addonId: string; quantity: number }[];
+  /** Backend-shaped variation choices (mirrors `options`). */
+  selectedVariations?: { variationId: string; optionId: string }[];
 }
 
 interface CartState {
@@ -18,7 +25,15 @@ interface CartState {
 
 interface CartActions {
   addLine: (
-    args: { restaurantId: string; restaurantName: string; restaurantSlug: string; line: OrderItem },
+    args: {
+      restaurantId: string;
+      restaurantName: string;
+      restaurantSlug: string;
+      line: OrderItem & {
+        selectedAddons?: { addonId: string; quantity: number }[];
+        selectedVariations?: { variationId: string; optionId: string }[];
+      };
+    },
     options?: { confirmReplace?: () => boolean },
   ) => boolean;
   updateLineQuantity: (lineId: string, quantity: number) => void;

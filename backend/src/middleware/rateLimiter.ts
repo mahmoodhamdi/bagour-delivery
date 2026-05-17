@@ -69,9 +69,7 @@ export const authLimiter = rateLimit({
   handler: (_req, _res, next) => {
     next(new TooManyRequestsError('تجاوزت الحد المسموح من محاولات تسجيل الدخول. يرجى المحاولة بعد 15 دقيقة'));
   },
-  keyGenerator: (req) => {
-    return req.ip || 'unknown';
-  },
+  keyGenerator: (req) => ipKeyGenerator(req.ip || '') || 'unknown',
 });
 
 /**
@@ -103,7 +101,5 @@ export const otpLimiter = rateLimit({
   handler: (_req, _res, next) => {
     next(new TooManyRequestsError('تجاوزت الحد المسموح من طلبات كود التحقق. يرجى المحاولة بعد 10 دقائق'));
   },
-  keyGenerator: (req) => {
-    return req.ip || 'unknown';
-  },
+  keyGenerator: (req) => ipKeyGenerator(req.ip || '') || 'unknown',
 });

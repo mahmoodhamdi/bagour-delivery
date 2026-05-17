@@ -54,8 +54,7 @@ const settingSchema = new Schema<ISetting>(
   }
 );
 
-// Index
-settingSchema.index({ key: 1 }, { unique: true });
+// Index — `key` declares `unique: true` at the field level.
 settingSchema.index({ isPublic: 1 });
 
 // Static method to get setting value by key

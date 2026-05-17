@@ -287,14 +287,16 @@ const seedDatabase = async () => {
         approvedAt: new Date(),
         approvedBy: adminUser._id,
         isActive: true,
+        // 24/7 in development so demos and smoke tests work at any hour.
+        // Production seeds should narrow this to realistic shifts.
         workingHours: [
-          { day: 0, isOpen: true, shifts: [{ open: '09:00', close: '23:00' }] },
-          { day: 1, isOpen: true, shifts: [{ open: '09:00', close: '23:00' }] },
-          { day: 2, isOpen: true, shifts: [{ open: '09:00', close: '23:00' }] },
-          { day: 3, isOpen: true, shifts: [{ open: '09:00', close: '23:00' }] },
-          { day: 4, isOpen: true, shifts: [{ open: '09:00', close: '23:00' }] },
-          { day: 5, isOpen: true, shifts: [{ open: '12:00', close: '23:00' }] },
-          { day: 6, isOpen: true, shifts: [{ open: '09:00', close: '23:00' }] },
+          { day: 0, isOpen: true, shifts: [{ open: '00:00', close: '23:59' }] },
+          { day: 1, isOpen: true, shifts: [{ open: '00:00', close: '23:59' }] },
+          { day: 2, isOpen: true, shifts: [{ open: '00:00', close: '23:59' }] },
+          { day: 3, isOpen: true, shifts: [{ open: '00:00', close: '23:59' }] },
+          { day: 4, isOpen: true, shifts: [{ open: '00:00', close: '23:59' }] },
+          { day: 5, isOpen: true, shifts: [{ open: '00:00', close: '23:59' }] },
+          { day: 6, isOpen: true, shifts: [{ open: '00:00', close: '23:59' }] },
         ],
       });
 

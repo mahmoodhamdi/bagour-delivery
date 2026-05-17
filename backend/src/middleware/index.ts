@@ -4,3 +4,4 @@ export * from './notFound';
 export * from './validate';
 export * from './rateLimiter';
 export * from './sanitize';
+export * from './loadProfile';

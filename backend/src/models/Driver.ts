@@ -220,8 +220,7 @@ const driverSchema = new Schema<IDriver>(
   }
 );
 
-// Indexes
-driverSchema.index({ userId: 1 }, { unique: true });
+// Indexes — `userId` already declares `unique: true` at the field level.
 driverSchema.index({ currentLocation: '2dsphere' });
 driverSchema.index({ isOnline: 1, isAvailable: 1 });
 driverSchema.index({ isApproved: 1, isActive: 1 });

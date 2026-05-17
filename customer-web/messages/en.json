@@ -80,6 +80,8 @@
     "deliverTo": "Deliver to",
     "noAddresses": "Add an address first.",
     "addAddress": "Add new address",
+    "defaultAddressLabel": "Home",
+    "phone": "Contact phone",
     "payment": "Payment",
     "payCash": "Cash on delivery",
     "payCard": "Credit card (Paymob)",
@@ -94,8 +96,10 @@
     "disclaimer": "By placing your order you accept our terms of service.",
     "errors": {
       "addressRequired": "Pick a delivery address.",
+      "addressMissingCoordinates": "This address is missing a pinned location. Edit it and drop a pin first.",
       "cartEmpty": "Your cart is empty. Add items and try again.",
-      "couponInvalid": "Coupon isn't valid."
+      "couponInvalid": "Coupon isn't valid.",
+      "phoneInvalid": "Enter a valid Egyptian mobile number (e.g. 01XXXXXXXXX)."
     },
     "toasts": {
       "couponApplied": "Coupon applied!",

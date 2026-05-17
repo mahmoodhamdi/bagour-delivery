@@ -80,6 +80,8 @@
     "deliverTo": "نوصلك على",
     "noAddresses": "محتاج تضيف عنوان أولاً.",
     "addAddress": "ضيف عنوان جديد",
+    "defaultAddressLabel": "البيت",
+    "phone": "رقم الموبايل",
     "payment": "طريقة الدفع",
     "payCash": "كاش عند الاستلام",
     "payCard": "بطاقة ائتمان (Paymob)",
@@ -94,8 +96,10 @@
     "disclaimer": "بالنقر على تأكيد الطلب أنت موافق على شروط الخدمة.",
     "errors": {
       "addressRequired": "اختار عنوان التوصيل.",
+      "addressMissingCoordinates": "العنوان ده مش معاه إحداثيات. عدّله وحدد موقعك على الخريطة الأول.",
       "cartEmpty": "السلة فاضية. ضيف منتجات وارجع تاني.",
-      "couponInvalid": "الكوبون مش صالح."
+      "couponInvalid": "الكوبون مش صالح.",
+      "phoneInvalid": "أدخل رقم موبايل مصري صحيح (مثال: 01XXXXXXXXX)."
     },
     "toasts": {
       "couponApplied": "تم تطبيق الكوبون!",
