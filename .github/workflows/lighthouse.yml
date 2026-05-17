@@ -29,7 +29,7 @@ jobs:
     env:
       SERWIST_SUPPRESS_TURBOPACK_WARNING: "1"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup
       - name: Skip when app has no Lighthouse config yet
         id: gate
