@@ -69,7 +69,7 @@ jobs:
         run: pnpm test
       - name: Upload coverage artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-${{ github.run_id }}
           path: |
@@ -133,7 +133,7 @@ jobs:
         run: pnpm --filter ./${{ matrix.app }} test:e2e --project=${{ matrix.browser }}
       - name: Upload Playwright report
         if: always() && steps.gate.outputs.exists == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-${{ matrix.app }}-${{ matrix.browser }}-${{ github.run_id }}
           path: |
