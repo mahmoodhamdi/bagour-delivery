@@ -367,7 +367,7 @@ class AdminService {
         .sort(sort)
         .skip(skip)
         .limit(limit)
-        .populate('ownerId', 'name email phone'),
+        .populate('userId', 'name email phone'),
       Restaurant.countDocuments(query),
     ]);
 
@@ -382,7 +382,7 @@ class AdminService {
 
   async getRestaurantById(restaurantId: string): Promise<IRestaurant> {
     const restaurant = await Restaurant.findById(restaurantId)
-      .populate('ownerId', 'name email phone');
+      .populate('userId', 'name email phone');
 
     if (!restaurant) {
       throw new NotFoundError('المطعم غير موجود');

@@ -93,9 +93,8 @@ const payoutSchema = new Schema<IPayout>(
   }
 );
 
-// Indexes
+// Indexes — `reference` declares `unique: true` at the field level.
 payoutSchema.index({ restaurantId: 1, status: 1 });
-payoutSchema.index({ reference: 1 }, { unique: true });
 payoutSchema.index({ createdAt: -1 });
 payoutSchema.index({ status: 1, createdAt: -1 });
 

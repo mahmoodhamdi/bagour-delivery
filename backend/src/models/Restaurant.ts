@@ -174,7 +174,6 @@ const restaurantSchema = new Schema<IRestaurant>(
     categories: {
       type: [String],
       default: [],
-      index: true,
     },
     tags: {
       type: [String],
@@ -362,9 +361,9 @@ const restaurantSchema = new Schema<IRestaurant>(
   }
 );
 
-// Indexes
-restaurantSchema.index({ userId: 1 }, { unique: true });
-restaurantSchema.index({ slug: 1 }, { unique: true });
+// Indexes — `userId` and `slug` declare `unique: true` at the field level
+// so Mongoose creates those indexes automatically; the rest are query
+// accelerators.
 restaurantSchema.index({ location: '2dsphere' });
 restaurantSchema.index({ categories: 1 });
 restaurantSchema.index({ isApproved: 1, isActive: 1 });

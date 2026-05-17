@@ -116,8 +116,7 @@ const reviewSchema = new Schema<IReview>(
   }
 );
 
-// Indexes
-reviewSchema.index({ orderId: 1 }, { unique: true });
+// Indexes — `orderId` declares `unique: true` at the field level.
 reviewSchema.index({ restaurantId: 1 });
 reviewSchema.index({ customerId: 1 });
 reviewSchema.index({ createdAt: -1 });
