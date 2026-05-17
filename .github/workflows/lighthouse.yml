@@ -49,7 +49,7 @@ jobs:
         run: pnpm dlx @lhci/cli@0.14.x autorun
       - name: Upload Lighthouse reports
         if: always() && steps.gate.outputs.exists == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: lighthouse-${{ matrix.app }}-${{ github.run_id }}
           path: ${{ matrix.app }}/.lighthouseci
