@@ -47,7 +47,9 @@ export function LoginForm({ redirectTo = "/" }: LoginFormProps) {
     setServerError(null);
     try {
       const { user, tokens } = await api.auth.login(values);
-      if (user.role !== "driver") {
+      // Backend historically used "delivery" while newer code uses "driver".
+      // Accept both so seeded data and fresh registrations both work.
+      if (user.role !== "driver" && user.role !== "delivery") {
         setServerError(t("Auth.errors.notADriver"));
         return;
       }
