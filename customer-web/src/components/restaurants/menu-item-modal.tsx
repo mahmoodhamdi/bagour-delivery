@@ -65,14 +65,22 @@ function ModalBody({ item, restaurant, restaurantSlug, onClose }: ModalBodyProps
 
   const [quantity, setQuantity] = useState(1);
   const [addons, setAddons] = useState<SelectedAddon[]>([]);
-  const [options, setOptions] = useState<SelectedChoice[]>(() =>
-    item.options
-      .map((o) => {
-        const def = o.choices.find((c) => c.isDefault);
-        return def ? { optionName: o.name, choice: def.name, price: def.price } : null;
-      })
-      .filter((s): s is SelectedChoice => s !== null),
-  );
+  const [options, setOptions] = useState<SelectedChoice[]>(() => {
+    const initial: SelectedChoice[] = [];
+    for (const o of item.options) {
+      const def = o.choices.find((c) => c.isDefault);
+      if (def) {
+        initial.push({
+          variationId: o.id,
+          optionId: def.id,
+          optionName: o.name,
+          choice: def.name,
+          price: def.price,
+        });
+      }
+    }
+    return initial;
+  });
   const [instructions, setInstructions] = useState("");
 
   const name = locale === "ar" ? item.name : (item.nameEn ?? item.name);
@@ -80,18 +88,24 @@ function ModalBody({ item, restaurant, restaurantSlug, onClose }: ModalBodyProps
 
   const total = computeItemTotal({ menuItem: item, quantity, addons, options });
 
-  const toggleOption = (groupName: string, choiceName: string, price: number) => {
+  const toggleOption = (
+    groupName: string,
+    choiceName: string,
+    price: number,
+    variationId: string | undefined,
+    optionId: string | undefined,
+  ) => {
     setOptions((prev) => {
       const others = prev.filter((p) => p.optionName !== groupName);
-      return [...others, { optionName: groupName, choice: choiceName, price }];
+      return [...others, { variationId, optionId, optionName: groupName, choice: choiceName, price }];
     });
   };
 
-  const toggleAddon = (addonName: string, price: number) => {
+  const toggleAddon = (addonName: string, price: number, addonId: string | undefined) => {
     setAddons((prev) => {
       const exists = prev.find((a) => a.name === addonName);
       if (exists) return prev.filter((a) => a.name !== addonName);
-      return [...prev, { name: addonName, price }];
+      return [...prev, { addonId, name: addonName, price, quantity: 1 }];
     });
   };
 
@@ -116,8 +130,14 @@ function ModalBody({ item, restaurant, restaurantSlug, onClose }: ModalBodyProps
           price: item.price,
           discountPrice: item.discountPrice,
           image: item.image,
-          addons,
+          addons: addons.map((a) => ({ name: a.name, price: a.price })),
           options: options.map((o) => ({ name: o.optionName, choice: o.choice, price: o.price })),
+          selectedAddons: addons
+            .filter((a) => !!a.addonId)
+            .map((a) => ({ addonId: a.addonId!, quantity: a.quantity ?? 1 })),
+          selectedVariations: options
+            .filter((o) => o.variationId && o.optionId)
+            .map((o) => ({ variationId: o.variationId!, optionId: o.optionId! })),
           specialInstructions: instructions.trim() || undefined,
           itemTotal: total,
         },
@@ -195,7 +215,7 @@ function ModalBody({ item, restaurant, restaurantSlug, onClose }: ModalBodyProps
                               id={id}
                               name={group.name}
                               checked={selected}
-                              onChange={() => toggleOption(group.name, c.name, c.price)}
+                              onChange={() => toggleOption(group.name, c.name, c.price, group.id, c.id)}
                               className="size-4 accent-primary"
                               data-testid={`option-${group.name}-${c.name}`}
                             />
@@ -230,7 +250,7 @@ function ModalBody({ item, restaurant, restaurantSlug, onClose }: ModalBodyProps
                           type="checkbox"
                           checked={selected}
                           disabled={!a.isAvailable}
-                          onChange={() => toggleAddon(a.name, a.price)}
+                          onChange={() => toggleAddon(a.name, a.price, a.id)}
                           className="size-4 accent-primary"
                           data-testid={`addon-${a.name}`}
                         />
