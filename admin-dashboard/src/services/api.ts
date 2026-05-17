@@ -30,7 +30,13 @@ export interface User {
 
 export interface AuthResponse {
   user: User;
-  admin: Admin;
+  /**
+   * Backend ships the role-specific document as `profile` (null for admins).
+   * Kept as a top-level alias so the admin-dashboard's login flow doesn't
+   * need to know about the rename.
+   */
+  admin?: Admin | null;
+  profile?: Admin | null;
   accessToken: string;
   refreshToken: string;
 }
@@ -139,8 +145,17 @@ export const authApi = {
   },
 
   getProfile: async (): Promise<ApiResponse<{ user: User; admin: Admin }>> => {
-    const response = await api.get<ApiResponse<{ user: User; admin: Admin }>>('/admin/profile');
-    return response.data;
+    // Backend doesn't ship a dedicated `/admin/profile` route — `/auth/me`
+    // returns the same user record for every role. Map it into the shape
+    // existing call sites expect so we don't have to touch them.
+    const response = await api.get<ApiResponse<User>>('/auth/me');
+    const user = response.data.data;
+    return {
+      ...response.data,
+      data: user
+        ? { user, admin: user as unknown as Admin }
+        : undefined,
+    };
   },
 };
 
