@@ -37,6 +37,6 @@
     "@bagour/config-eslint": "workspace:*",
     "@bagour/config-tsconfig": "workspace:*",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.6"
+    "vitest": "^4.1.7"
   }
 }
