@@ -28,7 +28,7 @@ importers:
         version: link:../packages/types
       '@hookform/resolvers':
         specifier: ^5.2.2
-        version: 5.2.2(react-hook-form@7.75.0(react@19.2.6))
+        version: 5.2.2(react-hook-form@7.76.1(react@19.2.6))
       '@radix-ui/react-avatar':
         specifier: ^1.1.11
         version: 1.1.11(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -67,7 +67,7 @@ importers:
         version: 16.2.6(@babel/core@7.29.0)(@playwright/test@1.60.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       next-intl:
         specifier: ^4.12.0
-        version: 4.12.0(next@16.2.6(@babel/core@7.29.0)(@playwright/test@1.60.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(react@19.2.6)(typescript@6.0.3)
+        version: 4.12.0(next@16.2.6(@playwright/test@1.60.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(react@19.2.6)(typescript@6.0.3)
       next-themes:
         specifier: ^0.4.6
         version: 0.4.6(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -78,8 +78,8 @@ importers:
         specifier: 19.2.6
         version: 19.2.6(react@19.2.6)
       react-hook-form:
-        specifier: ^7.69.0
-        version: 7.75.0(react@19.2.6)
+        specifier: ^7.76.1
+        version: 7.76.1(react@19.2.6)
       serwist:
         specifier: ^9.0.11
         version: 9.5.11(browserslist@4.28.2)(typescript@6.0.3)
@@ -116,7 +116,7 @@ importers:
         version: 1.60.0
       '@serwist/next':
         specifier: ^9.0.11
-        version: 9.5.11(next@16.2.6(@babel/core@7.29.0)(@playwright/test@1.60.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(react@19.2.6)(typescript@6.0.3)
+        version: 9.5.11(next@16.2.6(@playwright/test@1.60.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(react@19.2.6)(typescript@6.0.3)
       '@tailwindcss/postcss':
         specifier: ^4
         version: 4.3.0
@@ -182,7 +182,7 @@ importers:
         version: link:../packages/types
       '@hookform/resolvers':
         specifier: ^5.2.2
-        version: 5.2.2(react-hook-form@7.75.0(react@19.2.6))
+        version: 5.2.2(react-hook-form@7.76.1(react@19.2.6))
       '@radix-ui/react-avatar':
         specifier: ^1.1.11
         version: 1.1.11(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -227,7 +227,7 @@ importers:
         version: 16.2.6(@babel/core@7.29.0)(@playwright/test@1.60.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       next-intl:
         specifier: ^4.12.0
-        version: 4.12.0(next@16.2.6(@babel/core@7.29.0)(@playwright/test@1.60.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(react@19.2.6)(typescript@6.0.3)
+        version: 4.12.0(next@16.2.6(@playwright/test@1.60.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(react@19.2.6)(typescript@6.0.3)
       next-themes:
         specifier: ^0.4.6
         version: 0.4.6(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -238,8 +238,8 @@ importers:
         specifier: 19.2.6
         version: 19.2.6(react@19.2.6)
       react-hook-form:
-        specifier: ^7.69.0
-        version: 7.75.0(react@19.2.6)
+        specifier: ^7.76.1
+        version: 7.76.1(react@19.2.6)
       serwist:
         specifier: ^9.0.11
         version: 9.5.11(browserslist@4.28.2)(typescript@6.0.3)
@@ -276,7 +276,7 @@ importers:
         version: 1.60.0
       '@serwist/next':
         specifier: ^9.0.11
-        version: 9.5.11(next@16.2.6(@babel/core@7.29.0)(@playwright/test@1.60.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(react@19.2.6)(typescript@6.0.3)
+        version: 9.5.11(next@16.2.6(@playwright/test@1.60.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(react@19.2.6)(typescript@6.0.3)
       '@tailwindcss/postcss':
         specifier: ^4
         version: 4.3.0
@@ -3791,8 +3791,8 @@ packages:
     peerDependencies:
       react: ^19.2.6
 
-  react-hook-form@7.75.0:
-    resolution: {integrity: sha512-Ovv94H+0p3sJ7B9B5QxPuCP1u8V/cHuVGyH55cSwodYDtoJwK+fqk3vjfIgSX59I2U/bU4z0nRJ9HMLpNiWEmw==}
+  react-hook-form@7.76.1:
+    resolution: {integrity: sha512-rYM7tPiWlu3nZchkR/ex7piyzui2vFPyaLnXnI/RnblB/L4qfMmyses8llJVtF1NpE9WBBsJlGtcSZzPCXW1qQ==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       react: ^16.8.0 || ^17 || ^18 || ^19
@@ -4858,10 +4858,10 @@ snapshots:
     dependencies:
       '@formatjs/fast-memoize': 3.1.5
 
-  '@hookform/resolvers@5.2.2(react-hook-form@7.75.0(react@19.2.6))':
+  '@hookform/resolvers@5.2.2(react-hook-form@7.76.1(react@19.2.6))':
     dependencies:
       '@standard-schema/utils': 0.3.0
-      react-hook-form: 7.75.0(react@19.2.6)
+      react-hook-form: 7.76.1(react@19.2.6)
 
   '@humanfs/core@0.19.2':
     dependencies:
@@ -5669,7 +5669,7 @@ snapshots:
     transitivePeerDependencies:
       - browserslist
 
-  '@serwist/next@9.5.11(next@16.2.6(@babel/core@7.29.0)(@playwright/test@1.60.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(react@19.2.6)(typescript@6.0.3)':
+  '@serwist/next@9.5.11(next@16.2.6(@playwright/test@1.60.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(react@19.2.6)(typescript@6.0.3)':
     dependencies:
       '@serwist/build': 9.5.11(browserslist@4.28.2)(typescript@6.0.3)
       '@serwist/utils': 9.5.11(browserslist@4.28.2)
@@ -6742,7 +6742,7 @@ snapshots:
       eslint: 10.3.0(jiti@2.7.0)
       eslint-import-resolver-node: 0.3.10
       eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0)(eslint@10.3.0(jiti@2.7.0))
-      eslint-plugin-import: 2.32.0(eslint@10.3.0(jiti@2.7.0))
+      eslint-plugin-import: 2.32.0(eslint-import-resolver-typescript@3.10.1)(eslint@10.3.0(jiti@2.7.0))
       eslint-plugin-jsx-a11y: 6.10.2(eslint@10.3.0(jiti@2.7.0))
       eslint-plugin-react: 7.37.5(eslint@10.3.0(jiti@2.7.0))
       eslint-plugin-react-hooks: 7.1.1(eslint@10.3.0(jiti@2.7.0))
@@ -6779,7 +6779,7 @@ snapshots:
       tinyglobby: 0.2.16
       unrs-resolver: 1.11.1
     optionalDependencies:
-      eslint-plugin-import: 2.32.0(eslint@10.3.0(jiti@2.7.0))
+      eslint-plugin-import: 2.32.0(eslint-import-resolver-typescript@3.10.1)(eslint@10.3.0(jiti@2.7.0))
     transitivePeerDependencies:
       - supports-color
 
@@ -6832,7 +6832,7 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-plugin-import@2.32.0(eslint@10.3.0(jiti@2.7.0)):
+  eslint-plugin-import@2.32.0(eslint-import-resolver-typescript@3.10.1)(eslint@10.3.0(jiti@2.7.0)):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.9
@@ -7736,7 +7736,7 @@ snapshots:
 
   next-intl-swc-plugin-extractor@4.12.0: {}
 
-  next-intl@4.12.0(next@16.2.6(@babel/core@7.29.0)(@playwright/test@1.60.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(react@19.2.6)(typescript@6.0.3):
+  next-intl@4.12.0(next@16.2.6(@playwright/test@1.60.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(react@19.2.6)(typescript@6.0.3):
     dependencies:
       '@formatjs/intl-localematcher': 0.8.7
       '@parcel/watcher': 2.5.6
@@ -7957,7 +7957,7 @@ snapshots:
       react: 19.2.6
       scheduler: 0.27.0
 
-  react-hook-form@7.75.0(react@19.2.6):
+  react-hook-form@7.76.1(react@19.2.6):
     dependencies:
       react: 19.2.6
 
