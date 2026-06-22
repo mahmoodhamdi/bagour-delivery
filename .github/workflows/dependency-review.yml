@@ -18,7 +18,7 @@ jobs:
     # Once enabled, flip this to `false` to make the gate enforceable.
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/dependency-review-action@v5
         with:
           fail-on-severity: high
