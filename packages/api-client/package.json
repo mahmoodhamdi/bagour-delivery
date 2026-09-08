@@ -40,7 +40,7 @@
     "@bagour/config-tsconfig": "workspace:*",
     "msw": "^2.7.0",
     "typescript": "^6.0.3",
-    "vite": "^7",
+    "vite": "^8",
     "vitest": "^4.1.6"
   }
 }
